@@ -1,4 +1,14 @@
-import { mysqlTable, serial, varchar, mysqlEnum, uniqueIndex } from 'drizzle-orm/mysql-core';
+import {
+  mysqlTable,
+  serial,
+  varchar,
+  mysqlEnum,
+  uniqueIndex,
+  index,
+  int,
+  bigint,
+  tinyint,
+} from 'drizzle-orm/mysql-core';
 
 export const cities = mysqlTable('cities', {
   id: serial('id').primaryKey().notNull(),
@@ -19,7 +29,31 @@ export const countries = mysqlTable(
   }
 );
 
-export const users = mysqlTable('users', {
-  id: serial('id').primaryKey().notNull(),
-  name: varchar('name', { length: 255 }).notNull(),
-});
+export const orders = mysqlTable(
+  'orders',
+  {
+    id: serial('id').primaryKey().notNull(),
+    orderNumber: int('orderNumber').notNull(),
+    userId: bigint('userId', { mode: 'number' }).notNull(),
+  },
+  (table) => {
+    return {
+      userIdIdx: index('userId_idx').on(table.userId),
+    };
+  }
+);
+
+export const users = mysqlTable(
+  'users',
+  {
+    id: serial('id').primaryKey().notNull(),
+    name: varchar('name', { length: 255 }).notNull(),
+    age: tinyint('age').notNull(),
+  },
+  (table) => {
+    return {
+      ageIdx: index('age_idx').on(table.age),
+      nameIdx: index('name_idx').on(table.name),
+    };
+  }
+);

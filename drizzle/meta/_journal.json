@@ -15,6 +15,13 @@
       "when": 1686938959423,
       "tag": "0001_sour_bruce_banner",
       "breakpoints": false
+    },
+    {
+      "idx": 2,
+      "version": "5",
+      "when": 1686946465267,
+      "tag": "0002_redundant_sabra",
+      "breakpoints": false
     }
   ]
 }
