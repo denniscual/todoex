@@ -1,12 +1,15 @@
 import '../globals.css';
 import NavLink from '@/components/nav-link';
-import { UserButton } from '@clerk/nextjs';
+import { UserButton, auth } from '@clerk/nextjs';
 
 export const metadata = {
   title: 'Dashboard',
 };
 
 export default async function DashboardLayout({ children }: { children: React.ReactNode }) {
+  console.log({
+    auth: auth(),
+  });
   return (
     <div className="flex flex-col h-full">
       <header className="basis-[70px] border-b border-slate-900/10 px-4">
@@ -25,7 +28,9 @@ export default async function DashboardLayout({ children }: { children: React.Re
               User 2
             </NavLink>
           </div>
-          <div className="ml-auto">User button</div>
+          <div className="ml-auto">
+            <UserButton afterSignOutUrl="http://localhost:3000/sign-in" />
+          </div>
         </nav>
       </header>
       <main className="flex-1 px-4 py-10 border-b border-slate-900/10">
