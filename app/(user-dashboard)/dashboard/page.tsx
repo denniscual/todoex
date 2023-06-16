@@ -1,16 +1,11 @@
 import { Suspense } from 'react';
 import DashboardContent from './_dashboard-content';
-import Client from './client';
-import { auth, currentUser } from '@clerk/nextjs';
 
 export default async function Dashboard() {
-  console.log('server current user', await currentUser());
-  console.log('server auth', auth());
   return (
     <div className="space-y-7">
       <h1 className="font-semibold">Dashboard</h1>
       <div className="space-y-5">
-        <Client />
         <DashboardContent>
           <Suspense fallback={<div>Loading...</div>}>
             {/* @ts-expect-error Async React Component */}
