@@ -1,3 +1,5 @@
+export const runtime = 'edge';
+
 export default async function Dashboard() {
   return (
     <div className="space-y-7">
