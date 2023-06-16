@@ -1,11 +1,4 @@
-import {
-  mysqlTable,
-  AnyMySqlColumn,
-  serial,
-  varchar,
-  mysqlEnum,
-  uniqueIndex,
-} from 'drizzle-orm/mysql-core';
+import { mysqlTable, serial, varchar, mysqlEnum, uniqueIndex } from 'drizzle-orm/mysql-core';
 
 export const cities = mysqlTable('cities', {
   id: serial('id').primaryKey().notNull(),
