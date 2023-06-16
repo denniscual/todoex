@@ -29,7 +29,7 @@ export default async function DashboardLayout({ children }: { children: React.Re
             </NavLink>
           </div>
           <div className="ml-auto">
-            <UserButton afterSignOutUrl="http://localhost:3000/sign-in" />
+            <UserButton afterSignOutUrl={`${process.env.NEXT_PUBLIC_HOST}/sign-in`} />
           </div>
         </nav>
       </header>
