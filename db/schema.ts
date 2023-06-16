@@ -1,3 +1,4 @@
+import { InferColumnsDataTypes } from 'drizzle-orm';
 import {
   mysqlTable,
   serial,
@@ -57,3 +58,5 @@ export const users = mysqlTable(
     };
   }
 );
+
+export type User = InferColumnsDataTypes<(typeof users)['$columns']>;
