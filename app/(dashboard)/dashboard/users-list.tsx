@@ -1,5 +1,5 @@
 'use client';
-import { useState } from 'react';
+import { useState, experimental_useEffectEvent as useEffectEvent } from 'react';
 
 export default function UsersList() {
   const [users, setUsers] = useState(['zion', 'irish', 'dennis']);
