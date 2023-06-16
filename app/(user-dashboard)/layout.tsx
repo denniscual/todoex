@@ -1,15 +1,12 @@
 import '../globals.css';
 import NavLink from '@/components/nav-link';
-import { UserButton, auth } from '@clerk/nextjs';
+import { UserButton } from '@clerk/nextjs';
 
 export const metadata = {
   title: 'Dashboard',
 };
 
 export default async function DashboardLayout({ children }: { children: React.ReactNode }) {
-  console.log({
-    auth: auth(),
-  });
   return (
     <div className="flex flex-col h-full">
       <header className="basis-[70px] border-b border-slate-900/10 px-4">
