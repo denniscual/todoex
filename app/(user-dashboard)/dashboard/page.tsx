@@ -1,3 +1,5 @@
+import '@/db';
+
 export const runtime = 'edge';
 
 export default async function Dashboard() {
