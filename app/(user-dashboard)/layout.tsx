@@ -3,7 +3,7 @@ import NavLink from '@/components/nav-link';
 import { UserButton } from '@clerk/nextjs';
 
 export const metadata = {
-  title: 'Dashboard',
+  title: 'Private',
 };
 
 export default async function DashboardLayout({ children }: { children: React.ReactNode }) {
@@ -18,11 +18,8 @@ export default async function DashboardLayout({ children }: { children: React.Re
             <NavLink className="text-sm" href="/dashboard">
               Dashboard
             </NavLink>
-            <NavLink className="text-sm" href="/dashboard/users/1">
-              User 1
-            </NavLink>
-            <NavLink className="text-sm" href="/dashboard/users/2">
-              User 2
+            <NavLink className="text-sm" href="/chat">
+              Chat
             </NavLink>
           </div>
           <div className="ml-auto">
