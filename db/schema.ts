@@ -6,8 +6,7 @@ export const task = mysqlTable('task', {
   userId: int('user_id').notNull(),
   title: varchar('title', { length: 255 }).notNull(),
   description: text('description'),
-  // you can use { mode: 'date' }, if you want to have Date as type for this column
-  dueDate: date('due_date', { mode: 'string' }),
+  dueDate: date('due_date', { mode: 'date' }),
   status: mysqlEnum('status', ['pending', 'completed']).default('pending'),
   createdAt: timestamp('created_at', { mode: 'string' }).defaultNow(),
   updatedAt: timestamp('updated_at', { mode: 'string' }).defaultNow().onUpdateNow(),
