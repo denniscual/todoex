@@ -1,6 +1,6 @@
 import { Configuration, OpenAIApi } from 'openai';
 import { NextResponse } from 'next/server';
-import { db, task, user } from '@/db';
+import { db, task } from '@/db';
 import { sql } from 'drizzle-orm';
 
 const configuration = new Configuration({
@@ -11,7 +11,8 @@ const model = new OpenAIApi(configuration);
 export async function POST(req: Request) {
   const { messages } = await req.json();
 
-  messages[0].content = `${messages[0].content}. The query should be for user id 1.`;
+  messages[0].content = `${messages[0].content}. The query should be for user id 1. When retrieving todo/s, make sure to include the todo id.
+   `;
 
   const response = await model.createChatCompletion({
     model: 'gpt-3.5-turbo-0613',
@@ -24,8 +25,30 @@ export async function POST(req: Request) {
 
   if (message?.function_call && message?.function_call.name && message.function_call.arguments) {
     const foundFunctions = functions[message.function_call.name];
-    const functionResponse = await foundFunctions(JSON.parse(message.function_call.arguments));
+    const functionArguments = JSON.parse(message.function_call.arguments);
 
+    // We want the user to manually delete the todo. Due to this, we need to ask the user if they are sure they want to delete the todo.
+    if (
+      message?.function_call.name === 'ask_database' &&
+      'action' in functionArguments &&
+      functionArguments.action === 'DELETE'
+    ) {
+      const response = await model.createChatCompletion({
+        model: 'gpt-3.5-turbo-0613',
+        messages: [
+          ...messages,
+          message,
+          {
+            role: 'user',
+            content:
+              'Ask the user first if they are sure they want to delete the todo. You question should formal.',
+          },
+        ],
+      });
+      return NextResponse.json(response?.data?.choices[0].message?.content);
+    }
+
+    const functionResponse = await foundFunctions(functionArguments);
     const response = await model.createChatCompletion({
       model: 'gpt-3.5-turbo-0613',
       messages: [
@@ -38,15 +61,7 @@ export async function POST(req: Request) {
         },
       ],
     });
-
-    const answer = response?.data?.choices[0].message;
-
-    // return NextResponse.json({
-    //   content: answer?.content,
-    //   data: functionResponse,
-    // });
-
-    return NextResponse.json(answer?.content);
+    return NextResponse.json(response?.data?.choices[0].message?.content);
   }
 
   return NextResponse.json(message?.content);
@@ -72,52 +87,39 @@ const functionsDefinitions: {
           The query should be returned in plain text, not in JSON. 
           `,
         },
+        action: {
+          type: 'string',
+          description: 'Provide the SQL action type. Example: SELECT, INSERT, UPDATE, DELETE',
+        },
       },
-      required: ['query'],
+      required: ['query', 'action'],
     },
   },
 ];
 
 const functions: Record<string, (args: any) => Promise<any>> = {
   ask_database,
-  create_user_task,
 };
 
-async function ask_database({ query }: { userId: string; query: string }) {
+async function ask_database({ query, action }: { query: string; action: string }) {
   console.log({
     query,
+    action,
   });
   const data = await db.execute(sql.raw(query));
   return JSON.stringify(data.rows);
 }
 
-async function create_user_task({
-  userId,
-  title,
-  description,
-}: {
-  userId: string;
-  title: string;
-  description: string;
-}) {
-  const newTask = {
-    userId: parseInt(userId),
-    title,
-    description,
-  };
-  await db.insert(task).values(newTask);
-  return JSON.stringify(newTask);
-}
-
 function createStringifyDbSchema() {
+  const taskColumns = Object.values(task).map((column) => ({
+    name: column.name,
+    type: column.getSQLType(),
+  }));
+
   const tables = [
     `Table (task):
    - table name (task),
-   - table columns (${Object.values(task).map((column) => column.name)})
-  `,
-    `Table (user):
-   - table name (user),
-   - table columns (${Object.values(task).map((column) => column.name)})
+   - table columns (${JSON.stringify(taskColumns)}})
   `,
   ];
 

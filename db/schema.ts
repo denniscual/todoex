@@ -1,3 +1,4 @@
+import 'server-only';
 import {
   mysqlTable,
   int,
@@ -8,7 +9,7 @@ import {
   mysqlEnum,
   timestamp,
 } from 'drizzle-orm/mysql-core';
-import { InferColumnsDataTypes } from 'drizzle-orm';
+import { InferModel } from 'drizzle-orm';
 
 export const task = mysqlTable(
   'task',
@@ -38,5 +39,5 @@ export const user = mysqlTable('user', {
   updatedAt: timestamp('updated_at', { mode: 'string' }).defaultNow().onUpdateNow(),
 });
 
-export type User = InferColumnsDataTypes<(typeof user)['$columns']>;
-export type Task = InferColumnsDataTypes<(typeof task)['$columns']>;
+export type User = InferModel<typeof user>;
+export type Task = InferModel<typeof task>;
