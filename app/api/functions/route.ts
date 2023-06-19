@@ -8,6 +8,12 @@ const configuration = new Configuration({
 });
 const model = new OpenAIApi(configuration);
 
+/**
+ * TODO:
+ *
+ * - fine tune the model to avoid doing destructive actions like dropping a table or moving a todo to another user. This is not good lol.
+ * - add project model to the database and associate it with the user and task models.
+ */
 export async function POST(req: Request) {
   const { messages } = await req.json();
 
@@ -26,6 +32,8 @@ export async function POST(req: Request) {
   if (message?.function_call && message?.function_call.name && message.function_call.arguments) {
     const foundFunctions = functions[message.function_call.name];
     const functionArguments = JSON.parse(message.function_call.arguments);
+
+    console.log(functionArguments);
 
     // We want the user to manually delete the todo. Due to this, we need to ask the user if they are sure they want to delete the todo.
     if (
