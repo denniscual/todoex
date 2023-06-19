@@ -1,7 +1,7 @@
 import { Configuration, OpenAIApi } from 'openai';
 import { NextResponse } from 'next/server';
-import { db, task } from '@/db';
-import { eq } from 'drizzle-orm';
+import { db, task, user } from '@/db';
+import { sql } from 'drizzle-orm';
 
 const configuration = new Configuration({
   apiKey: process.env.OPENAI_API_KEY,
@@ -10,6 +10,8 @@ const model = new OpenAIApi(configuration);
 
 export async function POST(req: Request) {
   const { messages } = await req.json();
+
+  messages[0].content = `${messages[0].content}. The query should be for user id 1.`;
 
   const response = await model.createChatCompletion({
     model: 'gpt-3.5-turbo-0613',
@@ -39,6 +41,11 @@ export async function POST(req: Request) {
 
     const answer = response?.data?.choices[0].message;
 
+    // return NextResponse.json({
+    //   content: answer?.content,
+    //   data: functionResponse,
+    // });
+
     return NextResponse.json(answer?.content);
   }
 
@@ -51,54 +58,37 @@ const functionsDefinitions: {
   parameters: object;
 }[] = [
   {
-    name: 'get_user_tasks',
-    description: 'Get the current tasks of a user.',
+    name: 'ask_database',
+    description: 'Use this function to do a SQL query on the database.',
     parameters: {
       type: 'object',
       properties: {
-        userId: {
+        query: {
           type: 'string',
-          description: 'The id of the user.',
+          description: `
+          SQL query extracting info to answer the user's question.
+          SQL should be written using this database schema:
+          ${createStringifyDbSchema()}
+          The query should be returned in plain text, not in JSON. 
+          `,
         },
       },
-      required: ['userId'],
-    },
-  },
-  {
-    name: 'create_user_task',
-    description: 'Create a task for a user',
-    parameters: {
-      type: 'object',
-      properties: {
-        userId: {
-          type: 'string',
-          description: 'The id of the user.',
-        },
-        title: {
-          type: 'string',
-          description: 'The title of the task.',
-        },
-        description: {
-          type: 'string',
-          description: 'Description of the task',
-        },
-      },
-      required: ['userId', 'title'],
+      required: ['query'],
     },
   },
 ];
 
 const functions: Record<string, (args: any) => Promise<any>> = {
-  get_user_tasks,
+  ask_database,
   create_user_task,
 };
 
-async function get_user_tasks({ userId }: { userId: string }) {
-  const tasks = await db
-    .select()
-    .from(task)
-    .where(eq(task.userId, parseInt(userId)));
-  return JSON.stringify(tasks);
+async function ask_database({ query }: { userId: string; query: string }) {
+  console.log({
+    query,
+  });
+  const data = await db.execute(sql.raw(query));
+  return JSON.stringify(data.rows);
 }
 
 async function create_user_task({
@@ -117,4 +107,19 @@ async function create_user_task({
   };
   await db.insert(task).values(newTask);
   return JSON.stringify(newTask);
+}
+
+function createStringifyDbSchema() {
+  const tables = [
+    `Table (task):
+   - table name (task),
+   - table columns (${Object.values(task).map((column) => column.name)})
+  `,
+    `Table (user):
+   - table name (user),
+   - table columns (${Object.values(task).map((column) => column.name)})
+  `,
+  ];
+
+  return tables.join(';');
 }
