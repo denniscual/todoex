@@ -8,6 +8,7 @@ import { Task } from '@/db';
 //   through server action. Instead of returing rsc, return an object with the messages
 //   and the rsc.
 export default function ChatForm({ tasks }: { tasks: Task[] }) {
+  console.log({ tasks });
   const [messages, setMessages] = useState<any[]>([]);
   const [isPending, startTransition] = useTransition();
   const [response, setResponse] = useState<any>(null);
@@ -19,25 +20,24 @@ export default function ChatForm({ tasks }: { tasks: Task[] }) {
           startTransition(() => action());
 
           async function action() {
-            try {
-              const _messages = [
-                ...messages,
-                {
-                  role: 'user',
-                  content: formData.get('chat'),
-                },
-              ];
-              const res = await generate(_messages);
-              setResponse(res);
-            } catch (err) {
-              console.error('There is an error in action: ', (err as Error).message);
-            }
+            const _messages = [
+              ...messages,
+              {
+                role: 'user',
+                content: formData.get('chat'),
+              },
+            ];
+            const res = await generate(_messages);
+            setResponse(res);
           }
         }}
         className="flex items-end gap-4"
       >
         <textarea cols={40} rows={5} className="w" placeholder="E.g Get my todos" name="chat" />
-        <button className="px-4 py-2 font-bold text-white bg-blue-500 rounded hover:bg-blue-700">
+        <button
+          disabled={isPending}
+          className="px-4 py-2 font-bold text-white bg-blue-500 rounded hover:bg-blue-700"
+        >
           Button
         </button>
         {isPending && <span>Loading...</span>}
