@@ -91,7 +91,7 @@ export async function generate(messages: any[]) {
       </div>
     );
   } catch (err) {
-    console.error(err);
+    throw err;
   }
 }
 
