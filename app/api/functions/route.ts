@@ -8,15 +8,6 @@ const configuration = new Configuration({
 });
 const model = new OpenAIApi(configuration);
 
-/**
- * TODO:
- *
- * - Increase or more fine tuning the model to avoid doing destructive actions like dropping a table or moving a todo to another user. I think
- *   for the fucntion that accepts a "SQL query", we can blacklist some SQL actions like DROP, DELETE, etc.
- * - the initial todos come from all the users. Make sure to only get the todos of the current user.
- * - use server actions for the chat.
- * - add project model to the database and associate it with the user and task models.
- */
 export async function POST(req: Request) {
   const { messages } = await req.json();
 

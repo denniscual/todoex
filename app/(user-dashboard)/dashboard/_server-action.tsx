@@ -2,20 +2,21 @@
 import { Configuration, OpenAIApi } from 'openai';
 import { db, task } from '@/db';
 import { sql, eq } from 'drizzle-orm';
+import { revalidatePath } from 'next/cache';
 
 const configuration = new Configuration({
   apiKey: process.env.OPENAI_API_KEY,
 });
 const model = new OpenAIApi(configuration);
 
-export async function fakeServerAction(data: any) {
-  return await new Promise((res) => {
-    setTimeout(() => {
-      res(<div>Hello world</div>);
-    }, 1500);
-  });
-}
-
+/**
+ * TODO:
+ * - fine tune the function "createStringifyDbSchema". Sometimes the ai can't understand the generated table name and columns names.
+ * - Increase or more fine tuning the model to avoid doing destructive actions like dropping a table or moving a todo to another user. I think
+ *   for the fucntion that accepts a "SQL query", we can blacklist some SQL actions like DROP, DELETE, etc.
+ * - the initial todos come from all the users. Make sure to only get the todos of the current user.
+ * - add project model to the database and associate it with the user and task models.
+ */
 export async function generate(messages: any[]) {
   try {
     // TODO: We can add this initial message in the frontend. The user id should be the current user.
@@ -45,16 +46,32 @@ export async function generate(messages: any[]) {
           const { result } = functionResponse as {
             result: any[];
           };
+          if (result.length === 0) {
+            return <div>I am sorry, but I could not find any todo list.</div>;
+          }
           return (
             <ul>
               {result.map((row, idx) => (
                 <li key={row.id}>
-                  <span className="font-medium">{idx + 1}.</span> Title: {row.title} - Status:{' '}
-                  {row.status}
+                  <span className="font-medium">{idx + 1}.</span> Title: {row.title}
                 </li>
               ))}
             </ul>
           );
+        }
+        case 'creating': {
+          const { message } = functionResponse as {
+            message: string;
+          };
+          revalidatePath('/new-todo-list');
+          return <div>{message}</div>;
+        }
+        case 'updating': {
+          const { message } = functionResponse as {
+            message: string;
+          };
+          revalidatePath('/new-todo-list');
+          return <div>{message}</div>;
         }
         // TODO:
         // handle this case. This will throw an error in the frontend.
@@ -83,14 +100,14 @@ export async function generate(messages: any[]) {
 /////////////////////////////////////////////
 function createStringifyDbSchema() {
   const taskColumns = Object.values(task).map((column) => ({
-    name: column.name,
-    type: column.getSQLType(),
+    columnName: column.name,
+    columnType: column.getSQLType(),
     isNull: !column.notNull,
   }));
 
   const tables = [
     `create table task (
-      table columns ${JSON.stringify(taskColumns)}"
+      table columns for table "task" ${JSON.stringify(taskColumns)}"
     )
   `,
   ];
@@ -118,6 +135,7 @@ const functionsDefinitions: {
           SQL query extracting info to answer the user's question.
           SQL should be written using this database schema:
           ${createStringifyDbSchema()}
+          Make sure to check the appended db schema.
           These are the tables name: ${tablesAllowedToOperate.join(', ')}.
           Use the name of the tables to do the SQL Search query.
           The query should be returned in plain text, not in JSON. 
@@ -145,8 +163,12 @@ const functionsDefinitions: {
           type: 'string',
           description: 'The description of the todo.',
         },
+        successMessage: {
+          type: 'string',
+          description: 'Provide the possible success message for the user.',
+        },
       },
-      required: ['title'],
+      required: ['title', 'successMessage'],
     },
   },
   {
@@ -179,6 +201,7 @@ const functionsDefinitions: {
           SQL query extracting info to answer the user's question.
           SQL should be written using this database schema:
           ${createStringifyDbSchema()}
+          Make sure to check the appended db schema.
           The query should be returned in plain text, not in JSON. 
           Make sure to use the data from todos or tasks when creating a SQL query. 
           `,
@@ -244,19 +267,40 @@ const functionsHandlers: Record<string, (args: any) => Promise<any>> = {
   dropping,
 };
 
-async function searching({ query }: { query: string; successMessage: string }) {
+async function searching({ query, successMessage }: { query: string; successMessage: string }) {
   const data = await db.execute(sql.raw(query));
   return {
+    message: successMessage,
     result: data.rows,
   };
 }
 
-async function creating(args: any) {
-  return args;
+async function creating({
+  title,
+  description,
+  successMessage,
+}: {
+  title: string;
+  description: string;
+  successMessage: string;
+}) {
+  await db.insert(task).values({
+    title,
+    description,
+    userId: 1,
+  });
+
+  return {
+    message: successMessage,
+  };
 }
 
-async function updating(args: any) {
-  return args;
+async function updating({ query, successMessage }: { query: string; successMessage: string }) {
+  console.log({ query });
+  await db.execute(sql.raw(query));
+  return {
+    message: successMessage,
+  };
 }
 
 async function deleting(args: any) {

@@ -1,8 +1,13 @@
 'use client';
 import { useState, useTransition } from 'react';
-import { generate, fakeServerAction } from './_server-action';
+import { generate } from './_server-action';
+import { Task } from '@/db';
 
-export default function TodoList2() {
+// TODO:
+// - need to append the new messages to create a chat. We can achieve this
+//   through server action. Instead of returing rsc, return an object with the messages
+//   and the rsc.
+export default function ChatForm({ tasks }: { tasks: Task[] }) {
   const [messages, setMessages] = useState<any[]>([]);
   const [isPending, startTransition] = useTransition();
   const [response, setResponse] = useState<any>(null);
@@ -29,9 +34,9 @@ export default function TodoList2() {
             }
           }
         }}
-        className="space-x-4"
+        className="flex items-end gap-4"
       >
-        <input className="w" placeholder="Get my todos" type="text" name="chat" />
+        <textarea cols={40} rows={5} className="w" placeholder="E.g Get my todos" name="chat" />
         <button className="px-4 py-2 font-bold text-white bg-blue-500 rounded hover:bg-blue-700">
           Button
         </button>

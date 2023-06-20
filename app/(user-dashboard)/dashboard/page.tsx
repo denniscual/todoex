@@ -1,20 +1,26 @@
-import { db, user } from '@/db';
-
-export const runtime = 'edge';
+import ChatForm from './_chat-form';
+import { getUserTasks } from '@/db';
 
 export default async function Dashboard() {
-  const allUsers = await db.select().from(user);
+  const tasks = await getUserTasks();
 
   return (
-    <div className="space-y-7">
-      <section className="space-y-4">
-        <h2 className="font-medium">Users</h2>
+    <div className="space-y-8">
+      <div>
+        <p className="mb-4 font-semibold">Todo List</p>
         <ul>
-          {allUsers.map((user) => (
-            <li key={user.id}>{user.username}</li>
+          {tasks.map((task, idx) => (
+            <li key={task.id}>
+              <span className="font-medium">{idx + 1}.</span> Title: {task.title} - Status:{' '}
+              {task.status}
+            </li>
           ))}
         </ul>
-      </section>
+      </div>
+      <div>
+        <p className="mb-4 font-semibold">Chat Form</p>
+        <ChatForm tasks={tasks} />
+      </div>
     </div>
   );
 }

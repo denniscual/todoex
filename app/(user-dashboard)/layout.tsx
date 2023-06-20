@@ -18,12 +18,6 @@ export default async function DashboardLayout({ children }: { children: React.Re
             <NavLink className="text-sm" href="/dashboard">
               Dashboard
             </NavLink>
-            <NavLink className="text-sm" href="/todo-list">
-              Todo List
-            </NavLink>
-            <NavLink className="text-sm" href="/chat">
-              Chat
-            </NavLink>
           </div>
           <div className="ml-auto">
             <UserButton afterSignOutUrl={`${process.env.NEXT_PUBLIC_HOST}/sign-in`} />
