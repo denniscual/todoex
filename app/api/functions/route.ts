@@ -1,7 +1,7 @@
 import { Configuration, OpenAIApi } from 'openai';
 import { NextResponse } from 'next/server';
 import { db, task } from '@/db';
-import { sql } from 'drizzle-orm';
+import { sql, eq } from 'drizzle-orm';
 
 const configuration = new Configuration({
   apiKey: process.env.OPENAI_API_KEY,
@@ -13,16 +13,18 @@ const model = new OpenAIApi(configuration);
  *
  * - Increase or more fine tuning the model to avoid doing destructive actions like dropping a table or moving a todo to another user. I think
  *   for the fucntion that accepts a "SQL query", we can blacklist some SQL actions like DROP, DELETE, etc.
+ * - the initial todos come from all the users. Make sure to only get the todos of the current user.
+ * - use server actions for the chat.
  * - add project model to the database and associate it with the user and task models.
  */
 export async function POST(req: Request) {
   const { messages } = await req.json();
 
-  // We can add this initial message in the frontend.
-  const userTodos = await db.select().from(task);
+  // TODO: We can add this initial message in the frontend. The user id should be the current user.
+  const userTodos = await db.select().from(task).where(eq(task.userId, 1));
   const initialMessage = {
     role: 'user',
-    content: `Here are the todos: ${JSON.stringify(userTodos)}`,
+    content: `Here are the current user todos: ${JSON.stringify(userTodos)}`,
   };
 
   const response = await model.createChatCompletion({
@@ -58,6 +60,25 @@ export async function POST(req: Request) {
 //////////////////////////////////////////////
 // Functions definitions
 /////////////////////////////////////////////
+function createStringifyDbSchema() {
+  const taskColumns = Object.values(task).map((column) => ({
+    name: column.name,
+    type: column.getSQLType(),
+    isNull: !column.notNull,
+  }));
+
+  const tables = [
+    `create table task (
+      table columns ${JSON.stringify(taskColumns)}"
+    )
+  `,
+  ];
+
+  return tables;
+}
+
+const tablesAllowedToOperate = ['task'];
+
 const functionsDefinitions: {
   name: string;
   description: string;
@@ -76,8 +97,9 @@ const functionsDefinitions: {
           SQL query extracting info to answer the user's question.
           SQL should be written using this database schema:
           ${createStringifyDbSchema()}
+          These are the tables name: ${tablesAllowedToOperate.join(', ')}.
+          Use the name of the tables to do the SQL Search query.
           The query should be returned in plain text, not in JSON. 
-          Make sure to use the data from todos or tasks when creating a SQL query. 
           `,
         },
         successMessage: {
@@ -202,10 +224,10 @@ const functionsHandlers: Record<string, (args: any) => Promise<any>> = {
 };
 
 async function searching({ query }: { query: string; successMessage: string }) {
-  console.log({ query });
-  return {};
-  // const data = await db.execute(sql.raw(query));
-  // return JSON.stringify(data.rows);
+  const data = await db.execute(sql.raw(query));
+  return {
+    result: JSON.stringify(data.rows),
+  };
 }
 
 async function creating(args: any) {
@@ -226,21 +248,4 @@ async function suggesting(args: any) {
 
 async function dropping(args: any) {
   return args;
-}
-
-function createStringifyDbSchema() {
-  const taskColumns = Object.values(task).map((column) => ({
-    name: column.name,
-    type: column.getSQLType(),
-    isNull: !column.notNull,
-  }));
-
-  const tables = [
-    `Table (task):
-   - table name (task),
-   - table columns (${JSON.stringify(taskColumns)}})
-  `,
-  ];
-
-  return tables.join(';');
 }
