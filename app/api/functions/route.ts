@@ -33,8 +33,6 @@ export async function POST(req: Request) {
     const foundFunctions = functions[message.function_call.name];
     const functionArguments = JSON.parse(message.function_call.arguments);
 
-    console.log(functionArguments);
-
     // We want the user to manually delete the todo. Due to this, we need to ask the user if they are sure they want to delete the todo.
     if (
       message?.function_call.name === 'ask_database' &&

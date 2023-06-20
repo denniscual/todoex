@@ -38,5 +38,5 @@ export default function TodoListPage() {
 }
 
 function replaceWithBr(content = '') {
-  return content.replace(/\\n/g, '<br />');
+  return content.replace(/\\n/g, '<br />').replace(/"/g, '');
 }
