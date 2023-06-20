@@ -6,6 +6,8 @@ export default function TodoListPage() {
     api: '/api/functions',
   });
 
+  // console.log(JSON.parse(messages[9].content));
+
   return (
     <div>
       <div className="flex flex-col w-full max-w-md py-24 mx-auto space-y-10 stretch">

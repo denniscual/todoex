@@ -11,18 +11,23 @@ const model = new OpenAIApi(configuration);
 /**
  * TODO:
  *
- * - fine tune the model to avoid doing destructive actions like dropping a table or moving a todo to another user. This is not good lol.
+ * - Increase or more fine tuning the model to avoid doing destructive actions like dropping a table or moving a todo to another user. I think
+ *   for the fucntion that accepts a "SQL query", we can blacklist some SQL actions like DROP, DELETE, etc.
  * - add project model to the database and associate it with the user and task models.
  */
 export async function POST(req: Request) {
   const { messages } = await req.json();
 
-  messages[0].content = `${messages[0].content}. The query should be for user id 1. When retrieving todo/s, make sure to include the todo id.
-   `;
+  // We can add this initial message in the frontend.
+  const userTodos = await db.select().from(task);
+  const initialMessage = {
+    role: 'user',
+    content: `Here are the todos: ${JSON.stringify(userTodos)}`,
+  };
 
   const response = await model.createChatCompletion({
     model: 'gpt-3.5-turbo-0613',
-    messages,
+    messages: [initialMessage, ...messages],
     functions: functionsDefinitions,
     function_call: 'auto',
   });
@@ -30,57 +35,38 @@ export async function POST(req: Request) {
   const message = response?.data?.choices?.[0]?.message;
 
   if (message?.function_call && message?.function_call.name && message.function_call.arguments) {
-    const foundFunctions = functions[message.function_call.name];
+    const foundFunctions = functionsHandlers[message.function_call.name];
     const functionArguments = JSON.parse(message.function_call.arguments);
-
-    // We want the user to manually delete the todo. Due to this, we need to ask the user if they are sure they want to delete the todo.
-    if (
-      message?.function_call.name === 'ask_database' &&
-      'action' in functionArguments &&
-      functionArguments.action === 'DELETE'
-    ) {
-      const response = await model.createChatCompletion({
-        model: 'gpt-3.5-turbo-0613',
-        messages: [
-          ...messages,
-          message,
-          {
-            role: 'user',
-            content:
-              'Ask the user first if they are sure they want to delete the todo. You question should formal.',
-          },
-        ],
-      });
-      return NextResponse.json(response?.data?.choices[0].message?.content);
-    }
-
     const functionResponse = await foundFunctions(functionArguments);
-    const response = await model.createChatCompletion({
-      model: 'gpt-3.5-turbo-0613',
-      messages: [
-        ...messages,
-        message,
-        {
-          role: 'function',
-          name: message.function_call.name,
-          content: functionResponse,
-        },
-      ],
+
+    console.log({
+      ...functionResponse,
+      functionName: message?.function_call.name,
     });
-    return NextResponse.json(response?.data?.choices[0].message?.content);
+
+    return NextResponse.json({
+      message: functionArguments.successMessage,
+      data: functionResponse,
+    });
   }
 
-  return NextResponse.json(message?.content);
+  return NextResponse.json({
+    message: `Apologies, but I am unable to undertand your request. If you have a specific question or need assistance with your todo list, please let me know and I'll be happy to help.`,
+  });
 }
 
+//////////////////////////////////////////////
+// Functions definitions
+/////////////////////////////////////////////
 const functionsDefinitions: {
   name: string;
   description: string;
   parameters: object;
 }[] = [
   {
-    name: 'ask_database',
-    description: 'Use this function to do a SQL query on the database.',
+    name: 'searching',
+    description:
+      'Use this function to do a SQL SEARCH or SQL update on the database. E.g querying or searching todos or updating todo. Or maybe doing filter.',
     parameters: {
       type: 'object',
       properties: {
@@ -91,35 +77,162 @@ const functionsDefinitions: {
           SQL should be written using this database schema:
           ${createStringifyDbSchema()}
           The query should be returned in plain text, not in JSON. 
+          Make sure to use the data from todos or tasks when creating a SQL query. 
           `,
         },
-        action: {
+        successMessage: {
           type: 'string',
-          description: 'Provide the SQL action type. Example: SELECT, INSERT, UPDATE, DELETE',
+          description: 'Provide the possible success message for the user.',
         },
       },
-      required: ['query', 'action'],
+      required: ['query', 'successMessage'],
+    },
+  },
+  {
+    name: 'creating',
+    description: 'Use this function to do a SQL INSERT on the database.',
+    parameters: {
+      type: 'object',
+      properties: {
+        title: {
+          type: 'string',
+          description: 'The title of the todo.',
+        },
+        description: {
+          type: 'string',
+          description: 'The description of the todo.',
+        },
+      },
+      required: ['title'],
+    },
+  },
+  {
+    name: 'suggesting',
+    description: 'Use this function to do a todos or tasks suggestion.',
+    parameters: {
+      type: 'object',
+      properties: {
+        title: {
+          type: 'string',
+          description: 'The title of the todo.',
+        },
+        description: {
+          type: 'string',
+          description: 'The description of the todo.',
+        },
+      },
+      required: ['title'],
+    },
+  },
+  {
+    name: 'updating',
+    description: `Use this function to do a SQL UPDATE on the database. E.g updating a todo or task, already done to a task, completing task, reopeining task, adding due date, etc. TAKE NOTE that this function will not move a task from other user.`,
+    parameters: {
+      type: 'object',
+      properties: {
+        query: {
+          type: 'string',
+          description: `
+          SQL query extracting info to answer the user's question.
+          SQL should be written using this database schema:
+          ${createStringifyDbSchema()}
+          The query should be returned in plain text, not in JSON. 
+          Make sure to use the data from todos or tasks when creating a SQL query. 
+          `,
+        },
+        successMessage: {
+          type: 'string',
+          description: 'Provide the possible success message for the user.',
+        },
+      },
+      required: ['query', 'successMessage'],
+    },
+  },
+  {
+    name: 'deleting',
+    description: `Use this function to do a SQL DELETE on the database. E.g deleting todo or task based on user input and criteria. TAKE NOTE that this function will not be used to DROP a table or database or a user.`,
+    parameters: {
+      type: 'object',
+      properties: {
+        query: {
+          type: 'string',
+          description: `
+          SQL query extracting info to answer the user's question.
+          SQL should be written using this database schema:
+          ${createStringifyDbSchema()}
+          The query should be returned in plain text, not in JSON. 
+          Make sure to use the data from todos or tasks when creating a SQL query. 
+          `,
+        },
+        successMessage: {
+          type: 'string',
+          description: 'Provide the possible success message for the user.',
+        },
+      },
+      required: ['query', 'successMessage'],
+    },
+  },
+  {
+    name: 'dropping',
+    description: 'Use this function for dropping or deleting or removing table or database.',
+    parameters: {
+      type: 'object',
+      properties: {
+        successMessage: {
+          type: 'string',
+          description:
+            'Dropping or deleting or removing is not allowed. Create a message for the user to inform them that dropping is not allowed.',
+        },
+      },
+      required: ['successMessage'],
     },
   },
 ];
 
-const functions: Record<string, (args: any) => Promise<any>> = {
-  ask_database,
+//////////////////////////////////////////////
+// Functions handlers
+/////////////////////////////////////////////
+const functionsHandlers: Record<string, (args: any) => Promise<any>> = {
+  searching,
+  creating,
+  updating,
+  deleting,
+  suggesting,
+  dropping,
 };
 
-async function ask_database({ query, action }: { query: string; action: string }) {
-  console.log({
-    query,
-    action,
-  });
-  const data = await db.execute(sql.raw(query));
-  return JSON.stringify(data.rows);
+async function searching({ query }: { query: string; successMessage: string }) {
+  console.log({ query });
+  return {};
+  // const data = await db.execute(sql.raw(query));
+  // return JSON.stringify(data.rows);
+}
+
+async function creating(args: any) {
+  return args;
+}
+
+async function updating(args: any) {
+  return args;
+}
+
+async function deleting(args: any) {
+  return args;
+}
+
+async function suggesting(args: any) {
+  return args;
+}
+
+async function dropping(args: any) {
+  return args;
 }
 
 function createStringifyDbSchema() {
   const taskColumns = Object.values(task).map((column) => ({
     name: column.name,
     type: column.getSQLType(),
+    isNull: !column.notNull,
   }));
 
   const tables = [
