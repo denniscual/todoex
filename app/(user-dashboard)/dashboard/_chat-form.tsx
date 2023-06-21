@@ -1,6 +1,6 @@
 'use client';
 import { useState, useTransition } from 'react';
-import { generate } from './_server-action';
+import { generate } from './_server-actions';
 import { Task } from '@/db';
 
 // TODO:
@@ -16,9 +16,8 @@ export default function ChatForm({ tasks }: { tasks: Task[] }) {
   return (
     <div className="space-y-8">
       <form
-        action={(formData) => {
+        action={async (formData) => {
           startTransition(() => action());
-
           async function action() {
             const _messages = [
               ...messages,
@@ -27,7 +26,7 @@ export default function ChatForm({ tasks }: { tasks: Task[] }) {
                 content: formData.get('chat'),
               },
             ];
-            const res = await generate(_messages);
+            const res = (await generate(_messages)) as any;
             setResponse(res);
           }
         }}

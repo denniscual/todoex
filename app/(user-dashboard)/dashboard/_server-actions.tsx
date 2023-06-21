@@ -76,6 +76,25 @@ export async function generate(messages: any[]) {
           revalidatePath('/new-todo-list');
           return <div>{message}</div>;
         }
+        case 'suggesting': {
+          const { title, description, areThereDetailsNeededFromTheUser } = functionResponse as {
+            title: string;
+            description: string;
+            areThereDetailsNeededFromTheUser: boolean;
+          };
+
+          if (areThereDetailsNeededFromTheUser) {
+            return <div>{description}</div>;
+          }
+
+          return (
+            <div>
+              <p>Ok, here is a suggestion:</p>
+              <p>Title: {title}</p>
+              <p>Description: {description}</p>
+            </div>
+          );
+        }
         // TODO:
         // handle this case. This will throw an error in the frontend.
         default: {
@@ -175,24 +194,6 @@ const functionsDefinitions: {
     },
   },
   {
-    name: 'suggesting',
-    description: 'Use this function to do a todos or tasks suggestion.',
-    parameters: {
-      type: 'object',
-      properties: {
-        title: {
-          type: 'string',
-          description: 'The title of the todo.',
-        },
-        description: {
-          type: 'string',
-          description: 'The description of the todo.',
-        },
-      },
-      required: ['title'],
-    },
-  },
-  {
     name: 'updating',
     description: `Use this function to do a SQL UPDATE on the database. E.g updating a todo or task, already done to a task, completing task, reopeining task, adding due date, etc. TAKE NOTE that this function will not move a task from other user.`,
     parameters: {
@@ -256,6 +257,29 @@ const functionsDefinitions: {
       required: ['successMessage'],
     },
   },
+  {
+    name: 'suggesting',
+    description:
+      'Use this function to do a todos or tasks suggestion. Give a meaningful suggestion to the user.',
+    parameters: {
+      type: 'object',
+      properties: {
+        title: {
+          type: 'string',
+          description: 'The title of the todo.',
+        },
+        description: {
+          type: 'string',
+          description: 'The description of the todo.',
+        },
+        areThereDetailsNeededFromTheUser: {
+          type: 'boolean',
+          description: 'A flag to indicate if there are details needed from the user.',
+        },
+      },
+      required: ['title', 'description', 'areThereDetailsNeededFromTheUser'],
+    },
+  },
 ];
 
 //////////////////////////////////////////////
@@ -310,10 +334,42 @@ async function deleting(args: any) {
   return args;
 }
 
-async function suggesting(args: any) {
+async function dropping(args: any) {
   return args;
 }
 
-async function dropping(args: any) {
-  return args;
+async function suggesting({
+  title,
+  description,
+  successMessage,
+  areThereDetailsNeededFromTheUser,
+}: {
+  title: string;
+  description: string;
+  successMessage: string;
+  areThereDetailsNeededFromTheUser: boolean;
+}) {
+  return {
+    message: successMessage,
+    title,
+    description,
+    areThereDetailsNeededFromTheUser,
+  };
+}
+
+export async function insertTaskById({
+  title,
+  description,
+  id,
+}: {
+  title: string;
+  description: string;
+  id: number;
+}) {
+  await db.insert(task).values({
+    title,
+    description,
+    userId: id,
+  });
+  revalidatePath('/dashboard');
 }
