@@ -11,10 +11,10 @@ const model = new OpenAIApi(configuration);
 
 /**
  * TODO:
+ * - the initial todos come from all the users. Make sure to only get the todos of the current user.
  * - fine tune the function "createStringifyDbSchema". Sometimes the ai can't understand the generated table name and columns names.
  * - Increase or more fine tuning the model to avoid doing destructive actions like dropping a table or moving a todo to another user. I think
  *   for the fucntion that accepts a "MySQL query", we can blacklist some MySQL actions like DROP, DELETE, etc.
- * - the initial todos come from all the users. Make sure to only get the todos of the current user.
  * - add function defintion for handling couting and aggregating result. Make sure to add good function description to this
  *   to distinguish this function to "seaching" function. I think we can use the same function `ask_database` and call the `createChatCompletion`
  *   to pass message with role: "function" and append the `functionResponse` as the content. We let openai to generate the result for us and parse it by RSC.
