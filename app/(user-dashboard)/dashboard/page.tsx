@@ -12,7 +12,7 @@ export default async function Dashboard() {
           {tasks.map((task, idx) => (
             <li key={task.id}>
               <span className="font-medium">{idx + 1}.</span> Title: {task.title} - Status:{' '}
-              {task.status}
+              {task.status} - Due date: {task.dueDate}
             </li>
           ))}
         </ul>

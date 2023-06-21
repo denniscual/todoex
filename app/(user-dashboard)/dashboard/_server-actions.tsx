@@ -13,7 +13,7 @@ const model = new OpenAIApi(configuration);
  * TODO:
  * - fine tune the function "createStringifyDbSchema". Sometimes the ai can't understand the generated table name and columns names.
  * - Increase or more fine tuning the model to avoid doing destructive actions like dropping a table or moving a todo to another user. I think
- *   for the fucntion that accepts a "SQL query", we can blacklist some SQL actions like DROP, DELETE, etc.
+ *   for the fucntion that accepts a "MySQL query", we can blacklist some MySQL actions like DROP, DELETE, etc.
  * - the initial todos come from all the users. Make sure to only get the todos of the current user.
  * - add function defintion for handling couting and aggregating result. Make sure to add good function description to this
  *   to distinguish this function to "seaching" function. I think we can use the same function `ask_database` and call the `createChatCompletion`
@@ -49,32 +49,47 @@ export async function generate(messages: any[]) {
           const { result } = functionResponse as {
             result: any[];
           };
+          const data: any = {
+            message: JSON.stringify(result),
+          };
+
           if (result.length === 0) {
-            return <div>I am sorry, but I could not find any todo list.</div>;
+            data.rsc = <div>I am sorry, but I could not find any todo list.</div>;
+          } else {
+            data.rsc = (
+              <ul>
+                {result.map((row, idx) => (
+                  <li key={row.id}>
+                    <span className="font-medium">{idx + 1}.</span> Title: {row.title}
+                  </li>
+                ))}
+              </ul>
+            );
           }
-          return (
-            <ul>
-              {result.map((row, idx) => (
-                <li key={row.id}>
-                  <span className="font-medium">{idx + 1}.</span> Title: {row.title}
-                </li>
-              ))}
-            </ul>
-          );
+
+          return data;
         }
         case 'creating': {
           const { message } = functionResponse as {
             message: string;
           };
           revalidatePath('/new-todo-list');
-          return <div>{message}</div>;
+
+          return {
+            message,
+            rsc: <div>{message}</div>,
+          };
         }
         case 'updating': {
           const { message } = functionResponse as {
             message: string;
           };
           revalidatePath('/new-todo-list');
-          return <div>{message}</div>;
+
+          return {
+            message,
+            rsc: <div>{message}</div>,
+          };
         }
         case 'suggesting': {
           const { title, description, areThereDetailsNeededFromTheUser } = functionResponse as {
@@ -82,18 +97,22 @@ export async function generate(messages: any[]) {
             description: string;
             areThereDetailsNeededFromTheUser: boolean;
           };
+          const data: any = {};
 
           if (areThereDetailsNeededFromTheUser) {
-            return <div>{description}</div>;
+            data.message = description;
+            data.rsc = <div>{description}</div>;
+          } else {
+            data.message = `Suggested todo: Title = ${title}; Description = ${description}.`;
+            data.rsc = (
+              <div>
+                <p>Ok, here is a suggestion:</p>
+                <p>Title: {title}</p>
+                <p>Description: {description}</p>
+              </div>
+            );
           }
-
-          return (
-            <div>
-              <p>Ok, here is a suggestion:</p>
-              <p>Title: {title}</p>
-              <p>Description: {description}</p>
-            </div>
-          );
+          return data;
         }
         // TODO:
         // handle this case. This will throw an error in the frontend.
@@ -106,12 +125,16 @@ export async function generate(messages: any[]) {
       }
     }
 
-    return (
-      <div>
-        Apologies, but I am unable to understand your request. If you have a specific question or
-        need assistance with your todo list, please let me know and I will be happy to help.
-      </div>
-    );
+    return {
+      message:
+        'Apologies, but I am unable to understand your request. If you have a specific question or need assistance with your todo list, please let me know and I will be happy to help.',
+      rsc: (
+        <div>
+          Apologies, but I am unable to understand your request. If you have a specific question or
+          need assistance with your todo list, please let me know and I will be happy to help.
+        </div>
+      ),
+    };
   } catch (err) {
     throw err;
   }
@@ -137,7 +160,7 @@ function createStringifyDbSchema() {
   return tables;
 }
 
-const tablesAllowedToOperate = ['task'];
+const tablesAllowedToOperate = ['"task"'];
 
 const functionsDefinitions: {
   name: string;
@@ -147,19 +170,19 @@ const functionsDefinitions: {
   {
     name: 'searching',
     description:
-      'Use this function to do a SQL SEARCH or SQL update on the database. E.g querying or searching todos or updating todo. Or maybe doing filter.',
+      'Use this function to do a MySQL SEARCH or MySQL update on the database. E.g querying or searching todos or updating todo. Or maybe doing filter.',
     parameters: {
       type: 'object',
       properties: {
         query: {
           type: 'string',
           description: `
-          SQL query extracting info to answer the user's question.
-          SQL should be written using this database schema:
+          MySQL query extracting info to answer the user's question.
+          MySQL should be written using this database schema:
           ${createStringifyDbSchema()}
           Make sure to check the appended db schema.
           These are the tables name: ${tablesAllowedToOperate.join(', ')}.
-          Use the name of the tables to do the SQL Search query.
+          Use the name of the tables to do the MySQL Search query.
           The query should be returned in plain text, not in JSON. 
           `,
         },
@@ -173,7 +196,7 @@ const functionsDefinitions: {
   },
   {
     name: 'creating',
-    description: 'Use this function to do a SQL INSERT on the database.',
+    description: 'Use this function to do a MySQL INSERT on the database.',
     parameters: {
       type: 'object',
       properties: {
@@ -195,19 +218,19 @@ const functionsDefinitions: {
   },
   {
     name: 'updating',
-    description: `Use this function to do a SQL UPDATE on the database. E.g updating a todo or task, already done to a task, completing task, reopeining task, adding due date, etc. TAKE NOTE that this function will not move a task from other user.`,
+    description: `Use this function to do a MySQL UPDATE on the database. E.g updating a todo or task, already done to a task, completing task, reopeining task, adding due date, etc. TAKE NOTE that this function will not move a task from other user.`,
     parameters: {
       type: 'object',
       properties: {
         query: {
           type: 'string',
           description: `
-          SQL query extracting info to answer the user's question.
-          SQL should be written using this database schema:
+          MySQL query extracting info to answer the user's question.
+          MySQL should be written using this database schema:
           ${createStringifyDbSchema()}
           Make sure to check the appended db schema.
           The query should be returned in plain text, not in JSON. 
-          Make sure to use the data from todos or tasks when creating a SQL query. 
+          Make sure to use the data from todos or tasks when creating a MySQL query. 
           `,
         },
         successMessage: {
@@ -220,18 +243,18 @@ const functionsDefinitions: {
   },
   {
     name: 'deleting',
-    description: `Use this function to do a SQL DELETE on the database. E.g deleting todo or task based on user input and criteria. TAKE NOTE that this function will not be used to DROP a table or database or a user.`,
+    description: `Use this function to do a MySQL DELETE on the database. E.g deleting todo or task based on user input and criteria. TAKE NOTE that this function will not be used to DROP a table or database or a user.`,
     parameters: {
       type: 'object',
       properties: {
         query: {
           type: 'string',
           description: `
-          SQL query extracting info to answer the user's question.
-          SQL should be written using this database schema:
+          MySQL query extracting info to answer the user's question.
+          MySQL should be written using this database schema:
           ${createStringifyDbSchema()}
           The query should be returned in plain text, not in JSON. 
-          Make sure to use the data from todos or tasks when creating a SQL query. 
+          Make sure to use the data from todos or tasks when creating a MySQL query. 
           `,
         },
         successMessage: {
