@@ -1,4 +1,3 @@
-import 'server-only';
 import {
   mysqlTable,
   int,
@@ -31,10 +30,11 @@ export const task = mysqlTable(
 );
 
 export const user = mysqlTable('user', {
-  id: int('id').autoincrement().primaryKey().notNull(),
+  id: varchar('id', { length: 50 }).primaryKey().notNull(),
   username: varchar('username', { length: 50 }).notNull(),
-  email: varchar('email', { length: 255 }).notNull(),
-  password: varchar('password', { length: 255 }).notNull(),
+  firstName: varchar('first_name', { length: 255 }),
+  lastName: varchar('last_name', { length: 255 }),
+  emailAddress: varchar('email_address', { length: 255 }).notNull(),
   createdAt: timestamp('created_at', { mode: 'string' }).defaultNow(),
   updatedAt: timestamp('updated_at', { mode: 'string' }).defaultNow().onUpdateNow(),
 });
