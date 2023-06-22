@@ -2,6 +2,7 @@ import { IncomingHttpHeaders } from 'http';
 import { headers } from 'next/headers';
 import { NextResponse } from 'next/server';
 import { Webhook, WebhookRequiredHeaders } from 'svix';
+import { upsertUser, User } from '@/db';
 
 const webhookSecret = process.env.WEBHOOK_SECRET || '';
 
@@ -32,41 +33,69 @@ export async function POST(request: Request) {
   const payload = await request.json();
 
   const webhook = new Webhook(webhookSecret);
-  let evt: Event | null = null;
+  let event: Event | null = null;
   try {
-    evt = webhook.verify(
+    event = webhook.verify(
       JSON.stringify(payload),
       svixHeaders as IncomingHttpHeaders & WebhookRequiredHeaders
     ) as Event;
   } catch (err) {
     console.error((err as Error).message);
-    return NextResponse.json({}, { status: 400 });
+    return NextResponse.json(
+      {
+        message: 'Error verifying webhooks.',
+      },
+      { status: 400 }
+    );
   }
 
-  const { id } = evt.data;
-  const eventType: EventType = evt.type;
-  console.log('Event type:', eventType);
+  const eventType: EventType = event.type;
 
   if (eventType === 'user.created' || eventType === 'user.updated') {
+    const { data } = event;
+
     if (eventType === 'user.created') {
-      // Do an email welcome message here.
+      // TODO:
+      // - Do an email welcome message here.
     } else {
-      // Do an email to the user that something has changed.
+      // TODO:
+      // - Do an email to the user that something has changed.
     }
 
-    // Do an upsert here.
-    console.log('----------------- Sync Data ----------------------:');
-    console.log('Data: ', evt.data);
-    console.log('------------------ End of Sync Data ----------------------:');
+    const user = {
+      id: data.id as string,
+      firstName: data.first_name as string,
+      lastName: data.last_name as string,
+      username: data.username as string,
+    } as User;
+
+    if (
+      data.email_addresses &&
+      Array.isArray(data.email_addresses) &&
+      data.email_addresses.length > 0
+    ) {
+      user.emailAddress = data.email_addresses[0].email_address as string;
+    }
+
+    await upsertUser(user);
   }
 
-  console.log(`User ${id} was ${eventType}`);
-  return new Response('', {
-    status: 201,
-  });
+  // TODO:
+  // - handle user deletion.
+  if (eventType === 'user.deleted') {
+  }
+
+  return NextResponse.json(
+    {
+      message: 'Success',
+    },
+    {
+      status: 200,
+    }
+  );
 }
 
-type EventType = 'user.created' | 'user.updated' | '*';
+type EventType = 'user.created' | 'user.updated' | 'user.deleted';
 
 type Event = {
   data: Record<string, string | number>;

@@ -25,9 +25,7 @@ export async function insertTaskById({
 }
 
 export async function upsertUser(value: User) {
-  await db
-    .insert(user)
-    .values(value)
-    // @ts-expect-error - onConflictDoUpdate is not in the types yet.
-    .onConflictDoUpdate({ target: user.id, set: { name: 'John' } });
+  await db.insert(user).values(value).onDuplicateKeyUpdate({
+    set: value,
+  });
 }

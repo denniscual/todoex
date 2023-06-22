@@ -31,9 +31,9 @@ export const task = mysqlTable(
 
 export const user = mysqlTable('user', {
   id: varchar('id', { length: 50 }).primaryKey().notNull(),
-  username: varchar('username', { length: 50 }),
   firstName: varchar('first_name', { length: 255 }),
   lastName: varchar('last_name', { length: 255 }),
+  username: varchar('username', { length: 50 }),
   emailAddress: varchar('email_address', { length: 255 }).notNull(),
   createdAt: timestamp('created_at', { mode: 'string' }).defaultNow(),
   updatedAt: timestamp('updated_at', { mode: 'string' }).defaultNow().onUpdateNow(),
