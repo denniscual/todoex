@@ -8,10 +8,12 @@ export default function ChatForm({ tasks, userId }: { tasks: Task[]; userId: str
     {
       role: 'system',
       content: `You are an AI Assistant assisting a user with their tasks. The current user id is: ${userId}`,
+      hiddenInChat: true,
     },
     {
       role: 'user',
       content: `Here are the current user todos: ${JSON.stringify(tasks)}.`,
+      hiddenInChat: true,
     },
   ]);
   const [isPending, startTransition] = useTransition();
@@ -69,13 +71,25 @@ export default function ChatForm({ tasks, userId }: { tasks: Task[]; userId: str
         {isPending && <span>Loading...</span>}
       </div>
       {messages.length > 0
-        ? messages.map((m, idx) => (
+        ? messages.map((message, idx) => (
             <div key={idx} className="whitespace-pre-wrap">
-              <p>{m.role === 'user' ? 'User: ' : 'AI: '}</p>
-              <p>{m.role === 'user' ? m.content : m.rsc}</p>
+              <Chat {...message} />
             </div>
           ))
         : null}
     </div>
+  );
+}
+
+function Chat({ role, content, rsc, hiddenInChat }: any) {
+  if (hiddenInChat) {
+    return null;
+  }
+
+  return (
+    <>
+      <p>{role === 'user' ? 'User: ' : 'AI: '}</p>
+      <p>{role === 'user' ? content : rsc}</p>
+    </>
   );
 }
