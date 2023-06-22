@@ -54,8 +54,8 @@ export async function POST(request: Request) {
       // Do an email to the user that something has changed.
     }
 
-    // Sync the user to the database.
-    console.log('------------------ Sync Data ----------------------:');
+    // Do an upsert here.
+    console.log('----------------- Sync Data ----------------------:');
     console.log('Data: ', evt.data);
     console.log('------------------ End of Sync Data ----------------------:');
   }
