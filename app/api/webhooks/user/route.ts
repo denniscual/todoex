@@ -6,7 +6,6 @@ import { Webhook, WebhookRequiredHeaders } from 'svix';
 const webhookSecret = process.env.WEBHOOK_SECRET || '';
 
 export async function POST(request: Request) {
-  const payload = await request.json();
   const headersList = headers();
 
   // Doing verification.
@@ -17,15 +16,20 @@ export async function POST(request: Request) {
     console.log('svixId', svixId);
     console.log('svixIdTimeStamp', svixIdTimeStamp);
     console.log('svixSignature', svixSignature);
-    return new Response('Error occured', {
-      status: 400,
-    });
+    return NextResponse.json(
+      {
+        message: 'Unauthenticated',
+      },
+      { status: 401 }
+    );
   }
+
   const svixHeaders = {
     'svix-id': headersList.get('svix-id'),
     'svix-timestamp': headersList.get('svix-timestamp'),
     'svix-signature': headersList.get('svix-signature'),
   };
+  const payload = await request.json();
 
   const webhook = new Webhook(webhookSecret);
   let evt: Event | null = null;
@@ -44,6 +48,12 @@ export async function POST(request: Request) {
   console.log('Event type:', eventType);
 
   if (eventType === 'user.created' || eventType === 'user.updated') {
+    if (eventType === 'user.created') {
+      // Do an email welcome message here.
+    } else {
+      // Do an email to the user that something has changed.
+    }
+
     // Sync the user to the database.
     console.log('------------------ Sync Data ----------------------:');
     console.log('Data: ', evt.data);
