@@ -4,7 +4,8 @@ import { currentUser } from '@clerk/nextjs';
 
 export default async function Dashboard() {
   const user = await currentUser();
-  const tasks = await getUserTasks(user?.id ?? '');
+  const userId = user?.id ?? '';
+  const tasks = await getUserTasks(userId);
 
   return (
     <div className="space-y-8">
@@ -21,7 +22,7 @@ export default async function Dashboard() {
       </div>
       <div>
         <p className="mb-4 font-semibold">Chat Form</p>
-        <ChatForm tasks={tasks} />
+        <ChatForm userId={userId} tasks={tasks} />
       </div>
     </div>
   );

@@ -1,7 +1,7 @@
 'use server';
 import { Configuration, OpenAIApi } from 'openai';
 import { db, task } from '@/db';
-import { sql, eq } from 'drizzle-orm';
+import { sql } from 'drizzle-orm';
 import { revalidatePath } from 'next/cache';
 
 const configuration = new Configuration({
@@ -11,7 +11,6 @@ const model = new OpenAIApi(configuration);
 
 /**
  * TODO:
- * - the initial todos come from all the users. Make sure to only get the todos of the current user.
  * - fine tune the function "createStringifyDbSchema". Sometimes the ai can't understand the generated table name and columns names.
  * - Increase or more fine tuning the model to avoid doing destructive actions like dropping a table or moving a todo to another user. I think
  *   for the fucntion that accepts a "MySQL query", we can blacklist some MySQL actions like DROP, DELETE, etc.
@@ -20,18 +19,11 @@ const model = new OpenAIApi(configuration);
  *   to pass message with role: "function" and append the `functionResponse` as the content. We let openai to generate the result for us and parse it by RSC.
  * - add project model to the database and associate it with the user and task models.
  */
-export async function generate(messages: any[]) {
+export async function generate({ userId, messages }: { userId: string; messages: any[] }) {
   try {
-    // TODO: We can add this initial message in the frontend. The user id should be the current user.
-    const userTodos = await db.select().from(task).where(eq(task.userId, 1));
-    const initialMessage = {
-      role: 'user',
-      content: `Here are the current user todos: ${JSON.stringify(userTodos)}`,
-    };
-
     const response = await model.createChatCompletion({
       model: 'gpt-3.5-turbo-0613',
-      messages: [initialMessage, ...messages],
+      messages,
       functions: functionsDefinitions,
       function_call: 'auto',
     });
@@ -42,7 +34,10 @@ export async function generate(messages: any[]) {
       const functionName = message?.function_call.name;
       const foundFunctions = functionsHandlers[message.function_call.name];
       const functionArguments = JSON.parse(message.function_call.arguments);
-      const functionResponse = await foundFunctions(functionArguments);
+      const functionResponse = await foundFunctions({
+        ...functionArguments,
+        userId,
+      });
 
       switch (functionName) {
         case 'searching': {
@@ -329,15 +324,17 @@ async function creating({
   title,
   description,
   successMessage,
+  userId,
 }: {
   title: string;
   description: string;
   successMessage: string;
+  userId: string;
 }) {
   await db.insert(task).values({
     title,
     description,
-    userId: 1,
+    userId,
   });
 
   return {
@@ -346,7 +343,6 @@ async function creating({
 }
 
 async function updating({ query, successMessage }: { query: string; successMessage: string }) {
-  console.log({ query });
   await db.execute(sql.raw(query));
   return {
     message: successMessage,
@@ -387,7 +383,7 @@ export async function insertTaskById({
 }: {
   title: string;
   description: string;
-  id: number;
+  id: string;
 }) {
   await db.insert(task).values({
     title,

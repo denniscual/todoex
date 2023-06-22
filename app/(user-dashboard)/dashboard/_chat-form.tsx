@@ -3,8 +3,17 @@ import { useState, useTransition } from 'react';
 import { generate } from './_server-actions';
 import { Task } from '@/db';
 
-export default function ChatForm({ tasks }: { tasks: Task[] }) {
-  const [messages, setMessages] = useState<any[]>([]);
+export default function ChatForm({ tasks, userId }: { tasks: Task[]; userId: string }) {
+  const [messages, setMessages] = useState<any[]>([
+    {
+      role: 'system',
+      content: `You are an AI Assistant assisting a user with their tasks. The current user id is: ${userId}`,
+    },
+    {
+      role: 'user',
+      content: `Here are the current user todos: ${JSON.stringify(tasks)}.`,
+    },
+  ]);
   const [isPending, startTransition] = useTransition();
   const [chatBox, setChatBox] = useState('');
 
@@ -35,13 +44,14 @@ export default function ChatForm({ tasks }: { tasks: Task[] }) {
             startTransition(() => action());
 
             async function action() {
-              const res = (await generate(
+              const res = (await generate({
                 // Remove the rsc.
-                newMessages.map((message) => ({
+                messages: newMessages.map((message) => ({
                   role: message.role,
                   content: message.content,
-                }))
-              )) as any;
+                })),
+                userId,
+              })) as any;
               const { rsc, message } = res;
               const messagesWithAssistant = newMessages.concat({
                 role: 'assistant',
