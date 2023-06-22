@@ -1,8 +1,10 @@
 import ChatForm from './_chat-form';
 import { getUserTasks } from '@/db';
+import { currentUser } from '@clerk/nextjs';
 
 export default async function Dashboard() {
-  const tasks = await getUserTasks();
+  const user = await currentUser();
+  const tasks = await getUserTasks(user?.id ?? '');
 
   return (
     <div className="space-y-8">

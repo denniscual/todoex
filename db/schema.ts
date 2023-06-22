@@ -14,7 +14,7 @@ export const task = mysqlTable(
   'task',
   {
     id: int('id').autoincrement().primaryKey().notNull(),
-    userId: int('user_id').notNull(),
+    userId: varchar('user_id', { length: 50 }).notNull(),
     title: varchar('title', { length: 255 }).notNull(),
     description: text('description'),
     dueDate: date('due_date', { mode: 'string' }),

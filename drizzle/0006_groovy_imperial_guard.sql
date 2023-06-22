@@ -1,0 +1,1 @@
+ALTER TABLE `task` MODIFY COLUMN `user_id` varchar(50) NOT NULL;

@@ -3,8 +3,8 @@ import { cache } from 'react';
 import { db, task, User, user } from '@/db';
 import { eq } from 'drizzle-orm';
 
-export const getUserTasks = cache(async (id: number = 1) => {
-  const tasks = await db.select().from(task).where(eq(task.userId, 1));
+export const getUserTasks = cache(async (id: string) => {
+  const tasks = await db.select().from(task).where(eq(task.userId, id));
   return tasks;
 });
 
@@ -13,7 +13,7 @@ export async function insertTaskById({
   title,
   description,
 }: {
-  id: number;
+  id: string;
   title: string;
   description: string;
 }) {
