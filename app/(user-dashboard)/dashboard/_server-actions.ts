@@ -15,6 +15,7 @@ function foo() {
 
 /**
  * TODO:
+ * - improve the generation of column names. Sometimes openai uses camelCasing.
  * - Handle "deleting" and "dropping" functions on both server and client.
  * - handle dates. When interacting with AI, we need to explicitly tell the AI that that suggested dates are RELATIVE TO THE CURRENT DATE.
  * - when doing a suggesting, if the user will tell a date like "suggest a task for tomorrow", it would be good that we can also generate the date based on the users query.
@@ -155,6 +156,8 @@ function createStringifyDbSchema() {
   return tables;
 }
 
+console.log('schema', createStringifyDbSchema());
+
 const tablesAllowedToOperate = ['"task"'];
 
 const functionsDefinitions: {
@@ -175,7 +178,7 @@ const functionsDefinitions: {
           MySQL query extracting info to answer the user's question.
           MySQL should be written using this database schema:
           ${createStringifyDbSchema()}
-          Make sure to check the appended db schema.
+          Based on the above schema, the column names are using "Snake casing".
           These are the tables name: ${tablesAllowedToOperate.join(', ')}.
           Use the name of the tables to do the MySQL Search query.
           The query should be returned in plain text, not in JSON. 
@@ -223,7 +226,7 @@ const functionsDefinitions: {
           MySQL query extracting info to answer the user's question.
           MySQL should be written using this database schema:
           ${createStringifyDbSchema()}
-          Make sure to check the appended db schema.
+          Based on the above schema, the column names are using "Snake casing".
           The query should be returned in plain text, not in JSON. 
           Make sure to use the data from todos or tasks when creating a MySQL query. 
           `,
@@ -248,6 +251,7 @@ const functionsDefinitions: {
           MySQL query extracting info to answer the user's question.
           MySQL should be written using this database schema:
           ${createStringifyDbSchema()}
+          Based on the above schema, the column names are using "Snake casing".
           The query should be returned in plain text, not in JSON. 
           Make sure to use the data from todos or tasks when creating a MySQL query. 
           `,
