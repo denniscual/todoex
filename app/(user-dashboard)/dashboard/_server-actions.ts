@@ -17,6 +17,8 @@ function foo() {
  * TODO:
  * - Handle "deleting" and "dropping" functions on both server and client.
  * - handle dates. When interacting with AI, we need to explicitly tell the AI that that suggested dates are RELATIVE TO THE CURRENT DATE.
+ * - when doing a suggesting, if the user will tell a date like "suggest a task for tomorrow", it would be good that we can also generate the date based on the users query.
+ *   Just make sure that the date type matches the due date column type in the DB.
  * - add project model to the database and associate it with the user and task models.
  * - fine tune the function "createStringifyDbSchema". Sometimes the ai can't understand the generated table name and columns names.
  * - Increase or more fine tuning the model to avoid doing destructive actions like dropping a table or moving a todo to another user. I think
