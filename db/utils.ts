@@ -1,4 +1,3 @@
-import 'server-only';
 import { cache } from 'react';
 import { db, task, User, user } from '@/db';
 import { eq } from 'drizzle-orm';

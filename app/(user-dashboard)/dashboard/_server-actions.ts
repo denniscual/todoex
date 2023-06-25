@@ -2,23 +2,29 @@
 import { Configuration, OpenAIApi } from 'openai';
 import { db, task, Task } from '@/db';
 import { sql } from 'drizzle-orm';
-import { revalidatePath } from 'next/cache';
-import { FunctionHandlers } from './_utils';
+import { FunctionHandlers } from './_utils.shared';
 
 const configuration = new Configuration({
   apiKey: process.env.OPENAI_API_KEY,
 });
 const model = new OpenAIApi(configuration);
 
+function foo() {
+  return 'im string' as any as boolean;
+}
+
 /**
  * TODO:
+ * - Handle "deleting" and "dropping" functions on both server and client.
+ * - handle dates. When interacting with AI, we need to explicitly tell the AI that that suggested dates are RELATIVE TO THE CURRENT DATE.
+ * - add project model to the database and associate it with the user and task models.
  * - fine tune the function "createStringifyDbSchema". Sometimes the ai can't understand the generated table name and columns names.
  * - Increase or more fine tuning the model to avoid doing destructive actions like dropping a table or moving a todo to another user. I think
  *   for the fucntion that accepts a "MySQL query", we can blacklist some MySQL actions like DROP, DELETE, etc.
  * - add function defintion for handling couting and aggregating result. Make sure to add good function description to this
  *   to distinguish this function to "seaching" function. I think we can use the same function `ask_database` and call the `createChatCompletion`
  *   to pass message with role: "function" and append the `functionResponse` as the content. We let openai to generate the result for us and parse it by RSC.
- * - add project model to the database and associate it with the user and task models.
+ * - improve typescript.
  */
 export async function generate({ userId, messages }: { userId: string; messages: any[] }) {
   try {
@@ -43,89 +49,84 @@ export async function generate({ userId, messages }: { userId: string; messages:
       switch (functionName) {
         case FunctionHandlers.searching: {
           functionResponse;
-          const { result, message } = functionResponse as InferHandlerReturnType<
-            typeof functionName
-          >;
-          if (result.length === 0) {
-            return {
-              rsc: <div>I am sorry, but I could not find any todo list.</div>,
-              message,
-            };
-          }
+          const { rows, message } = functionResponse as InferHandlerReturnType<typeof functionName>;
           return {
-            rsc: (
-              <ul>
-                {result.map((row, idx) => (
-                  <li key={row.id}>
-                    <span className="font-medium">{idx + 1}.</span> Title: {row.title}
-                  </li>
-                ))}
-              </ul>
-            ),
-            message,
+            handler: functionName,
+            result: {
+              message,
+              rows,
+            },
           };
         }
         case FunctionHandlers.creating: {
           const { message } = functionResponse as InferHandlerReturnType<typeof functionName>;
-          revalidatePath('/new-todo-list');
           return {
-            message,
-            rsc: <div>{message}</div>,
+            handler: functionName,
+            result: {
+              message,
+            },
           };
         }
         case FunctionHandlers.updating: {
           const { message } = functionResponse as InferHandlerReturnType<typeof functionName>;
-          revalidatePath('/new-todo-list');
-
           return {
-            message,
-            rsc: <div>{message}</div>,
+            handler: functionName,
+            result: {
+              message,
+            },
           };
         }
-        case FunctionHandlers.suggesting: {
-          const { title, description, areThereDetailsNeededFromTheUser } =
-            functionResponse as InferHandlerReturnType<typeof functionName>;
-
-          if (areThereDetailsNeededFromTheUser) {
-            return {
-              message,
-              rsc: <div>{description}</div>,
-            };
-          }
+        case FunctionHandlers.deleting: {
+          const { message } = functionResponse as InferHandlerReturnType<typeof functionName>;
           return {
-            message: `Suggested todo: Title = ${title}; Description = ${description}.`,
-            rsc: (
-              <div>
-                <p>Ok, here is a suggestion:</p>
-                <p>Title: {title}</p>
-                <p>Description: {description}</p>
-              </div>
-            ),
+            handler: functionName,
+            result: {
+              message,
+            },
           };
         }
         case FunctionHandlers.dropping: {
-          return;
+          return {
+            handler: functionName,
+            result: {
+              message: functionArguments.successMessage as string,
+            },
+          };
+        }
+        case FunctionHandlers.suggesting: {
+          const { title, description, areThereDetailsNeededFromTheUser, message } =
+            functionResponse as InferHandlerReturnType<typeof functionName>;
+          const _message = areThereDetailsNeededFromTheUser
+            ? message
+            : `Suggested todo: Title = ${title}; Description = ${description}.`;
+          return {
+            handler: functionName,
+            result: {
+              title,
+              description,
+              message: _message,
+              areThereDetailsNeededFromTheUser,
+            },
+          };
         }
         // TODO:
-        // handle this case. This will throw an error in the frontend.
+        // - handle here the "deleting" and "dropping"
         default: {
           return {
-            message: functionArguments.successMessage,
-            data: functionResponse,
+            handler: functionName,
+            result: {
+              message: functionArguments.successMessage as string,
+            },
           };
         }
       }
     }
 
     return {
-      message:
-        'Apologies, but I am unable to understand your request. If you have a specific question or need assistance with your todo list, please let me know and I will be happy to help.',
-      rsc: (
-        <div>
-          Apologies, but I am unable to understand your request. If you have a specific question or
-          need assistance with your todo list, please let me know and I will be happy to help.
-        </div>
-      ),
+      result: {
+        message:
+          'Apologies, but I am unable to understand your request. If you have a specific question or need assistance with your todo list, please let me know and I will be happy to help.',
+      },
     };
   } catch (err) {
     throw err;
@@ -305,8 +306,8 @@ const handlers = {
   [FunctionHandlers.creating]: creating,
   [FunctionHandlers.updating]: updating,
   [FunctionHandlers.deleting]: deleting,
-  [FunctionHandlers.suggesting]: suggesting,
   [FunctionHandlers.dropping]: dropping,
+  [FunctionHandlers.suggesting]: suggesting,
 } as const;
 
 async function searching({
@@ -317,14 +318,15 @@ async function searching({
   successMessage: string;
 }): Promise<{
   message: string;
-  result: Task[];
+  rows: Task[];
 }> {
   const data = await db.execute(sql.raw(query));
   return {
     message: successMessage,
-    result: data.rows as Task[],
+    rows: data.rows as Task[],
   };
 }
+export type SearchingReturnType = Awaited<ReturnType<typeof searching>>;
 
 async function creating({
   title,
@@ -347,6 +349,7 @@ async function creating({
     message: successMessage,
   };
 }
+export type CreatingReturnType = Awaited<ReturnType<typeof creating>>;
 
 async function updating({ query, successMessage }: { query: string; successMessage: string }) {
   await db.execute(sql.raw(query));
@@ -354,14 +357,17 @@ async function updating({ query, successMessage }: { query: string; successMessa
     message: successMessage,
   };
 }
+export type UpdatingReturnType = Awaited<ReturnType<typeof updating>>;
 
 async function deleting(args: any) {
   return args;
 }
+export type DeletingReturnType = Awaited<ReturnType<typeof deleting>>;
 
 async function dropping(args: any) {
   return args;
 }
+export type DroppingReturnType = Awaited<ReturnType<typeof dropping>>;
 
 async function suggesting({
   title,
@@ -381,6 +387,7 @@ async function suggesting({
     areThereDetailsNeededFromTheUser,
   };
 }
+export type SuggestingReturnType = Awaited<ReturnType<typeof suggesting>>;
 
 type InferHandlerReturnType<F extends keyof typeof FunctionHandlers> = Awaited<
   ReturnType<(typeof handlers)[F]>

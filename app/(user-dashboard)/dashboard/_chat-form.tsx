@@ -1,11 +1,19 @@
 'use client';
 import { useState, useTransition } from 'react';
-import { generate } from './_server-actions';
+import {
+  generate,
+  SearchingReturnType,
+  CreatingReturnType,
+  UpdatingReturnType,
+  DeletingReturnType,
+  DroppingReturnType,
+  SuggestingReturnType,
+} from './_server-actions';
 import { Task } from '@/db';
-import { FunctionHandlers } from './_utils';
+import { FunctionHandlers } from './_utils.shared';
+import { useRouter } from 'next/navigation';
 
 export default function ChatForm({ tasks, userId }: { tasks: Task[]; userId: string }) {
-  console.log('handlers', FunctionHandlers.creating);
   const [messages, setMessages] = useState<any[]>([
     {
       role: 'system',
@@ -20,6 +28,7 @@ export default function ChatForm({ tasks, userId }: { tasks: Task[]; userId: str
   ]);
   const [isPending, startTransition] = useTransition();
   const [chatBox, setChatBox] = useState('');
+  const router = useRouter();
 
   return (
     <div className="space-y-8">
@@ -48,19 +57,48 @@ export default function ChatForm({ tasks, userId }: { tasks: Task[]; userId: str
             startTransition(() => action());
 
             async function action() {
-              const res = (await generate({
-                // Remove the rsc.
+              const res = await generate({
+                // Remove the elements.
                 messages: newMessages.map((message) => ({
                   role: message.role,
                   content: message.content,
                 })),
                 userId,
-              })) as any;
-              const { rsc, message } = res;
+              });
+              const { handler, result } = res;
+              let elements: React.ReactNode = null;
+
+              switch (handler) {
+                case FunctionHandlers.searching: {
+                  elements = <TodoList {...res.result} />;
+                  break;
+                }
+                case FunctionHandlers.creating: {
+                  router.refresh();
+                  elements = <CreatingTodo {...res.result} />;
+                  break;
+                }
+                case FunctionHandlers.updating: {
+                  router.refresh();
+                  elements = <UpdatingTodo {...res.result} />;
+                  break;
+                }
+                // TODO:
+                // - handle here the "deleting" and "dropping"
+                case FunctionHandlers.suggesting: {
+                  router.refresh();
+                  elements = <TodoSuggestion {...res.result} />;
+                  break;
+                }
+                default: {
+                  elements = <div>{result.message}</div>;
+                }
+              }
+
               const messagesWithAssistant = newMessages.concat({
                 role: 'assistant',
-                content: message,
-                rsc,
+                content: result.message,
+                elements,
               });
               setMessages(messagesWithAssistant);
             }
@@ -83,7 +121,7 @@ export default function ChatForm({ tasks, userId }: { tasks: Task[]; userId: str
   );
 }
 
-function Chat({ role, content, rsc, hiddenInChat }: any) {
+function Chat({ role, content, elements, hiddenInChat }: any) {
   if (hiddenInChat) {
     return null;
   }
@@ -91,7 +129,48 @@ function Chat({ role, content, rsc, hiddenInChat }: any) {
   return (
     <>
       <p>{role === 'user' ? 'User: ' : 'AI: '}</p>
-      <p>{role === 'user' ? content : rsc}</p>
+      <p>{role === 'user' ? content : elements}</p>
     </>
+  );
+}
+
+function TodoList({ rows }: SearchingReturnType) {
+  if (rows.length === 0) {
+    return <div>I am sorry, but I could not find any todo list.</div>;
+  }
+  return (
+    <ul>
+      {rows.map((row, idx) => (
+        <li key={row.id}>
+          <span className="font-medium">{idx + 1}.</span> Title: {row.title}
+        </li>
+      ))}
+    </ul>
+  );
+}
+
+function CreatingTodo({ message }: CreatingReturnType) {
+  return <div>{message}</div>;
+}
+
+function UpdatingTodo({ message }: UpdatingReturnType) {
+  return <div>{message}</div>;
+}
+
+function TodoSuggestion({
+  title,
+  description,
+  areThereDetailsNeededFromTheUser,
+}: SuggestingReturnType) {
+  if (areThereDetailsNeededFromTheUser) {
+    return <div>{description}</div>;
+  }
+
+  return (
+    <div>
+      <p>Ok, here is a suggestion:</p>
+      <p>Title: {title}</p>
+      <p>Description: {description}</p>
+    </div>
   );
 }
