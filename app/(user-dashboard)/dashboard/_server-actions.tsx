@@ -3,20 +3,12 @@ import { Configuration, OpenAIApi } from 'openai';
 import { db, task, Task } from '@/db';
 import { sql } from 'drizzle-orm';
 import { revalidatePath } from 'next/cache';
+import { FunctionHandlers } from './_utils';
 
 const configuration = new Configuration({
   apiKey: process.env.OPENAI_API_KEY,
 });
 const model = new OpenAIApi(configuration);
-
-const FunctionHandlers = {
-  searching: 'searching',
-  creating: 'creating',
-  updating: 'updating',
-  deleting: 'deleting',
-  suggesting: 'suggesting',
-  dropping: 'dropping',
-} as const;
 
 /**
  * TODO:
@@ -388,23 +380,6 @@ async function suggesting({
     description,
     areThereDetailsNeededFromTheUser,
   };
-}
-
-export async function insertTaskById({
-  title,
-  description,
-  id,
-}: {
-  title: string;
-  description: string;
-  id: string;
-}) {
-  await db.insert(task).values({
-    title,
-    description,
-    userId: id,
-  });
-  revalidatePath('/dashboard');
 }
 
 type InferHandlerReturnType<F extends keyof typeof FunctionHandlers> = Awaited<

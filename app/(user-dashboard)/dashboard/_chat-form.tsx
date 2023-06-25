@@ -2,8 +2,10 @@
 import { useState, useTransition } from 'react';
 import { generate } from './_server-actions';
 import { Task } from '@/db';
+import { FunctionHandlers } from './_utils';
 
 export default function ChatForm({ tasks, userId }: { tasks: Task[]; userId: string }) {
+  console.log('handlers', FunctionHandlers.creating);
   const [messages, setMessages] = useState<any[]>([
     {
       role: 'system',
