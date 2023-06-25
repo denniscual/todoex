@@ -1,6 +1,6 @@
 'use server';
 import { Configuration, OpenAIApi } from 'openai';
-import { db, task } from '@/db';
+import { db, task, Task } from '@/db';
 import { sql } from 'drizzle-orm';
 import { revalidatePath } from 'next/cache';
 
@@ -8,6 +8,15 @@ const configuration = new Configuration({
   apiKey: process.env.OPENAI_API_KEY,
 });
 const model = new OpenAIApi(configuration);
+
+const FunctionHandlers = {
+  searching: 'searching',
+  creating: 'creating',
+  updating: 'updating',
+  deleting: 'deleting',
+  suggesting: 'suggesting',
+  dropping: 'dropping',
+} as const;
 
 /**
  * TODO:
@@ -31,27 +40,28 @@ export async function generate({ userId, messages }: { userId: string; messages:
     const message = response?.data?.choices?.[0]?.message;
 
     if (message?.function_call && message?.function_call.name && message.function_call.arguments) {
-      const functionName = message?.function_call.name;
-      const foundFunctions = functionsHandlers[message.function_call.name];
+      const functionName = message?.function_call.name as keyof typeof FunctionHandlers;
       const functionArguments = JSON.parse(message.function_call.arguments);
-      const functionResponse = await foundFunctions({
+      const foundFunction = handlers[functionName];
+      const functionResponse = await foundFunction({
         ...functionArguments,
         userId,
       });
 
       switch (functionName) {
-        case 'searching': {
-          const { result } = functionResponse as {
-            result: any[];
-          };
-          const data: any = {
-            message: JSON.stringify(result),
-          };
-
+        case FunctionHandlers.searching: {
+          functionResponse;
+          const { result, message } = functionResponse as InferHandlerReturnType<
+            typeof functionName
+          >;
           if (result.length === 0) {
-            data.rsc = <div>I am sorry, but I could not find any todo list.</div>;
-          } else {
-            data.rsc = (
+            return {
+              rsc: <div>I am sorry, but I could not find any todo list.</div>,
+              message,
+            };
+          }
+          return {
+            rsc: (
               <ul>
                 {result.map((row, idx) => (
                   <li key={row.id}>
@@ -59,15 +69,20 @@ export async function generate({ userId, messages }: { userId: string; messages:
                   </li>
                 ))}
               </ul>
-            );
-          }
-
-          return data;
-        }
-        case 'creating': {
-          const { message } = functionResponse as {
-            message: string;
+            ),
+            message,
           };
+        }
+        case FunctionHandlers.creating: {
+          const { message } = functionResponse as InferHandlerReturnType<typeof functionName>;
+          revalidatePath('/new-todo-list');
+          return {
+            message,
+            rsc: <div>{message}</div>,
+          };
+        }
+        case FunctionHandlers.updating: {
+          const { message } = functionResponse as InferHandlerReturnType<typeof functionName>;
           revalidatePath('/new-todo-list');
 
           return {
@@ -75,39 +90,29 @@ export async function generate({ userId, messages }: { userId: string; messages:
             rsc: <div>{message}</div>,
           };
         }
-        case 'updating': {
-          const { message } = functionResponse as {
-            message: string;
-          };
-          revalidatePath('/new-todo-list');
-
-          return {
-            message,
-            rsc: <div>{message}</div>,
-          };
-        }
-        case 'suggesting': {
-          const { title, description, areThereDetailsNeededFromTheUser } = functionResponse as {
-            title: string;
-            description: string;
-            areThereDetailsNeededFromTheUser: boolean;
-          };
-          const data: any = {};
+        case FunctionHandlers.suggesting: {
+          const { title, description, areThereDetailsNeededFromTheUser } =
+            functionResponse as InferHandlerReturnType<typeof functionName>;
 
           if (areThereDetailsNeededFromTheUser) {
-            data.message = description;
-            data.rsc = <div>{description}</div>;
-          } else {
-            data.message = `Suggested todo: Title = ${title}; Description = ${description}.`;
-            data.rsc = (
+            return {
+              message,
+              rsc: <div>{description}</div>,
+            };
+          }
+          return {
+            message: `Suggested todo: Title = ${title}; Description = ${description}.`,
+            rsc: (
               <div>
                 <p>Ok, here is a suggestion:</p>
                 <p>Title: {title}</p>
                 <p>Description: {description}</p>
               </div>
-            );
-          }
-          return data;
+            ),
+          };
+        }
+        case FunctionHandlers.dropping: {
+          return;
         }
         // TODO:
         // handle this case. This will throw an error in the frontend.
@@ -163,7 +168,7 @@ const functionsDefinitions: {
   parameters: object;
 }[] = [
   {
-    name: 'searching',
+    name: FunctionHandlers.searching,
     description:
       'Use this function to do a MySQL SEARCH or MySQL update on the database. E.g querying or searching todos or updating todo. Or maybe doing filter.',
     parameters: {
@@ -190,7 +195,7 @@ const functionsDefinitions: {
     },
   },
   {
-    name: 'creating',
+    name: FunctionHandlers.creating,
     description: 'Use this function to do a MySQL INSERT on the database.',
     parameters: {
       type: 'object',
@@ -212,7 +217,7 @@ const functionsDefinitions: {
     },
   },
   {
-    name: 'updating',
+    name: FunctionHandlers.updating,
     description: `Use this function to do a MySQL UPDATE on the database. E.g updating a todo or task, already done to a task, completing task, reopeining task, adding due date, etc. TAKE NOTE that this function will not move a task from other user.`,
     parameters: {
       type: 'object',
@@ -237,7 +242,7 @@ const functionsDefinitions: {
     },
   },
   {
-    name: 'deleting',
+    name: FunctionHandlers.deleting,
     description: `Use this function to do a MySQL DELETE on the database. E.g deleting todo or task based on user input and criteria. TAKE NOTE that this function will not be used to DROP a table or database or a user.`,
     parameters: {
       type: 'object',
@@ -261,7 +266,7 @@ const functionsDefinitions: {
     },
   },
   {
-    name: 'dropping',
+    name: FunctionHandlers.dropping,
     description: 'Use this function for dropping or deleting or removing table or database.',
     parameters: {
       type: 'object',
@@ -276,7 +281,7 @@ const functionsDefinitions: {
     },
   },
   {
-    name: 'suggesting',
+    name: FunctionHandlers.suggesting,
     description:
       'Use this function to do a todos or tasks suggestion. Give a meaningful suggestion to the user.',
     parameters: {
@@ -303,20 +308,29 @@ const functionsDefinitions: {
 //////////////////////////////////////////////
 // Functions handlers
 /////////////////////////////////////////////
-const functionsHandlers: Record<string, (args: any) => Promise<any>> = {
-  searching,
-  creating,
-  updating,
-  deleting,
-  suggesting,
-  dropping,
-};
+const handlers = {
+  [FunctionHandlers.searching]: searching,
+  [FunctionHandlers.creating]: creating,
+  [FunctionHandlers.updating]: updating,
+  [FunctionHandlers.deleting]: deleting,
+  [FunctionHandlers.suggesting]: suggesting,
+  [FunctionHandlers.dropping]: dropping,
+} as const;
 
-async function searching({ query, successMessage }: { query: string; successMessage: string }) {
+async function searching({
+  query,
+  successMessage,
+}: {
+  query: string;
+  successMessage: string;
+}): Promise<{
+  message: string;
+  result: Task[];
+}> {
   const data = await db.execute(sql.raw(query));
   return {
     message: successMessage,
-    result: data.rows,
+    result: data.rows as Task[],
   };
 }
 
@@ -392,3 +406,7 @@ export async function insertTaskById({
   });
   revalidatePath('/dashboard');
 }
+
+type InferHandlerReturnType<F extends keyof typeof FunctionHandlers> = Awaited<
+  ReturnType<(typeof handlers)[F]>
+>;
