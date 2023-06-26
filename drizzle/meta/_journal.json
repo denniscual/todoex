@@ -57,6 +57,13 @@
       "when": 1687798692344,
       "tag": "0007_clumsy_calypso",
       "breakpoints": false
+    },
+    {
+      "idx": 8,
+      "version": "5",
+      "when": 1687799314395,
+      "tag": "0008_modern_thunderbolts",
+      "breakpoints": false
     }
   ]
 }
