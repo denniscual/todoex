@@ -9,7 +9,6 @@ import {
   DroppingReturnType,
   SuggestingReturnType,
 } from './_server-actions';
-import { Task } from '@/db';
 import { FunctionHandlers } from './_utils.shared';
 import { useRouter } from 'next/navigation';
 
@@ -47,7 +46,7 @@ export default function ChatForm({ userId }: { userId: string }) {
 
             async function action() {
               const res = await generate({
-                // Remove the elements.
+                // Remove the jsx elements.
                 messages: newMessages.map((message) => ({
                   role: message.role,
                   content: message.content,
@@ -72,11 +71,13 @@ export default function ChatForm({ userId }: { userId: string }) {
                   elements = <UpdatingTodo {...res.result} />;
                   break;
                 }
-                // TODO:
-                // - handle here the "deleting" and "dropping"
                 case FunctionHandlers.deleting: {
                   router.refresh();
                   elements = <DeletingTodo {...res.result} />;
+                  break;
+                }
+                case FunctionHandlers.dropping: {
+                  elements = <Dropping {...res.result} />;
                   break;
                 }
                 case FunctionHandlers.suggesting: {
@@ -148,6 +149,10 @@ function UpdatingTodo({ message }: UpdatingReturnType) {
 }
 
 function DeletingTodo({ message }: DeletingReturnType) {
+  return <div>{message}</div>;
+}
+
+function Dropping({ message }: DroppingReturnType) {
   return <div>{message}</div>;
 }
 

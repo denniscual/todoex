@@ -12,9 +12,7 @@ const model = new OpenAIApi(configuration);
 /**
  * TODO:
  *
- * - Handle "deleting" and "dropping" functions on both server and client.
  * - we need to prevent the user from sending a "SQL-like query" message.
- * - when doing a suggesting, if the user will tell a date like "suggest a task for tomorrow", it would be good that we can also generate the date based on the users query.
  *   Just make sure that the date type matches the due date column type in the DB.
  * - add project model to the database and associate it with the user and task models.
  * - fine tune the function "createStringifyDbSchema". Sometimes the ai can't understand the generated table name and columns names.
@@ -102,10 +100,11 @@ export async function generate({ userId, messages }: { userId: string; messages:
           };
         }
         case FunctionHandlers.dropping: {
+          const { message } = functionResponse as InferHandlerReturnType<typeof functionName>;
           return {
             handler: functionName,
             result: {
-              message: functionArguments.successMessage as string,
+              message,
             },
           };
         }
@@ -125,8 +124,6 @@ export async function generate({ userId, messages }: { userId: string; messages:
             },
           };
         }
-        // TODO:
-        // - handle here the "deleting" and "dropping"
         default: {
           return {
             handler: functionName,
@@ -378,8 +375,10 @@ async function deleting({ id, successMessage }: { id: number; successMessage: st
 }
 export type DeletingReturnType = Awaited<ReturnType<typeof deleting>>;
 
-async function dropping(args: any) {
-  return args;
+async function dropping({ successMessage }: { successMessage: string }) {
+  return {
+    message: successMessage,
+  };
 }
 export type DroppingReturnType = Awaited<ReturnType<typeof dropping>>;
 
