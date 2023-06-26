@@ -7,6 +7,7 @@ import {
   date,
   mysqlEnum,
   timestamp,
+  primaryKey,
 } from 'drizzle-orm/mysql-core';
 import { InferModel } from 'drizzle-orm';
 
@@ -22,6 +23,19 @@ export const project = mysqlTable(
   (table) => {
     return {
       titleIdx: index('title_idx').on(table.title),
+    };
+  }
+);
+
+export const projectUser = mysqlTable(
+  'project_user',
+  {
+    userId: int('user_id').notNull(),
+    projectId: int('project_id').notNull(),
+  },
+  (table) => {
+    return {
+      pk: primaryKey(table.userId, table.projectId),
     };
   }
 );
