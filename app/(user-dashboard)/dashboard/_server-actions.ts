@@ -31,7 +31,7 @@ export async function generate({ userId, messages }: { userId: string; messages:
     const chatMessages = [
       {
         role: 'system',
-        content: `You are an AI Assistant assisting a user with their tasks. The current user id is: ${userId}`,
+        content: `You are an AI Assistant assisting a user with their tasks. The current user id is: ${userId}.`,
       },
       {
         role: 'user',
