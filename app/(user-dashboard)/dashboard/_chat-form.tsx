@@ -37,7 +37,7 @@ export default function ChatForm({ tasks, userId }: { tasks: Task[]; userId: str
           onClick={() => {
             const newMessage = {
               role: 'user',
-              content: chatBox,
+              content: chatBox.trim(),
             };
             const newMessages: any[] = [...messages, newMessage];
             setMessages(newMessages);

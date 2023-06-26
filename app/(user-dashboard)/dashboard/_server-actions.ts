@@ -376,7 +376,9 @@ async function updating({ query, successMessage }: { query: string; successMessa
 export type UpdatingReturnType = Awaited<ReturnType<typeof updating>>;
 
 async function deleting(args: any) {
-  return args;
+  return {
+    message: args.successMessage,
+  };
 }
 export type DeletingReturnType = Awaited<ReturnType<typeof deleting>>;
 
