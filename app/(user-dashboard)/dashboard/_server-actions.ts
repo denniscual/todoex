@@ -12,8 +12,7 @@ const model = new OpenAIApi(configuration);
 /**
  * TODO:
  *
- * - we need to prevent the user from sending a "SQL-like query" message.
- *   Just make sure that the date type matches the due date column type in the DB.
+ * - use Zod to validate the arguments.
  * - add project model to the database and associate it with the user and task models.
  * - fine tune the function "createStringifyDbSchema". Sometimes the ai can't understand the generated table name and columns names.
  * - Increase or more fine tuning the model to avoid doing destructive actions like dropping a table or moving a todo to another user. I think
