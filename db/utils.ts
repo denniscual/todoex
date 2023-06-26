@@ -7,7 +7,7 @@ export const getUserTasks = cache(async (id: string) => {
   return tasks;
 });
 
-export async function insertTaskById({
+export async function insertTaskByUserId({
   id,
   title,
   description,
@@ -21,6 +21,10 @@ export async function insertTaskById({
     title,
     description,
   });
+}
+
+export async function deleteTaskById(id: number) {
+  await db.delete(task).where(eq(task.id, id));
 }
 
 export async function upsertUser(value: User) {

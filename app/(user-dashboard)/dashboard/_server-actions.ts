@@ -11,7 +11,9 @@ const model = new OpenAIApi(configuration);
 
 /**
  * TODO:
+ *
  * - Handle "deleting" and "dropping" functions on both server and client.
+ * - we need to prevent the user from sending a "SQL-like query" message.
  * - when doing a suggesting, if the user will tell a date like "suggest a task for tomorrow", it would be good that we can also generate the date based on the users query.
  *   Just make sure that the date type matches the due date column type in the DB.
  * - add project model to the database and associate it with the user and task models.
