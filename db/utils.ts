@@ -11,15 +11,18 @@ export async function insertTaskByUserId({
   id,
   title,
   description,
+  projectId,
 }: {
   id: string;
   title: string;
   description: string;
+  projectId: number;
 }) {
   await db.insert(task).values({
     userId: id,
     title,
     description,
+    projectId,
   });
 }
 

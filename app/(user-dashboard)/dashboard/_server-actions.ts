@@ -219,6 +219,10 @@ function createFunctionsDefinitions() {
             type: 'string',
             description: 'The due date of the todo.',
           },
+          projectId: {
+            type: 'number',
+            description: 'The project id of the todo.',
+          },
           successMessage: {
             type: 'string',
             description: 'Provide the possible success message for the user.',
@@ -348,18 +352,21 @@ async function creating({
   successMessage,
   userId,
   dueDate,
+  projectId,
 }: {
   title: string;
   description: string;
   successMessage: string;
   userId: string;
   dueDate?: string;
+  projectId: number;
 }) {
   await db.insert(task).values({
     title,
     description,
     userId,
     dueDate,
+    projectId,
   });
 
   return {
