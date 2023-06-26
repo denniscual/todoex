@@ -10,15 +10,12 @@ import {
 } from 'drizzle-orm/mysql-core';
 import { InferModel } from 'drizzle-orm';
 
-export const task = mysqlTable(
-  'task',
+export const project = mysqlTable(
+  'project',
   {
     id: int('id').autoincrement().primaryKey().notNull(),
-    userId: varchar('user_id', { length: 50 }).notNull(),
     title: varchar('title', { length: 255 }).notNull(),
     description: text('description'),
-    dueDate: date('due_date', { mode: 'string' }),
-    status: mysqlEnum('status', ['pending', 'completed']).default('pending'),
     createdAt: timestamp('created_at', { mode: 'string' }).defaultNow(),
     updatedAt: timestamp('updated_at', { mode: 'string' }).defaultNow().onUpdateNow(),
   },
@@ -39,5 +36,26 @@ export const user = mysqlTable('user', {
   updatedAt: timestamp('updated_at', { mode: 'string' }).defaultNow().onUpdateNow(),
 });
 
+export const task = mysqlTable(
+  'task',
+  {
+    id: int('id').autoincrement().primaryKey().notNull(),
+    userId: varchar('user_id', { length: 50 }).notNull(),
+    projectId: int('project_id').notNull(),
+    title: varchar('title', { length: 255 }).notNull(),
+    description: text('description'),
+    dueDate: date('due_date', { mode: 'string' }),
+    status: mysqlEnum('status', ['pending', 'completed']).default('pending'),
+    createdAt: timestamp('created_at', { mode: 'string' }).defaultNow(),
+    updatedAt: timestamp('updated_at', { mode: 'string' }).defaultNow().onUpdateNow(),
+  },
+  (table) => {
+    return {
+      titleIdx: index('title_idx').on(table.title),
+    };
+  }
+);
+
 export type User = InferModel<typeof user>;
+export type Project = InferModel<typeof project>;
 export type Task = InferModel<typeof task>;

@@ -50,6 +50,13 @@
       "when": 1687448969468,
       "tag": "0006_groovy_imperial_guard",
       "breakpoints": false
+    },
+    {
+      "idx": 7,
+      "version": "5",
+      "when": 1687798692344,
+      "tag": "0007_clumsy_calypso",
+      "breakpoints": false
     }
   ]
 }
