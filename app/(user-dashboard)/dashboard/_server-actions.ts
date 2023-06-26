@@ -200,7 +200,10 @@ function createFunctionsDefinitions() {
     },
     {
       name: FunctionHandlers.creating,
-      description: 'Use this function to do a MySQL INSERT on the database.',
+      description: `
+          Use this function to do a MySQL INSERT on the database.
+          The current date is ${now.toISOString()}. Use this date if the user's question is using a relative date.
+      `,
       parameters: {
         type: 'object',
         properties: {
@@ -211,6 +214,10 @@ function createFunctionsDefinitions() {
           description: {
             type: 'string',
             description: 'The description of the todo.',
+          },
+          dueDate: {
+            type: 'string',
+            description: 'The due date of the todo.',
           },
           successMessage: {
             type: 'string',
@@ -340,16 +347,19 @@ async function creating({
   description,
   successMessage,
   userId,
+  dueDate,
 }: {
   title: string;
   description: string;
   successMessage: string;
   userId: string;
+  dueDate?: string;
 }) {
   await db.insert(task).values({
     title,
     description,
     userId,
+    dueDate,
   });
 
   return {
