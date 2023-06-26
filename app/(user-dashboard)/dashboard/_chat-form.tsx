@@ -13,7 +13,7 @@ import { Task } from '@/db';
 import { FunctionHandlers } from './_utils.shared';
 import { useRouter } from 'next/navigation';
 
-export default function ChatForm({ tasks, userId }: { tasks: Task[]; userId: string }) {
+export default function ChatForm({ userId }: { userId: string }) {
   const [messages, setMessages] = useState<any[]>([]);
   const [isPending, startTransition] = useTransition();
   const [chatBox, setChatBox] = useState('');
@@ -74,6 +74,11 @@ export default function ChatForm({ tasks, userId }: { tasks: Task[]; userId: str
                 }
                 // TODO:
                 // - handle here the "deleting" and "dropping"
+                case FunctionHandlers.deleting: {
+                  router.refresh();
+                  elements = <DeletingTodo {...res.result} />;
+                  break;
+                }
                 case FunctionHandlers.suggesting: {
                   router.refresh();
                   elements = <TodoSuggestion {...res.result} />;
@@ -139,6 +144,10 @@ function CreatingTodo({ message }: CreatingReturnType) {
 }
 
 function UpdatingTodo({ message }: UpdatingReturnType) {
+  return <div>{message}</div>;
+}
+
+function DeletingTodo({ message }: DeletingReturnType) {
   return <div>{message}</div>;
 }
 

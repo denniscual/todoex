@@ -25,7 +25,7 @@ export default async function Dashboard() {
       </div>
       <div>
         <p className="mb-4 font-semibold">Chat Form</p>
-        <ChatForm userId={userId} tasks={tasks} />
+        <ChatForm userId={userId} />
       </div>
     </div>
   );

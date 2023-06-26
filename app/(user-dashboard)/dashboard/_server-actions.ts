@@ -1,6 +1,6 @@
 'use server';
 import { Configuration, OpenAIApi } from 'openai';
-import { db, getUserTasks, task, Task } from '@/db';
+import { db, deleteTaskById, getUserTasks, task, Task } from '@/db';
 import { sql } from 'drizzle-orm';
 import { FunctionHandlers } from './_utils.shared';
 
@@ -255,16 +255,9 @@ function createFunctionsDefinitions() {
       parameters: {
         type: 'object',
         properties: {
-          query: {
-            type: 'string',
-            description: `
-          MySQL query extracting info to answer the user's question.
-          MySQL should be written using this database schema:
-          ${createStringifyDbSchema()}
-          The query should be returned in plain text, not in JSON. 
-          Make sure to use the data from todos or tasks when creating a MySQL query. 
-          The current date is ${now.toISOString()}. Use this date if the user's question is using a relative date.
-          `,
+          id: {
+            type: 'number',
+            description: 'The id of the todo or task to be deleted.',
           },
           successMessage: {
             type: 'string',
@@ -377,9 +370,10 @@ async function updating({ query, successMessage }: { query: string; successMessa
 }
 export type UpdatingReturnType = Awaited<ReturnType<typeof updating>>;
 
-async function deleting(args: any) {
+async function deleting({ id, successMessage }: { id: number; successMessage: string }) {
+  await deleteTaskById(id);
   return {
-    message: args.successMessage,
+    message: successMessage,
   };
 }
 export type DeletingReturnType = Awaited<ReturnType<typeof deleting>>;
