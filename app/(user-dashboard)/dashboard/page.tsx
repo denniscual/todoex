@@ -1,7 +1,6 @@
 import ChatForm from './_chat-form';
 import { getUserTasks } from '@/db';
 import { currentUser } from '@clerk/nextjs';
-
 export default async function Dashboard() {
   const user = await currentUser();
   const userId = user?.id ?? '';

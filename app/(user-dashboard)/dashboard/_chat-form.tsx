@@ -14,18 +14,7 @@ import { FunctionHandlers } from './_utils.shared';
 import { useRouter } from 'next/navigation';
 
 export default function ChatForm({ tasks, userId }: { tasks: Task[]; userId: string }) {
-  const [messages, setMessages] = useState<any[]>([
-    {
-      role: 'system',
-      content: `You are an AI Assistant assisting a user with their tasks. The current user id is: ${userId}`,
-      hiddenInChat: true,
-    },
-    {
-      role: 'user',
-      content: `Here are the current user todos: ${JSON.stringify(tasks)}.`,
-      hiddenInChat: true,
-    },
-  ]);
+  const [messages, setMessages] = useState<any[]>([]);
   const [isPending, startTransition] = useTransition();
   const [chatBox, setChatBox] = useState('');
   const router = useRouter();
@@ -121,11 +110,7 @@ export default function ChatForm({ tasks, userId }: { tasks: Task[]; userId: str
   );
 }
 
-function Chat({ role, content, elements, hiddenInChat }: any) {
-  if (hiddenInChat) {
-    return null;
-  }
-
+function Chat({ role, content, elements }: any) {
   return (
     <>
       <p>{role === 'user' ? 'User: ' : 'AI: '}</p>
