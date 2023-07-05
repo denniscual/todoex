@@ -30,7 +30,7 @@ export const project = mysqlTable(
 export const projectUser = mysqlTable(
   'project_user',
   {
-    userId: int('user_id').notNull(),
+    userId: varchar('user_id', { length: 50 }).notNull(),
     projectId: int('project_id').notNull(),
   },
   (table) => {

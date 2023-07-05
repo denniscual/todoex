@@ -1,0 +1,1 @@
+ALTER TABLE `project_user` MODIFY COLUMN `user_id` varchar(50) NOT NULL;
