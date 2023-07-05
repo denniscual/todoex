@@ -1,5 +1,5 @@
 import ChatForm from './_chat-form';
-import { getUserTasksByProjectId, db, project } from '@/db';
+import { getUserTasksByProjectId, db, project, getUserProjects } from '@/db';
 import { currentUser } from '@clerk/nextjs';
 import { eq } from 'drizzle-orm';
 

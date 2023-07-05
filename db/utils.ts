@@ -1,5 +1,5 @@
 import { cache } from 'react';
-import { db, task, User, user } from '@/db';
+import { db, task, User, user, project, projectUser } from '@/db';
 import { eq, and } from 'drizzle-orm';
 
 export const getUserTasksByProjectId = cache(async (id: string, projectId: number) => {
@@ -8,6 +8,19 @@ export const getUserTasksByProjectId = cache(async (id: string, projectId: numbe
     .from(task)
     .where(and(eq(task.userId, id), eq(task.projectId, projectId)));
   return tasks;
+});
+
+export const getUserProjects = cache(async (id: string) => {
+  const projects = await db
+    .select({
+      title: project.title,
+      id: project.id,
+    })
+    .from(project)
+    .innerJoin(projectUser, eq(project.id, projectUser.projectId))
+    .innerJoin(user, eq(user.id, projectUser.userId))
+    .where(eq(user.id, id));
+  return projects;
 });
 
 export async function insertTaskByUserId({
