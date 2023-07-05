@@ -3,6 +3,10 @@ import { getUserTasksByProjectId, db, project } from '@/db';
 import { currentUser } from '@clerk/nextjs';
 import { eq } from 'drizzle-orm';
 
+/**
+ * TODO:
+ * - add select project element on the dashboard page.
+ */
 export default async function Dashboard() {
   const user = await currentUser();
   const userId = user?.id ?? '';

@@ -12,6 +12,7 @@ const model = new OpenAIApi(configuration);
 /**
  * TODO:
  *
+ * - add select project element on the dashboard page.
  * - use Zod to validate the arguments.
  * - add project model to the database and associate it with the user and task models.
  * - fine tune the function "createStringifyDbSchema". Sometimes the ai can't understand the generated table name and columns names.
