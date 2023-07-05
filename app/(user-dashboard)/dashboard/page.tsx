@@ -1,5 +1,5 @@
 import ChatForm from './_chat-form';
-import { getUserTasksByProjectId, db, project } from '@/db';
+import { getUserTasksByProjectId, getUserProjects, getProject } from '@/db';
 import { currentUser } from '@clerk/nextjs';
 import { eq } from 'drizzle-orm';
 
@@ -12,14 +12,9 @@ export default async function Dashboard() {
   const userId = user?.id ?? '';
   const projectId = 1;
   const tasks = await getUserTasksByProjectId(userId, projectId);
-  const projects = await db
-    .select({
-      title: project.title,
-      description: project.description,
-    })
-    .from(project)
-    .where(eq(project.id, projectId));
-  const currentProject = projects[0];
+  const currentProject = await getProject(projectId);
+
+  console.log(await getUserProjects(userId));
 
   if (!currentProject) {
     return <div>Current project is not found.</div>;
