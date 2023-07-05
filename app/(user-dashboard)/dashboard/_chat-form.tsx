@@ -12,7 +12,14 @@ import {
 import { FunctionHandlers } from './_utils.shared';
 import { useRouter } from 'next/navigation';
 
-export default function ChatForm({ userId }: { userId: string }) {
+export default function ChatForm({
+  userId,
+  projectId,
+}: {
+  userId: string;
+
+  projectId: number;
+}) {
   const [messages, setMessages] = useState<any[]>([]);
   const [isPending, startTransition] = useTransition();
   const [chatBox, setChatBox] = useState('');
@@ -52,6 +59,7 @@ export default function ChatForm({ userId }: { userId: string }) {
                   content: message.content,
                 })),
                 userId,
+                projectId,
               });
               const { handler, result } = res;
               let elements: React.ReactNode = null;

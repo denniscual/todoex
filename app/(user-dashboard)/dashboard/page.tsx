@@ -1,15 +1,30 @@
 import ChatForm from './_chat-form';
-import { getUserTasks } from '@/db';
+import { getUserTasksByProjectId, db, project } from '@/db';
 import { currentUser } from '@clerk/nextjs';
+import { eq } from 'drizzle-orm';
+
 export default async function Dashboard() {
   const user = await currentUser();
   const userId = user?.id ?? '';
-  const tasks = await getUserTasks(userId);
+  const projectId = 1;
+  const tasks = await getUserTasksByProjectId(userId, projectId);
+  const projects = await db
+    .select({
+      title: project.title,
+      description: project.description,
+    })
+    .from(project)
+    .where(eq(project.id, projectId));
+  const currentProject = projects[0];
+
+  if (!currentProject) {
+    return <div>Current project is not found.</div>;
+  }
 
   return (
     <div className="space-y-8">
       <div>
-        <p className="mb-4 font-semibold">Todo List</p>
+        <p className="mb-4 font-semibold">{currentProject.title}</p>
         {tasks.length === 0 ? (
           <div>No existing tasks</div>
         ) : (
@@ -25,7 +40,7 @@ export default async function Dashboard() {
       </div>
       <div>
         <p className="mb-4 font-semibold">Chat Form</p>
-        <ChatForm userId={userId} />
+        <ChatForm projectId={projectId} userId={userId} />
       </div>
     </div>
   );

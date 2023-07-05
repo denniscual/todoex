@@ -1,6 +1,6 @@
 'use server';
 import { Configuration, OpenAIApi } from 'openai';
-import { db, deleteTaskById, getUserTasks, task, Task } from '@/db';
+import { db, deleteTaskById, getUserTasksByProjectId, task, Task } from '@/db';
 import { sql } from 'drizzle-orm';
 import { FunctionHandlers } from './_utils.shared';
 
@@ -22,15 +22,23 @@ const model = new OpenAIApi(configuration);
  *   to pass message with role: "function" and append the `functionResponse` as the content. We let openai to generate the result for us and parse it by RSC.
  * - improve typescript.
  */
-export async function generate({ userId, messages }: { userId: string; messages: any[] }) {
+export async function generate({
+  userId,
+  messages,
+  projectId,
+}: {
+  userId: string;
+  projectId: number;
+  messages: any[];
+}) {
   try {
-    const userTasks = await getUserTasks(userId);
+    const userTasks = await getUserTasksByProjectId(userId, projectId);
     const functionsDefinitions = createFunctionsDefinitions();
 
     const chatMessages = [
       {
         role: 'system',
-        content: `You are an AI Assistant assisting a user with their tasks. The current user id is: ${userId}.`,
+        content: `You are an AI Assistant assisting a user with their tasks. The current user id is: ${userId}. The current project id is: ${projectId}`,
       },
       {
         role: 'user',
@@ -57,6 +65,7 @@ export async function generate({ userId, messages }: { userId: string; messages:
       const functionResponse = await foundFunction({
         ...functionArguments,
         userId,
+        projectId,
       });
 
       switch (functionName) {
@@ -110,6 +119,15 @@ export async function generate({ userId, messages }: { userId: string; messages:
         case FunctionHandlers.suggesting: {
           const { title, description, areThereDetailsNeededFromTheUser, message } =
             functionResponse as InferHandlerReturnType<typeof functionName>;
+
+          if (!title && !description) {
+            return {
+              result: {
+                message: `Apologies, but I am unable to understand your request. If you have a specific question or need assistance with your todo list, please let me know and I will be happy to help.`,
+              },
+            };
+          }
+
           const _message = areThereDetailsNeededFromTheUser
             ? message
             : `Suggested todo: Title = ${title}; Description = ${description}.`;
@@ -138,7 +156,7 @@ export async function generate({ userId, messages }: { userId: string; messages:
       result: {
         message:
           message?.content ??
-          `'Apologies, but I am unable to understand your request. If you have a specific question or need assistance with your todo list, please let me know and I will be happy to help.'`,
+          `Apologies, but I am unable to understand your request. If you have a specific question or need assistance with your todo list, please let me know and I will be happy to help.`,
       },
     };
   } catch (err) {
@@ -361,6 +379,10 @@ async function creating({
   dueDate?: string;
   projectId: number;
 }) {
+  console.log({
+    userId,
+    projectId,
+  });
   await db.insert(task).values({
     title,
     description,
@@ -409,6 +431,11 @@ async function suggesting({
   successMessage: string;
   areThereDetailsNeededFromTheUser: boolean;
 }) {
+  console.log({
+    title,
+    description,
+    areThereDetailsNeededFromTheUser,
+  });
   return {
     message: successMessage,
     title,
@@ -433,5 +460,6 @@ function mapTasksFieldsToDbFields(tasks: Task[]) {
     status: task.status,
     title: task.title,
     description: task.description,
+    project_id: task.projectId,
   }));
 }

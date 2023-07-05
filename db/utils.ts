@@ -1,9 +1,12 @@
 import { cache } from 'react';
 import { db, task, User, user } from '@/db';
-import { eq } from 'drizzle-orm';
+import { eq, and } from 'drizzle-orm';
 
-export const getUserTasks = cache(async (id: string) => {
-  const tasks = await db.select().from(task).where(eq(task.userId, id));
+export const getUserTasksByProjectId = cache(async (id: string, projectId: number) => {
+  const tasks = await db
+    .select()
+    .from(task)
+    .where(and(eq(task.userId, id), eq(task.projectId, projectId)));
   return tasks;
 });
 
