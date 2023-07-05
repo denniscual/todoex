@@ -1,8 +1,8 @@
 import { cache } from 'react';
-import { db, task, User, user, project, projectUser } from '@/db';
+import { db, task, User, user, project, projectUser, Project, Task } from '@/db';
 import { eq, and } from 'drizzle-orm';
 
-export const getUserTasksByProjectId = cache(async (id: string, projectId: number) => {
+export const getUserTasksByProjectId = cache(async (id: User['id'], projectId: Project['id']) => {
   const tasks = await db
     .select()
     .from(task)
@@ -10,7 +10,7 @@ export const getUserTasksByProjectId = cache(async (id: string, projectId: numbe
   return tasks;
 });
 
-export const getUserProjects = cache(async (id: string) => {
+export const getUserProjects = cache(async (id: User['id']) => {
   const projects = await db
     .select({
       title: project.title,
@@ -29,10 +29,10 @@ export async function insertTaskByUserId({
   description,
   projectId,
 }: {
-  id: string;
-  title: string;
-  description: string;
-  projectId: number;
+  id: User['id'];
+  title: Task['title'];
+  description: Task['description'];
+  projectId: Project['id'];
 }) {
   await db.insert(task).values({
     userId: id,
@@ -42,7 +42,7 @@ export async function insertTaskByUserId({
   });
 }
 
-export async function deleteTaskById(id: number) {
+export async function deleteTaskById(id: Task['id']) {
   await db.delete(task).where(eq(task.id, id));
 }
 
