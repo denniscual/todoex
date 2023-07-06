@@ -1,6 +1,14 @@
 'use server';
 import { Configuration, OpenAIApi } from 'openai';
-import { db, deleteTaskById, getUserTasksByProjectId, task, Task } from '@/db';
+import {
+  db,
+  deleteTaskById,
+  getUserProjects,
+  getUserTasksByProjectId,
+  Project,
+  task,
+  Task,
+} from '@/db';
 import { sql } from 'drizzle-orm';
 import { FunctionHandlers } from './_utils.shared';
 
@@ -35,6 +43,7 @@ export async function generate({
 }) {
   try {
     const userTasks = await getUserTasksByProjectId(userId, projectId);
+    const userProjects = await getUserProjects(userId);
     const functionsDefinitions = createFunctionsDefinitions();
 
     const chatMessages = [
@@ -44,9 +53,9 @@ export async function generate({
       },
       {
         role: 'user',
-        content: `Here are the current user todos: ${JSON.stringify(
+        content: `Here are the current user todos/tasks for a current project: ${JSON.stringify(
           mapTasksFieldsToDbFields(userTasks)
-        )}.`,
+        )}. Here are the current user projects: ${JSON.stringify(userProjects)}.`,
       },
       ...messages,
     ];
@@ -458,6 +467,7 @@ function mapTasksFieldsToDbFields(tasks: Task[]) {
     id: task.id,
     user_id: task.userId,
     created_at: task.createdAt,
+    updated_at: task.updatedAt,
     due_date: task.dueDate,
     status: task.status,
     title: task.title,
