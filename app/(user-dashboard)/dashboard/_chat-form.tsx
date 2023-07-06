@@ -127,8 +127,8 @@ export default function ChatForm({
 function Chat({ role, content, elements }: any) {
   return (
     <>
-      <p>{role === 'user' ? 'User: ' : 'AI: '}</p>
-      <p>{role === 'user' ? content : elements}</p>
+      <div>{role === 'user' ? 'User: ' : 'AI: '}</div>
+      <div>{role === 'user' ? content : elements}</div>
     </>
   );
 }
