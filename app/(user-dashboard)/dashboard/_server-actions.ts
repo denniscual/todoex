@@ -12,7 +12,8 @@ const model = new OpenAIApi(configuration);
 /**
  * TODO:
  *
- * - add select project element on the dashboard page.
+ * - utilize data fetching using Suspense like make it parallel as much as possible or maybe we can do preload.
+ *   Check/review nextjs or reactjs docs about utilization.
  * - use Zod to validate the arguments.
  * - add project model to the database and associate it with the user and task models.
  * - fine tune the function "createStringifyDbSchema". Sometimes the ai can't understand the generated table name and columns names.
