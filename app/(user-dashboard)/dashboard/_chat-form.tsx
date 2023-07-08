@@ -12,6 +12,8 @@ import {
 import { FunctionHandlers } from './_utils.shared';
 import { useRouter } from 'next/navigation';
 
+const { timeZone } = Intl.DateTimeFormat().resolvedOptions();
+
 export default function ChatForm({
   userId,
   projectId,
@@ -60,6 +62,9 @@ export default function ChatForm({
                 })),
                 userId,
                 projectId,
+                userMeta: {
+                  timeZone,
+                },
               });
               const { handler, result } = res;
               let elements: React.ReactNode = null;

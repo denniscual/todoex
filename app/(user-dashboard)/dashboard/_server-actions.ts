@@ -1,14 +1,6 @@
 'use server';
 import { Configuration, OpenAIApi } from 'openai';
-import {
-  db,
-  deleteTaskById,
-  getUserProjects,
-  getUserTasksByProjectId,
-  Project,
-  task,
-  Task,
-} from '@/db';
+import { db, deleteTaskById, getUserProjects, getUserTasksByProjectId, task, Task } from '@/db';
 import { sql } from 'drizzle-orm';
 import { FunctionHandlers } from './_utils.shared';
 
@@ -37,17 +29,24 @@ export async function generate({
   userId,
   messages,
   projectId,
+  userMeta: { timeZone },
 }: {
   userId: string;
   projectId: number;
   messages: any[];
+  userMeta: {
+    timeZone: string;
+  };
 }) {
   const date = new Date().toISOString();
 
   try {
     const userTasks = await getUserTasksByProjectId(userId, projectId);
     const userProjects = await getUserProjects(userId);
-    const functionsDefinitions = createFunctionsDefinitions(date);
+    const functionsDefinitions = createFunctionsDefinitions({
+      date,
+      timeZone,
+    });
 
     const chatMessages = [
       {
@@ -198,8 +197,7 @@ function createStringifyDbSchema() {
   return tables;
 }
 
-function createFunctionsDefinitions(date: string) {
-  const now = new Date();
+function createFunctionsDefinitions({ date, timeZone }: { date: string; timeZone: string }) {
   const functionsDefinitions: {
     name: string;
     description: string;
@@ -219,7 +217,7 @@ function createFunctionsDefinitions(date: string) {
           MySQL should be written using this database schema:
           ${createStringifyDbSchema()}
           The query should be returned in plain text, not in JSON. 
-          The user current date is ${date} in UTC format. Use this date if the user's question is using a relative date.
+          The current date is ${date} in UTC format. Use this date if the user's question includes a relative date.
           `,
           },
           successMessage: {
@@ -234,7 +232,8 @@ function createFunctionsDefinitions(date: string) {
       name: FunctionHandlers.creating,
       description: `
           Use this function to do a MySQL INSERT on the database.
-          The current date is ${date} in UTC format. Use this date if the user's question is using a relative date.
+          The current date is ${date} in UTC format. Use this date if the user's question includes a relative date.
+          User's timeZone is in ${timeZone}. When adding a due date, use this timeZone and then convert it to UTC format.
       `,
       parameters: {
         type: 'object',
@@ -277,7 +276,8 @@ function createFunctionsDefinitions(date: string) {
           ${createStringifyDbSchema()}
           The query should be returned in plain text, not in JSON. 
           Make sure to use the data from todos or tasks when creating a MySQL query. 
-          The current date is ${date} in UTC format. Use this date if the user's question is using a relative date.
+          The current date is ${date} in UTC format. Use this date if the user's question includes a relative date.
+          User's timeZone is in ${timeZone}. When updating a due date, use this timeZone and then convert it to UTC format.
           `,
           },
           successMessage: {
@@ -324,7 +324,8 @@ function createFunctionsDefinitions(date: string) {
     {
       name: FunctionHandlers.suggesting,
       description: `Use this function to do a todos or tasks suggestion. Give a meaningful suggestion to the user.
-          The current date is ${date} in UTC format. Use this date if the user's question is using a relative date.
+          The current date is ${date} in UTC format. Use this date if the user's question includes a relative date.
+          User's timeZone is in ${timeZone}. When suggesting a due date, use this timeZone and then convert it to UTC format.
         `,
       parameters: {
         type: 'object',
