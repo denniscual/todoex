@@ -20,6 +20,7 @@ const model = new OpenAIApi(configuration);
 /**
  * TODO:
  *
+ * - when suggesting a task, make sure to capture the dueDate if the user includes deadline.
  * - utilize data fetching using Suspense like make it parallel as much as possible or maybe we can do preload.
  *   Check/review nextjs or reactjs docs about utilization.
  * - use Zod to validate the arguments.
@@ -41,15 +42,17 @@ export async function generate({
   projectId: number;
   messages: any[];
 }) {
+  const date = new Date().toISOString();
+
   try {
     const userTasks = await getUserTasksByProjectId(userId, projectId);
     const userProjects = await getUserProjects(userId);
-    const functionsDefinitions = createFunctionsDefinitions();
+    const functionsDefinitions = createFunctionsDefinitions(date);
 
     const chatMessages = [
       {
         role: 'system',
-        content: `You are an AI Assistant assisting a user with their tasks. The current user id is: ${userId}. The current project id is: ${projectId}`,
+        content: `You are friendly and clever AI Assistant assisting a user with their tasks. The current user id is: ${userId}. The current project id is: ${projectId}`,
       },
       {
         role: 'user',
@@ -195,7 +198,7 @@ function createStringifyDbSchema() {
   return tables;
 }
 
-function createFunctionsDefinitions() {
+function createFunctionsDefinitions(date: string) {
   const now = new Date();
   const functionsDefinitions: {
     name: string;
@@ -216,7 +219,7 @@ function createFunctionsDefinitions() {
           MySQL should be written using this database schema:
           ${createStringifyDbSchema()}
           The query should be returned in plain text, not in JSON. 
-          The current date is ${now.toISOString()}. Use this date if the user's question is using a relative date.
+          The user current date is ${date} in UTC format. Use this date if the user's question is using a relative date.
           `,
           },
           successMessage: {
@@ -231,7 +234,7 @@ function createFunctionsDefinitions() {
       name: FunctionHandlers.creating,
       description: `
           Use this function to do a MySQL INSERT on the database.
-          The current date is ${now.toISOString()}. Use this date if the user's question is using a relative date.
+          The current date is ${date} in UTC format. Use this date if the user's question is using a relative date.
       `,
       parameters: {
         type: 'object',
@@ -274,7 +277,7 @@ function createFunctionsDefinitions() {
           ${createStringifyDbSchema()}
           The query should be returned in plain text, not in JSON. 
           Make sure to use the data from todos or tasks when creating a MySQL query. 
-          The current date is ${now.toISOString()}. Use this date if the user's question is using a relative date.
+          The current date is ${date} in UTC format. Use this date if the user's question is using a relative date.
           `,
           },
           successMessage: {
@@ -320,8 +323,9 @@ function createFunctionsDefinitions() {
     },
     {
       name: FunctionHandlers.suggesting,
-      description:
-        'Use this function to do a todos or tasks suggestion. Give a meaningful suggestion to the user.',
+      description: `Use this function to do a todos or tasks suggestion. Give a meaningful suggestion to the user.
+          The current date is ${date} in UTC format. Use this date if the user's question is using a relative date.
+        `,
       parameters: {
         type: 'object',
         properties: {
@@ -332,6 +336,10 @@ function createFunctionsDefinitions() {
           description: {
             type: 'string',
             description: 'The description of the todo.',
+          },
+          dueDate: {
+            type: 'string',
+            description: 'A due date / deadline of a todo or task that is converted to UTC.',
           },
           areThereDetailsNeededFromTheUser: {
             type: 'boolean',
@@ -436,16 +444,16 @@ async function suggesting({
   description,
   successMessage,
   areThereDetailsNeededFromTheUser,
+  dueDate,
 }: {
   title: string;
   description: string;
   successMessage: string;
   areThereDetailsNeededFromTheUser: boolean;
+  dueDate: string;
 }) {
   console.log({
-    title,
-    description,
-    areThereDetailsNeededFromTheUser,
+    dueDate,
   });
   return {
     message: successMessage,

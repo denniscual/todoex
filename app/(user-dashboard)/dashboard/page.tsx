@@ -50,6 +50,15 @@ async function CurrentProject({
   const tasks = await getUserTasksByProjectId(userId, projectId);
   const currentProject = await getProject(projectId);
 
+  // console.log({
+  //   tasks,
+  // });
+
+  // if (tasks[0].createdAt) {
+  //   const date = new Date(tasks[0].createdAt);
+  //   console.log({ date });
+  // }
+
   if (!currentProject) {
     return <div>Current project is not found.</div>;
   }
