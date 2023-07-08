@@ -24,7 +24,7 @@ const model = new OpenAIApi(configuration);
  * - utilize data fetching using Suspense like make it parallel as much as possible or maybe we can do preload.
  *   Check/review nextjs or reactjs docs about utilization.
  * - use Zod to validate the arguments.
- * - add project model to the database and associate it with the user and task models.
+ * - fine tune prompts.
  * - fine tune the function "createStringifyDbSchema". Sometimes the ai can't understand the generated table name and columns names.
  * - Increase or more fine tuning the model to avoid doing destructive actions like dropping a table or moving a todo to another user. I think
  *   for the fucntion that accepts a "MySQL query", we can blacklist some MySQL actions like DROP, DELETE, etc.
@@ -52,7 +52,7 @@ export async function generate({
     const chatMessages = [
       {
         role: 'system',
-        content: `You are friendly and clever AI Assistant assisting a user with their tasks. The current user id is: ${userId}. The current project id is: ${projectId}`,
+        content: `You are friendly and clever AI Assistant assisting a user with their tasks. The current user id is: ${userId}. The current project id is: ${projectId}.`,
       },
       {
         role: 'user',
