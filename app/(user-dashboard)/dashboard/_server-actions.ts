@@ -233,7 +233,7 @@ function createFunctionsDefinitions({ date, timeZone }: { date: string; timeZone
       description: `
           Use this function to do a MySQL INSERT on the database.
           The current date is ${date} in UTC format. Use this date if the user's question includes a relative date.
-          User's timeZone is in ${timeZone}. When adding a due date, use this timeZone and then convert it to UTC format.
+          User's timeZone is in "${timeZone}". When suggesting a due date, use this timeZone and then convert it to UTC date.
       `,
       parameters: {
         type: 'object',
@@ -277,7 +277,7 @@ function createFunctionsDefinitions({ date, timeZone }: { date: string; timeZone
           The query should be returned in plain text, not in JSON. 
           Make sure to use the data from todos or tasks when creating a MySQL query. 
           The current date is ${date} in UTC format. Use this date if the user's question includes a relative date.
-          User's timeZone is in ${timeZone}. When updating a due date, use this timeZone and then convert it to UTC format.
+          User's timeZone is in "${timeZone}". When suggesting a due date, use this timeZone and then convert it to UTC date.
           `,
           },
           successMessage: {
@@ -325,7 +325,7 @@ function createFunctionsDefinitions({ date, timeZone }: { date: string; timeZone
       name: FunctionHandlers.suggesting,
       description: `Use this function to do a todos or tasks suggestion. Give a meaningful suggestion to the user.
           The current date is ${date} in UTC format. Use this date if the user's question includes a relative date.
-          User's timeZone is in ${timeZone}. When suggesting a due date, use this timeZone and then convert it to UTC format.
+          User's timeZone is in "${timeZone}". When suggesting a due date, use this timeZone and then convert it to UTC date.
         `,
       parameters: {
         type: 'object',
