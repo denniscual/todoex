@@ -12,16 +12,8 @@ import {
 import { FunctionHandlers } from './_utils.shared';
 import { useRouter } from 'next/navigation';
 
-const { timeZone } = Intl.DateTimeFormat().resolvedOptions();
-
-export default function ChatForm({
-  userId,
-  projectId,
-}: {
-  userId: string;
-
-  projectId: number;
-}) {
+export default function ChatForm({ userId, projectId }: { userId: string; projectId: number }) {
+  const { timeZone } = Intl.DateTimeFormat().resolvedOptions();
   const [messages, setMessages] = useState<any[]>([]);
   const [isPending, startTransition] = useTransition();
   const [chatBox, setChatBox] = useState('');
