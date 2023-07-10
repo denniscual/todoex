@@ -29,14 +29,10 @@ export async function generate({
   userId,
   messages,
   projectId,
-  userMeta: { timeZone },
 }: {
   userId: string;
   projectId: number;
   messages: any[];
-  userMeta: {
-    timeZone: string;
-  };
 }) {
   const date = new Date().toISOString();
 
@@ -45,7 +41,6 @@ export async function generate({
     const userProjects = await getUserProjects(userId);
     const functionsDefinitions = createFunctionsDefinitions({
       date,
-      timeZone,
     });
 
     const chatMessages = [
@@ -197,7 +192,7 @@ function createStringifyDbSchema() {
   return tables;
 }
 
-function createFunctionsDefinitions({ date, timeZone }: { date: string; timeZone: string }) {
+function createFunctionsDefinitions({ date }: { date: string }) {
   const functionsDefinitions: {
     name: string;
     description: string;
@@ -233,9 +228,6 @@ function createFunctionsDefinitions({ date, timeZone }: { date: string; timeZone
       description: `
           Use this function to do a MySQL INSERT on the database.
           The current date is ${date} in UTC format. Use this date if the user's question includes a relative date.
-          User's timeZone is in "${timeZone}". When suggesting a due date, use this timeZone and then convert it to UTC date.
-          E.g User's timezone is "Asia/manila" and the user wants to do the task at 3pm local time. When creating the due date,
-          you must convert this local time into UTC. So it will become "7am / 07:00:00".
       `,
       parameters: {
         type: 'object',
@@ -279,9 +271,6 @@ function createFunctionsDefinitions({ date, timeZone }: { date: string; timeZone
           The query should be returned in plain text, not in JSON. 
           Make sure to use the data from todos or tasks when creating a MySQL query. 
           The current date is ${date} in UTC format. Use this date if the user's question includes a relative date.
-          User's timeZone is in "${timeZone}". When updating a due date, use this timeZone and then convert it to UTC date.
-          E.g User's timezone is "Asia/manila" and the user wants to do the task at 3pm local time. When creating the due date,
-          you must convert this local time into UTC. So it will become "7am / 07:00:00".
           `,
           },
           successMessage: {
@@ -343,12 +332,7 @@ function createFunctionsDefinitions({ date, timeZone }: { date: string; timeZone
           },
           dueDate: {
             type: 'string',
-            description: `.
-            The due date or deadline for a task.
-            When setting a due date, remember to consider the user's time zone (${timeZone}) and convert it to Coordinated Universal Time (UTC).
-            For example, if the user's local date and time is "2023-07-08T19:00:00" in the "Asia/Manila" time zone, after adjusting it, the due date should be converted 
-            to UTC as "2023-07-08T11:00:00Z".
-            `,
+            description: 'The due date of the todo.',
           },
           areThereDetailsNeededFromTheUser: {
             type: 'boolean',

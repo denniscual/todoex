@@ -54,9 +54,6 @@ export default function ChatForm({ userId, projectId }: { userId: string; projec
                 })),
                 userId,
                 projectId,
-                userMeta: {
-                  timeZone,
-                },
               });
               const { handler, result } = res;
               let elements: React.ReactNode = null;
