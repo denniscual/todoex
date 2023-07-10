@@ -271,7 +271,6 @@ function createFunctionsDefinitions({ date }: { date: string }) {
           The query should be returned in plain text, not in JSON. 
           Make sure to use the data from todos or tasks when creating a MySQL query. 
           The current date is ${date} in UTC format. Use this date if the user's question includes a relative date.
-          When updating the due date, make sure to use UTC format.
           `,
           },
           successMessage: {
