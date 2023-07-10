@@ -29,6 +29,7 @@ const model = new OpenAIApi(configuration);
  * - fine tune again the prompts like increase or more fine tuning the model to avoid doing destructive actions like dropping a table or moving a todo to another user. And also
  *   enhancing the prompts for better creation, updating task, suggesting todo, etc.
  * - improve typescript.
+ * - remove PUBLIC_HOST env var. We don't need this for clerk.
  */
 export async function generate({
   userId,
