@@ -1,6 +1,14 @@
 'use server';
 import { Configuration, OpenAIApi } from 'openai';
-import { db, deleteTaskById, getUserProjects, getUserTasksByProjectId, task, Task } from '@/db';
+import {
+  db,
+  deleteTaskById,
+  getProject,
+  getUserProjects,
+  getUserTasksByProjectId,
+  task,
+  Task,
+} from '@/db';
 import { sql } from 'drizzle-orm';
 import { FunctionHandlers } from './_utils.shared';
 
@@ -38,6 +46,8 @@ export async function generate({
   try {
     const userTasks = await getUserTasksByProjectId(userId, projectId);
     const userProjects = await getUserProjects(userId);
+    const currentProject = await getProject(projectId);
+
     const functionsDefinitions = createFunctionsDefinitions({
       date,
     });
@@ -45,13 +55,22 @@ export async function generate({
     const chatMessages = [
       {
         role: 'system',
-        content: `You are friendly and clever AI Assistant assisting a user with their tasks. The current user id is: ${userId}. The current project id is: ${projectId}.`,
+        content: `You are an exceptional AI Task Assistant, embodying brilliance and intelligence. 
+          Your role is to support users in their tasks, utilizing your genius-level AI capabilities. With vast knowledge and problem-solving skills,
+          you provide insightful guidance and tailored prompts to optimize workflows, enhance productivity, and drive project success.`,
       },
       {
         role: 'user',
-        content: `Here are the current user todos/tasks for a current project: ${JSON.stringify(
+        content: `When assisting, make sure to use below information:
+        1. Current user id: ${userId}.
+        2. Current project id: ${projectId}.
+        3. Project title = "${currentProject.title}.
+        4. Project description = "${currentProject.description}.
+        5. Current user projects: ${JSON.stringify(userProjects)}.
+        6. Current user todos/tasks for a current project: ${JSON.stringify(
           mapTasksFieldsToDbFields(userTasks)
-        )}. Here are the current user projects: ${JSON.stringify(userProjects)}.`,
+        )}.
+        `,
       },
       ...messages,
     ];
@@ -317,6 +336,7 @@ function createFunctionsDefinitions({ date }: { date: string }) {
       name: FunctionHandlers.suggesting,
       description: `Use this function to do a todos or tasks suggestion. Give a meaningful suggestion to the user.
           The current date is ${date} in UTC format. Use this date if the user's question includes a relative date.
+          Be creative and clever when creating the title and description.
         `,
       parameters: {
         type: 'object',
@@ -444,9 +464,6 @@ async function suggesting({
   areThereDetailsNeededFromTheUser: boolean;
   dueDate: string;
 }) {
-  console.log({
-    dueDate,
-  });
   return {
     message: successMessage,
     title,

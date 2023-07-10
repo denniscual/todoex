@@ -3,6 +3,7 @@ import { getUserTasksByProjectId, getUserProjects, getProject, Project, User } f
 import { currentUser } from '@clerk/nextjs';
 import { revalidatePath } from 'next/cache';
 import { cookies } from 'next/headers';
+import { Suspense } from 'react';
 
 export default async function Dashboard() {
   const cookieStore = cookies();
@@ -35,7 +36,11 @@ export default async function Dashboard() {
         </select>
         <button>Pick</button>
       </form>
-      {!!projectId && <CurrentProject projectId={parseInt(projectId)} userId={userId} />}
+      {!!projectId && (
+        <Suspense fallback={<div>Loading project...</div>}>
+          <CurrentProject projectId={parseInt(projectId)} userId={userId} />
+        </Suspense>
+      )}
     </div>
   );
 }
