@@ -12,7 +12,6 @@ const model = new OpenAIApi(configuration);
 /**
  * TODO:
  *
- * - when suggesting a task, make sure to capture the dueDate if the user includes deadline. The duedate should respect the users timezone and will be converted to UTC.
  * - utilize data fetching using Suspense like make it parallel as much as possible or maybe we can do preload.
  *   Check/review nextjs or reactjs docs about utilization.
  * - use Zod to validate the arguments.
