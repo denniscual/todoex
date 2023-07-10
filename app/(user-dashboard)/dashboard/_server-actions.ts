@@ -23,13 +23,11 @@ const model = new OpenAIApi(configuration);
  * - utilize data fetching using Suspense like make it parallel as much as possible or maybe we can do preload.
  *   Check/review nextjs or reactjs docs about utilization.
  * - use Zod to validate the arguments.
- * - fine tune prompts.
- * - fine tune the function "createStringifyDbSchema". Sometimes the ai can't understand the generated table name and columns names.
- * - Increase or more fine tuning the model to avoid doing destructive actions like dropping a table or moving a todo to another user. I think
- *   for the fucntion that accepts a "MySQL query", we can blacklist some MySQL actions like DROP, DELETE, etc.
  * - add function defintion for handling couting and aggregating result. Make sure to add good function description to this
  *   to distinguish this function to "seaching" function. I think we can use the same function `ask_database` and call the `createChatCompletion`
  *   to pass message with role: "function" and append the `functionResponse` as the content. We let openai to generate the result for us and parse it by RSC.
+ * - fine tune again the prompts like increase or more fine tuning the model to avoid doing destructive actions like dropping a table or moving a todo to another user. And also
+ *   enhancing the prompts for better creation, updating task, suggesting todo, etc.
  * - improve typescript.
  */
 export async function generate({
@@ -143,7 +141,7 @@ export async function generate({
           };
         }
         case FunctionHandlers.suggesting: {
-          const { title, description, areThereDetailsNeededFromTheUser, message } =
+          const { title, description, areThereDetailsNeededFromTheUser, message, dueDate } =
             functionResponse as InferHandlerReturnType<typeof functionName>;
 
           if (!title && !description) {
@@ -156,14 +154,18 @@ export async function generate({
 
           const _message = areThereDetailsNeededFromTheUser
             ? message
-            : `Suggested todo: Title = ${title}; Description = ${description}.`;
+            : `Suggested todo: Title = ${title}; Description = ${description}. ${
+                !!dueDate ? `Due date = ${dueDate}` : ''
+              }.`;
           return {
             handler: functionName,
             result: {
               title,
               description,
+              suggestMessage: message,
               message: _message,
               areThereDetailsNeededFromTheUser,
+              dueDate,
             },
           };
         }
@@ -353,12 +355,18 @@ function createFunctionsDefinitions({ date }: { date: string }) {
             type: 'string',
             description: 'The due date of the todo.',
           },
+          successMessage: {
+            type: 'string',
+            description: `Provide the possible success message for the user. When using creating this message if there is a suggested task, no need  or avoid adding the title, description, and due date.
+            E.g "Ok, here is the suggested task:" or "Allow me to introduce the suggested task at this moment:" No need the title, description, and due date..
+            `,
+          },
           areThereDetailsNeededFromTheUser: {
             type: 'boolean',
             description: 'A flag to indicate if there are details needed from the user.',
           },
         },
-        required: ['title', 'description', 'areThereDetailsNeededFromTheUser'],
+        required: ['title', 'description', 'areThereDetailsNeededFromTheUser', 'successMessage'],
       },
     },
   ];
@@ -462,13 +470,14 @@ async function suggesting({
   description: string;
   successMessage: string;
   areThereDetailsNeededFromTheUser: boolean;
-  dueDate: string;
+  dueDate?: string;
 }) {
   return {
     message: successMessage,
     title,
     description,
     areThereDetailsNeededFromTheUser,
+    dueDate,
   };
 }
 export type SuggestingReturnType = Awaited<ReturnType<typeof suggesting>>;

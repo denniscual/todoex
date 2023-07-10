@@ -161,16 +161,21 @@ function TodoSuggestion({
   title,
   description,
   areThereDetailsNeededFromTheUser,
-}: SuggestingReturnType) {
+  dueDate,
+  suggestMessage,
+}: SuggestingReturnType & {
+  suggestMessage: string;
+}) {
   if (areThereDetailsNeededFromTheUser) {
     return <div>{description}</div>;
   }
 
   return (
     <div>
-      <p>Ok, here is a suggestion:</p>
+      <p>{suggestMessage}</p>
       <p>Title: {title}</p>
       <p>Description: {description}</p>
+      {!!dueDate && <p>Due date: {dueDate}</p>}
     </div>
   );
 }
