@@ -265,7 +265,8 @@ function createFunctionsDefinitions({ date }: { date: string }) {
           },
           dueDate: {
             type: 'string',
-            description: 'The due date of the todo.',
+            description:
+              'The due date of the todo. Make sure the value is compatible to Mysql date type.',
           },
           projectId: {
             type: 'number',
@@ -356,7 +357,8 @@ function createFunctionsDefinitions({ date }: { date: string }) {
           },
           dueDate: {
             type: 'string',
-            description: 'The due date of the todo.',
+            description:
+              'The due date of the todo. Make sure the value is compatible to Mysql date type. This field is optional.',
           },
           successMessage: {
             type: 'string',
