@@ -32,6 +32,7 @@ export default async function Dashboard() {
           cookieStore.set('projectId', values.projects);
           revalidatePath('/dashboard');
         }}
+        className="flex items-center gap-4"
       >
         <label htmlFor="project-select">Choose a project:</label>
         <select defaultValue={projectId} name="projects" id="project-select">
@@ -42,7 +43,9 @@ export default async function Dashboard() {
             </option>
           ))}
         </select>
-        <button>Pick</button>
+        <button className="px-4 py-2 font-bold text-white bg-blue-500 rounded hover:bg-blue-700">
+          Pick
+        </button>
       </form>
       {!!projectId && (
         <Suspense fallback={<div>Loading project...</div>}>
@@ -70,7 +73,7 @@ async function UserProject({
     <>
       <p className="mb-4 font-semibold">{userProject.title}</p>
       <Suspense fallback={<div>Loading user tasks...</div>}>
-        <UserTasks projectId={projectId} userId={userId} />
+        <UserProjectTasks projectId={projectId} userId={userId} />
       </Suspense>
       <div>
         <p className="mb-4 font-semibold">Chat Form</p>
@@ -80,7 +83,13 @@ async function UserProject({
   );
 }
 
-async function UserTasks({ userId, projectId }: { userId: User['id']; projectId: Project['id'] }) {
+async function UserProjectTasks({
+  userId,
+  projectId,
+}: {
+  userId: User['id'];
+  projectId: Project['id'];
+}) {
   const tasks = await getUserProjectTasks(userId, projectId);
 
   if (tasks.length === 0) {

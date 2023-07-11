@@ -20,8 +20,6 @@ const model = new OpenAIApi(configuration);
 /**
  * TODO:
  *
- * - utilize data fetching using Suspense like make it parallel as much as possible or maybe we can do preload.
- *   Check/review nextjs or reactjs docs about utilization.
  * - use Zod to validate the arguments.
  * - add function defintion for handling couting and aggregating result. Make sure to add good function description to this
  *   to distinguish this function to "seaching" function. I think we can use the same function `ask_database` and call the `createChatCompletion`
