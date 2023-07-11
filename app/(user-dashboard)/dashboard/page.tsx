@@ -1,5 +1,5 @@
 import ChatForm from './_chat-form';
-import { getUserTasksByProjectId, getUserProjects, getProject, Project, User, Task } from '@/db';
+import { getUserProjectTasks, getUserProjects, getProject, Project, User, Task } from '@/db';
 import { currentUser } from '@clerk/nextjs';
 import { revalidatePath } from 'next/cache';
 import { cookies } from 'next/headers';
@@ -9,7 +9,15 @@ export default async function Dashboard() {
   const cookieStore = cookies();
   const user = await currentUser();
   const userId = user?.id ?? '';
+
+  // preload current project and tasks.
   const projectId = cookieStore.get('projectId')?.value as string | undefined;
+  if (!!projectId) {
+    const parsedProjectId = parseInt(projectId);
+    preloadProject(parsedProjectId);
+    preloadUserProjectTasks(userId, parsedProjectId);
+  }
+
   const projects = await getUserProjects(userId);
 
   return (
@@ -52,18 +60,17 @@ async function UserProject({
   projectId: Project['id'];
   userId: User['id'];
 }) {
-  const tasksPromise = getUserTasksByProjectId(userId, projectId);
-  const currentProject = await getProject(projectId);
+  const userProject = await getProject(projectId);
 
-  if (!currentProject) {
+  if (!userProject) {
     return <div>Current project is not found.</div>;
   }
 
   return (
     <>
-      <p className="mb-4 font-semibold">{currentProject.title}</p>
+      <p className="mb-4 font-semibold">{userProject.title}</p>
       <Suspense fallback={<div>Loading user tasks...</div>}>
-        <UserTasks tasksPromise={tasksPromise} />
+        <UserTasks projectId={projectId} userId={userId} />
       </Suspense>
       <div>
         <p className="mb-4 font-semibold">Chat Form</p>
@@ -73,8 +80,8 @@ async function UserProject({
   );
 }
 
-async function UserTasks({ tasksPromise }: { tasksPromise: Promise<Task[]> }) {
-  const tasks = await tasksPromise;
+async function UserTasks({ userId, projectId }: { userId: User['id']; projectId: Project['id'] }) {
+  const tasks = await getUserProjectTasks(userId, projectId);
 
   if (tasks.length === 0) {
     return <div>No existing tasks</div>;
@@ -90,4 +97,12 @@ async function UserTasks({ tasksPromise }: { tasksPromise: Promise<Task[]> }) {
       ))}
     </ul>
   );
+}
+
+function preloadUserProjectTasks(userId: User['id'], projectId: Project['id']) {
+  void getUserProjectTasks(userId, projectId);
+}
+
+function preloadProject(projectId: Project['id']) {
+  void getProject(projectId);
 }

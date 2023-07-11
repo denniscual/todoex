@@ -2,11 +2,11 @@ import { cache } from 'react';
 import { db, task, User, user, project, projectUser, Project, Task } from '@/db';
 import { eq, and } from 'drizzle-orm';
 
-export const getUserTasksByProjectId = cache((id: User['id'], projectId: Project['id']) => {
+export const getUserProjectTasks = cache((userId: User['id'], projectId: Project['id']) => {
   const tasks = db
     .select()
     .from(task)
-    .where(and(eq(task.userId, id), eq(task.projectId, projectId)));
+    .where(and(eq(task.userId, userId), eq(task.projectId, projectId)));
   return tasks;
 });
 

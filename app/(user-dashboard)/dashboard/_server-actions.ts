@@ -5,7 +5,7 @@ import {
   deleteTaskById,
   getProject,
   getUserProjects,
-  getUserTasksByProjectId,
+  getUserProjectTasks,
   task,
   Task,
 } from '@/db';
@@ -44,7 +44,7 @@ export async function generate({
 
   try {
     const [userTasks, userProjects, userProject] = await Promise.all([
-      getUserTasksByProjectId(userId, projectId),
+      getUserProjectTasks(userId, projectId),
       getUserProjects(userId),
       getProject(projectId),
     ]);
