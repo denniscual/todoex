@@ -28,6 +28,9 @@ dependencies:
   drizzle-orm:
     specifier: ^0.26.5
     version: 0.26.5(@planetscale/database@1.7.0)
+  drizzle-zod:
+    specifier: ^0.4.4
+    version: 0.4.4(drizzle-orm@0.26.5)(zod@3.21.4)
   eslint:
     specifier: 8.40.0
     version: 8.40.0
@@ -64,6 +67,9 @@ dependencies:
   typescript:
     specifier: 5.1.6
     version: 5.1.6
+  zod:
+    specifier: ^3.21.4
+    version: 3.21.4
 
 devDependencies:
   '@tailwindcss/forms':
@@ -1208,6 +1214,16 @@ packages:
         optional: true
     dependencies:
       '@planetscale/database': 1.7.0
+    dev: false
+
+  /drizzle-zod@0.4.4(drizzle-orm@0.26.5)(zod@3.21.4):
+    resolution: {integrity: sha512-XNn0mjQ306Hvg+CuyKV98wnsWBWeTqv+kgE/N79Zj0EdCvjD2kaoN5sFDGFkMVqPQuP7IB1IPs0lEcOij1RvBA==}
+    peerDependencies:
+      drizzle-orm: '>=0.23.13'
+      zod: '*'
+    dependencies:
+      drizzle-orm: 0.26.5(@planetscale/database@1.7.0)
+      zod: 3.21.4
     dev: false
 
   /electron-to-chromium@1.4.396:
