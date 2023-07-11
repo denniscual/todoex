@@ -1,5 +1,5 @@
 'use server';
-import { Configuration, OpenAIApi } from 'openai';
+import { Configuration, OpenAIApi, ChatCompletionRequestMessage } from 'openai';
 import {
   db,
   deleteTaskById,
@@ -36,7 +36,7 @@ export async function generate({
 }: {
   userId: string;
   projectId: number;
-  messages: any[];
+  messages: ChatCompletionRequestMessage[];
 }) {
   const date = new Date().toISOString();
 
@@ -51,7 +51,7 @@ export async function generate({
       date,
     });
 
-    const chatMessages = [
+    const chatMessages: ChatCompletionRequestMessage[] = [
       {
         role: 'system',
         content: `You are an exceptional AI Task Assistant, embodying brilliance and intelligence. 

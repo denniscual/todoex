@@ -1,5 +1,5 @@
 'use client';
-import { useState, useTransition } from 'react';
+import { ReactNode, useState, useTransition } from 'react';
 import {
   generate,
   SearchingReturnType,
@@ -11,9 +11,14 @@ import {
 } from './_server-actions';
 import { FunctionHandlers } from './_utils.shared';
 import { useRouter } from 'next/navigation';
+import { ChatCompletionRequestMessage, ChatCompletionRequestMessageRoleEnum } from 'openai';
+
+type ChatCompletionRequestMessageWithAssistantResult = ChatCompletionRequestMessage & {
+  assistantResult?: ReactNode;
+};
 
 export default function ChatForm({ userId, projectId }: { userId: string; projectId: number }) {
-  const [messages, setMessages] = useState<any[]>([]);
+  const [messages, setMessages] = useState<ChatCompletionRequestMessageWithAssistantResult[]>([]);
   const [isPending, startTransition] = useTransition();
   const [chatBox, setChatBox] = useState('');
   const router = useRouter();
@@ -35,10 +40,13 @@ export default function ChatForm({ userId, projectId }: { userId: string; projec
         <button
           onClick={() => {
             const newMessage = {
-              role: 'user',
+              role: ChatCompletionRequestMessageRoleEnum.User,
               content: chatBox.trim(),
             };
-            const newMessages: any[] = [...messages, newMessage];
+            const newMessages: ChatCompletionRequestMessageWithAssistantResult[] = [
+              ...messages,
+              newMessage,
+            ];
             setMessages(newMessages);
             setChatBox('');
 
@@ -46,7 +54,7 @@ export default function ChatForm({ userId, projectId }: { userId: string; projec
 
             async function action() {
               const res = await generate({
-                // Remove the jsx elements.
+                // Remove the jsx elements (assistantResult).
                 messages: newMessages.map((message) => ({
                   role: message.role,
                   content: message.content,
@@ -55,46 +63,46 @@ export default function ChatForm({ userId, projectId }: { userId: string; projec
                 projectId,
               });
               const { handler, result } = res;
-              let elements: React.ReactNode = null;
+              let assistantResult: React.ReactNode = null;
 
               switch (handler) {
                 case FunctionHandlers.searching: {
-                  elements = <TodoList {...res.result} />;
+                  assistantResult = <TodoList {...res.result} />;
                   break;
                 }
                 case FunctionHandlers.creating: {
                   router.refresh();
-                  elements = <CreatingTodo {...res.result} />;
+                  assistantResult = <CreatingTodo {...res.result} />;
                   break;
                 }
                 case FunctionHandlers.updating: {
                   router.refresh();
-                  elements = <UpdatingTodo {...res.result} />;
+                  assistantResult = <UpdatingTodo {...res.result} />;
                   break;
                 }
                 case FunctionHandlers.deleting: {
                   router.refresh();
-                  elements = <DeletingTodo {...res.result} />;
+                  assistantResult = <DeletingTodo {...res.result} />;
                   break;
                 }
                 case FunctionHandlers.dropping: {
-                  elements = <Dropping {...res.result} />;
+                  assistantResult = <Dropping {...res.result} />;
                   break;
                 }
                 case FunctionHandlers.suggesting: {
                   router.refresh();
-                  elements = <TodoSuggestion {...res.result} />;
+                  assistantResult = <TodoSuggestion {...res.result} />;
                   break;
                 }
                 default: {
-                  elements = <div>{result.message}</div>;
+                  assistantResult = <div>{result.message}</div>;
                 }
               }
 
               const messagesWithAssistant = newMessages.concat({
-                role: 'assistant',
+                role: ChatCompletionRequestMessageRoleEnum.Assistant,
                 content: result.message,
-                elements,
+                assistantResult,
               });
               setMessages(messagesWithAssistant);
             }
@@ -117,11 +125,18 @@ export default function ChatForm({ userId, projectId }: { userId: string; projec
   );
 }
 
-function Chat({ role, content, elements }: any) {
+function Chat({ role, content, assistantResult }: ChatCompletionRequestMessageWithAssistantResult) {
+  if (role === ChatCompletionRequestMessageRoleEnum.User) {
+    <>
+      <div>User</div>
+      <div>{content}</div>
+    </>;
+  }
+
   return (
     <>
-      <div>{role === 'user' ? 'User: ' : 'AI: '}</div>
-      <div>{role === 'user' ? content : elements}</div>
+      <div>AI:</div>
+      <div>{assistantResult}</div>
     </>
   );
 }
