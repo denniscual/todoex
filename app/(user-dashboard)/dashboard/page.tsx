@@ -1,5 +1,5 @@
 import ChatForm from './_chat-form';
-import { getUserTasksByProjectId, getUserProjects, getProject, Project, User } from '@/db';
+import { getUserTasksByProjectId, getUserProjects, getProject, Project, User, Task } from '@/db';
 import { currentUser } from '@clerk/nextjs';
 import { revalidatePath } from 'next/cache';
 import { cookies } from 'next/headers';
@@ -38,31 +38,22 @@ export default async function Dashboard() {
       </form>
       {!!projectId && (
         <Suspense fallback={<div>Loading project...</div>}>
-          <CurrentProject projectId={parseInt(projectId)} userId={userId} />
+          <UserProject projectId={parseInt(projectId)} userId={userId} />
         </Suspense>
       )}
     </div>
   );
 }
 
-async function CurrentProject({
+async function UserProject({
   projectId,
   userId,
 }: {
   projectId: Project['id'];
   userId: User['id'];
 }) {
-  const tasks = await getUserTasksByProjectId(userId, projectId);
+  const tasksPromise = getUserTasksByProjectId(userId, projectId);
   const currentProject = await getProject(projectId);
-
-  // console.log({
-  //   tasks,
-  // });
-
-  // if (tasks[0].createdAt) {
-  //   const date = new Date(tasks[0].createdAt);
-  //   console.log({ date });
-  // }
 
   if (!currentProject) {
     return <div>Current project is not found.</div>;
@@ -71,22 +62,32 @@ async function CurrentProject({
   return (
     <>
       <p className="mb-4 font-semibold">{currentProject.title}</p>
-      {tasks.length === 0 ? (
-        <div>No existing tasks</div>
-      ) : (
-        <ul>
-          {tasks.map((task, idx) => (
-            <li key={task.id}>
-              <span className="font-medium">{idx + 1}.</span> Title: {task.title} - Status:{' '}
-              {task.status} - Due date: {task.dueDate}
-            </li>
-          ))}
-        </ul>
-      )}
+      <Suspense fallback={<div>Loading user tasks...</div>}>
+        <UserTasks tasksPromise={tasksPromise} />
+      </Suspense>
       <div>
         <p className="mb-4 font-semibold">Chat Form</p>
         <ChatForm key={projectId} projectId={projectId} userId={userId} />
       </div>
     </>
+  );
+}
+
+async function UserTasks({ tasksPromise }: { tasksPromise: Promise<Task[]> }) {
+  const tasks = await tasksPromise;
+
+  if (tasks.length === 0) {
+    return <div>No existing tasks</div>;
+  }
+
+  return (
+    <ul>
+      {tasks.map((task, idx) => (
+        <li key={task.id}>
+          <span className="font-medium">{idx + 1}.</span> Title: {task.title} - Status:{' '}
+          {task.status} - Due date: {task.dueDate}
+        </li>
+      ))}
+    </ul>
   );
 }
