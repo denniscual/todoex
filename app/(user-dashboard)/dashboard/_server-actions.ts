@@ -43,9 +43,11 @@ export async function generate({
   const date = new Date().toISOString();
 
   try {
-    const userTasks = await getUserTasksByProjectId(userId, projectId);
-    const userProjects = await getUserProjects(userId);
-    const currentProject = await getProject(projectId);
+    const [userTasks, userProjects, userProject] = await Promise.all([
+      getUserTasksByProjectId(userId, projectId),
+      getUserProjects(userId),
+      getProject(projectId),
+    ]);
 
     const functionsDefinitions = createFunctionsDefinitions({
       date,
@@ -63,8 +65,8 @@ export async function generate({
         content: `When assisting, make sure to use below information:
         1. Current user id: ${userId}.
         2. Current project id: ${projectId}.
-        3. Project title = "${currentProject.title}.
-        4. Project description = "${currentProject.description}.
+        3. Project title = "${userProject.title}.
+        4. Project description = "${userProject.description}.
         5. Current user projects: ${JSON.stringify(userProjects)}.
         6. Current user todos/tasks for a current project: ${JSON.stringify(
           mapTasksFieldsToDbFields(userTasks)
