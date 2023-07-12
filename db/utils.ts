@@ -67,6 +67,9 @@ export const insertUserSchema = createInsertSchema(user, {
   },
 });
 
+// Schema validation for inserting a project.
+export const insertProjectSchema = createInsertSchema(project);
+
 // Schema validation for inserting a task.
 export const insertTaskSchema = createInsertSchema(task, {
   projectId(schema) {

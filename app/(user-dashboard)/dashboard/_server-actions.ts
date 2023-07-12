@@ -21,13 +21,13 @@ const model = new OpenAIApi(configuration);
 /**
  * TODO:
  *
- * - use Zod to validate the arguments.
  * - add function defintion for handling couting and aggregating result. Make sure to add good function description to this
  *   to distinguish this function to "seaching" function. I think we can use the same function `ask_database` and call the `createChatCompletion`
  *   to pass message with role: "function" and append the `functionResponse` as the content. We let openai to generate the result for us and parse it by RSC.
  * - fine tune again the prompts like increase or more fine tuning the model to avoid doing destructive actions like dropping a table or moving a todo to another user. And also
  *   enhancing the prompts for better creation, updating task, suggesting todo, etc.
  * - improve typescript.
+ * - use Zod to validate the form.
  * - remove PUBLIC_HOST env var. We don't need this for clerk.
  */
 export async function generate({
