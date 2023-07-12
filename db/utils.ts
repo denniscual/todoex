@@ -38,12 +38,19 @@ export const getUserProjects = cache((id: User['id']) => {
 });
 
 export async function insertTask(newTask: z.infer<typeof insertTaskSchema>) {
-  const values = insertTaskSchema.parse(newTask);
-  await db.insert(task).values(values);
+  const validNewtask = insertTaskSchema.parse(newTask);
+  await db.insert(task).values(validNewtask);
 }
 
 export async function deleteTaskById(id: Task['id']) {
-  await db.delete(task).where(eq(task.id, id));
+  const validId = z
+    .number()
+    .positive({
+      message: 'The task id must be positive number.',
+    })
+    .parse(id);
+
+  await db.delete(task).where(eq(task.id, validId));
 }
 
 export async function upsertUser(value: User) {
