@@ -77,6 +77,7 @@ export default function ChatForm({ userId, projectId }: { userId: string; projec
         assistantResult,
       });
       setMessages(messagesWithAssistant);
+      setError(null);
     } catch (err) {
       setError(err as Error);
     }

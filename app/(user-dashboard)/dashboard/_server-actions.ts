@@ -189,7 +189,8 @@ export async function generate({
           `Apologies, but I am unable to understand your request. If you have a specific question or need assistance with your todo list, please let me know and I will be happy to help.`,
       },
     };
-  } catch {
+  } catch (err) {
+    console.log('Error when generating response: ', (err as Error).toString());
     throw new Error('Server error');
   }
 }
@@ -312,7 +313,8 @@ function createFunctionsDefinitions({ date }: { date: string }) {
         properties: {
           id: {
             type: 'number',
-            description: 'The id of the todo or task to be deleted.',
+            description:
+              'The id of the todo or task to be deleted. Make sure it is not undefined or not null.',
           },
           successMessage: {
             type: 'string',
