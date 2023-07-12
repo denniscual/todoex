@@ -8,7 +8,7 @@ import {
   getUserProjectTasks,
   task,
   Task,
-  insertTaskSchema,
+  insertTask,
 } from '@/db';
 import { sql } from 'drizzle-orm';
 import { FunctionHandlers } from './_utils.shared';
@@ -424,16 +424,13 @@ async function creating({
   dueDate?: string;
   projectId: number;
 }) {
-  const values = insertTaskSchema.parse({
+  await insertTask({
     title,
     description,
     userId,
     dueDate,
     projectId,
   });
-
-  await db.insert(task).values(values);
-
   return {
     message: successMessage,
   };

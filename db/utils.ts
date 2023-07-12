@@ -2,6 +2,8 @@ import { cache } from 'react';
 import { db, task, User, user, project, projectUser, Project, Task } from '@/db';
 import { eq, and } from 'drizzle-orm';
 import { createInsertSchema } from 'drizzle-zod';
+import { z } from 'zod';
+import { areDatesEqualOrGreater } from '@/utils/dates';
 
 export const getUserProjectTasks = cache((userId: User['id'], projectId: Project['id']) => {
   const tasks = db
@@ -35,23 +37,9 @@ export const getUserProjects = cache((id: User['id']) => {
   return projects;
 });
 
-export async function insertTaskByUserId({
-  id,
-  title,
-  description,
-  projectId,
-}: {
-  id: User['id'];
-  title: Task['title'];
-  description: Task['description'];
-  projectId: Project['id'];
-}) {
-  await db.insert(task).values({
-    userId: id,
-    title,
-    description,
-    projectId,
-  });
+export async function insertTask(newTask: z.infer<typeof insertTaskSchema>) {
+  const values = insertTaskSchema.parse(newTask);
+  await db.insert(task).values(values);
 }
 
 export async function deleteTaskById(id: Task['id']) {
@@ -92,9 +80,3 @@ export const insertTaskSchema = createInsertSchema(task, {
       );
   },
 });
-
-function areDatesEqualOrGreater(date1: Date, date2: Date) {
-  date1.setHours(0, 0, 0, 0);
-  date2.setHours(0, 0, 0, 0);
-  return date1 >= date2;
-}
