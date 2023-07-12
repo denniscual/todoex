@@ -5,6 +5,13 @@ import { createInsertSchema } from 'drizzle-zod';
 import { z } from 'zod';
 import { areDatesEqualOrGreater } from '@/utils/dates';
 
+export async function upsertUser(upsertedUser: z.infer<typeof insertUserSchema>) {
+  const validUpsertedUser = insertUserSchema.parse(upsertedUser);
+  await db.insert(user).values(validUpsertedUser).onDuplicateKeyUpdate({
+    set: validUpsertedUser,
+  });
+}
+
 export const getUserProjectTasks = cache((userId: User['id'], projectId: Project['id']) => {
   const tasks = db
     .select()
@@ -53,11 +60,12 @@ export async function deleteTaskById(id: Task['id']) {
   await db.delete(task).where(eq(task.id, validId));
 }
 
-export async function upsertUser(value: User) {
-  await db.insert(user).values(value).onDuplicateKeyUpdate({
-    set: value,
-  });
-}
+// Schema validation for inserting a user.
+export const insertUserSchema = createInsertSchema(user, {
+  emailAddress(schema) {
+    return schema.emailAddress.email();
+  },
+});
 
 // Schema validation for inserting a task.
 export const insertTaskSchema = createInsertSchema(task, {
