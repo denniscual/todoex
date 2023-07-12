@@ -14,7 +14,7 @@
     "db:drop": "drizzle-kit drop"
   },
   "dependencies": {
-    "@clerk/nextjs": "^4.21.2",
+    "@clerk/nextjs": "^4.21.15",
     "@planetscale/database": "^1.7.0",
     "@types/node": "20.1.5",
     "@types/react": "18.2.14",
@@ -22,7 +22,7 @@
     "autoprefixer": "10.4.14",
     "clsx": "^1.2.1",
     "dotenv": "^16.2.0",
-    "drizzle-orm": "^0.26.5",
+    "drizzle-orm": "^0.27.2",
     "drizzle-zod": "^0.4.4",
     "eslint": "8.40.0",
     "eslint-config-next": "13.4.2",

@@ -10,6 +10,7 @@ import {
   primaryKey,
 } from 'drizzle-orm/mysql-core';
 import { InferModel } from 'drizzle-orm';
+import { createInsertSchema } from 'drizzle-zod';
 
 export const user = mysqlTable('user', {
   id: varchar('id', { length: 50 }).primaryKey().notNull(),
@@ -73,3 +74,6 @@ export const task = mysqlTable(
 export type User = InferModel<typeof user>;
 export type Project = InferModel<typeof project>;
 export type Task = InferModel<typeof task>;
+
+// Schema for inserting a task.
+export const insertTaskSchema = createInsertSchema(task);

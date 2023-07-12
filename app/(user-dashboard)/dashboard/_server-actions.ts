@@ -8,6 +8,7 @@ import {
   getUserProjectTasks,
   task,
   Task,
+  insertTaskSchema,
 } from '@/db';
 import { sql } from 'drizzle-orm';
 import { FunctionHandlers } from './_utils.shared';
@@ -188,8 +189,8 @@ export async function generate({
           `Apologies, but I am unable to understand your request. If you have a specific question or need assistance with your todo list, please let me know and I will be happy to help.`,
       },
     };
-  } catch (err) {
-    throw err;
+  } catch {
+    throw new Error('Server error');
   }
 }
 
@@ -421,17 +422,15 @@ async function creating({
   dueDate?: string;
   projectId: number;
 }) {
-  console.log({
-    userId,
-    projectId,
-  });
-  await db.insert(task).values({
+  const values = insertTaskSchema.parse({
     title,
     description,
     userId,
     dueDate,
     projectId,
   });
+
+  await db.insert(task).values(values);
 
   return {
     message: successMessage,

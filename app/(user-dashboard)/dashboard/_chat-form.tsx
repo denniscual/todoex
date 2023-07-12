@@ -22,96 +22,114 @@ export default function ChatForm({ userId, projectId }: { userId: string; projec
   const [isPending, startTransition] = useTransition();
   const [chatBox, setChatBox] = useState('');
   const router = useRouter();
+  const [error, setError] = useState<Error | null>(null);
+
+  async function generateResponse(chatMessages: ChatCompletionRequestMessageWithAssistantResult[]) {
+    try {
+      const res = await generate({
+        // Remove the jsx elements (assistantResult).
+        messages: chatMessages.map((message) => ({
+          role: message.role,
+          content: message.content,
+        })),
+        userId,
+        projectId,
+      });
+      const { handler, result } = res;
+      let assistantResult: React.ReactNode = null;
+
+      switch (handler) {
+        case FunctionHandlers.searching: {
+          assistantResult = <TodoList {...res.result} />;
+          break;
+        }
+        case FunctionHandlers.creating: {
+          router.refresh();
+          assistantResult = <CreatingTodo {...res.result} />;
+          break;
+        }
+        case FunctionHandlers.updating: {
+          router.refresh();
+          assistantResult = <UpdatingTodo {...res.result} />;
+          break;
+        }
+        case FunctionHandlers.deleting: {
+          router.refresh();
+          assistantResult = <DeletingTodo {...res.result} />;
+          break;
+        }
+        case FunctionHandlers.dropping: {
+          assistantResult = <Dropping {...res.result} />;
+          break;
+        }
+        case FunctionHandlers.suggesting: {
+          router.refresh();
+          assistantResult = <TodoSuggestion {...res.result} />;
+          break;
+        }
+        default: {
+          assistantResult = <div>{result.message}</div>;
+        }
+      }
+      const messagesWithAssistant = chatMessages.concat({
+        role: ChatCompletionRequestMessageRoleEnum.Assistant,
+        content: result.message,
+        assistantResult,
+      });
+      setMessages(messagesWithAssistant);
+    } catch (err) {
+      setError(err as Error);
+    }
+  }
 
   return (
     <div className="space-y-8">
       <div className="flex items-end gap-4">
-        <textarea
-          value={chatBox}
-          onChange={(event) => {
-            setChatBox(event.currentTarget.value);
-          }}
-          cols={40}
-          rows={5}
-          className="w"
-          placeholder="E.g Get my todos"
-          name="chat"
-        />
-        <button
-          onClick={() => {
-            const newMessage = {
-              role: ChatCompletionRequestMessageRoleEnum.User,
-              content: chatBox.trim(),
-            };
-            const newMessages: ChatCompletionRequestMessageWithAssistantResult[] = [
-              ...messages,
-              newMessage,
-            ];
-            setMessages(newMessages);
-            setChatBox('');
-
-            startTransition(() => action());
-
-            async function action() {
-              const res = await generate({
-                // Remove the jsx elements (assistantResult).
-                messages: newMessages.map((message) => ({
-                  role: message.role,
-                  content: message.content,
-                })),
-                userId,
-                projectId,
-              });
-              const { handler, result } = res;
-              let assistantResult: React.ReactNode = null;
-
-              switch (handler) {
-                case FunctionHandlers.searching: {
-                  assistantResult = <TodoList {...res.result} />;
-                  break;
-                }
-                case FunctionHandlers.creating: {
-                  router.refresh();
-                  assistantResult = <CreatingTodo {...res.result} />;
-                  break;
-                }
-                case FunctionHandlers.updating: {
-                  router.refresh();
-                  assistantResult = <UpdatingTodo {...res.result} />;
-                  break;
-                }
-                case FunctionHandlers.deleting: {
-                  router.refresh();
-                  assistantResult = <DeletingTodo {...res.result} />;
-                  break;
-                }
-                case FunctionHandlers.dropping: {
-                  assistantResult = <Dropping {...res.result} />;
-                  break;
-                }
-                case FunctionHandlers.suggesting: {
-                  router.refresh();
-                  assistantResult = <TodoSuggestion {...res.result} />;
-                  break;
-                }
-                default: {
-                  assistantResult = <div>{result.message}</div>;
-                }
-              }
-
-              const messagesWithAssistant = newMessages.concat({
-                role: ChatCompletionRequestMessageRoleEnum.Assistant,
-                content: result.message,
-                assistantResult,
-              });
-              setMessages(messagesWithAssistant);
-            }
-          }}
-          disabled={isPending}
-          className="px-4 py-2 font-bold text-white bg-blue-500 rounded hover:bg-blue-700"
-        >
-          Button
-        </button>
+        {!error ? (
+          <div className="flex items-end gap-4">
+            <textarea
+              value={chatBox}
+              onChange={(event) => {
+                setChatBox(event.currentTarget.value);
+              }}
+              cols={40}
+              rows={5}
+              className="w"
+              placeholder="E.g Get my todos"
+              name="chat"
+            />
+            <button
+              onClick={() => {
+                const messagesWithNewChatMessage: ChatCompletionRequestMessageWithAssistantResult[] =
+                  [
+                    ...messages,
+                    {
+                      role: ChatCompletionRequestMessageRoleEnum.User,
+                      content: chatBox.trim(),
+                    },
+                  ];
+                setMessages(messagesWithNewChatMessage);
+                setChatBox('');
+                startTransition(() => generateResponse(messagesWithNewChatMessage));
+              }}
+              disabled={isPending}
+              className="px-4 py-2 font-bold text-white bg-blue-500 rounded hover:bg-blue-700"
+            >
+              Button
+            </button>
+          </div>
+        ) : (
+          <div>
+            <div>There was an issue processing your request.</div>
+            <button
+              disabled={isPending}
+              className="px-4 py-2 font-bold text-white bg-blue-500 rounded hover:bg-blue-700"
+              onClick={() => startTransition(() => generateResponse(messages))}
+            >
+              Regenerate response
+            </button>
+          </div>
+        )}
         {isPending && <span>Loading...</span>}
       </div>
       {messages.length > 0
@@ -127,10 +145,12 @@ export default function ChatForm({ userId, projectId }: { userId: string; projec
 
 function Chat({ role, content, assistantResult }: ChatCompletionRequestMessageWithAssistantResult) {
   if (role === ChatCompletionRequestMessageRoleEnum.User) {
-    <>
-      <div>User</div>
-      <div>{content}</div>
-    </>;
+    return (
+      <>
+        <div>User:</div>
+        <div>{content}</div>
+      </>
+    );
   }
 
   return (
