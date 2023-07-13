@@ -1,16 +1,15 @@
 'use client';
 import { ReactNode, useState, useTransition } from 'react';
 import {
-  generate,
   SearchingReturnType,
   CreatingReturnType,
   UpdatingReturnType,
   DeletingReturnType,
   DroppingReturnType,
   SuggestingReturnType,
+  generateResponseAction,
 } from './_server-actions';
 import { FunctionHandlers } from './_utils.shared';
-import { useRouter } from 'next/navigation';
 import { ChatCompletionRequestMessage, ChatCompletionRequestMessageRoleEnum } from 'openai';
 
 type ChatCompletionRequestMessageWithAssistantResult = ChatCompletionRequestMessage & {
@@ -21,12 +20,11 @@ export default function ChatForm({ userId, projectId }: { userId: string; projec
   const [messages, setMessages] = useState<ChatCompletionRequestMessageWithAssistantResult[]>([]);
   const [isPending, startTransition] = useTransition();
   const [chatBox, setChatBox] = useState('');
-  const router = useRouter();
   const [error, setError] = useState<Error | null>(null);
 
   async function generateResponse(chatMessages: ChatCompletionRequestMessageWithAssistantResult[]) {
     try {
-      const res = await generate({
+      const res = await generateResponseAction({
         // Remove the jsx elements (assistantResult).
         messages: chatMessages.map((message) => ({
           role: message.role,
@@ -44,17 +42,14 @@ export default function ChatForm({ userId, projectId }: { userId: string; projec
           break;
         }
         case FunctionHandlers.creating: {
-          router.refresh();
           assistantResult = <CreatingTodo {...res.result} />;
           break;
         }
         case FunctionHandlers.updating: {
-          router.refresh();
           assistantResult = <UpdatingTodo {...res.result} />;
           break;
         }
         case FunctionHandlers.deleting: {
-          router.refresh();
           assistantResult = <DeletingTodo {...res.result} />;
           break;
         }
@@ -63,7 +58,6 @@ export default function ChatForm({ userId, projectId }: { userId: string; projec
           break;
         }
         case FunctionHandlers.suggesting: {
-          router.refresh();
           assistantResult = <TodoSuggestion {...res.result} />;
           break;
         }

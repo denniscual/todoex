@@ -12,6 +12,7 @@ import {
 } from '@/db';
 import { sql } from 'drizzle-orm';
 import { FunctionHandlers } from './_utils.shared';
+import { revalidatePath } from 'next/cache';
 
 const configuration = new Configuration({
   apiKey: process.env.OPENAI_API_KEY,
@@ -30,7 +31,7 @@ const model = new OpenAIApi(configuration);
  * - use Zod to validate the form.
  * - remove PUBLIC_HOST env var. We don't need this for clerk.
  */
-export async function generate({
+async function generate({
   userId,
   messages,
   projectId,
@@ -181,7 +182,6 @@ export async function generate({
         }
       }
     }
-
     return {
       result: {
         message:
@@ -502,3 +502,19 @@ function mapTasksFieldsToDbFields(tasks: Task[]) {
     project_id: task.projectId,
   }));
 }
+
+export const generateResponseAction: typeof generate = async ({ userId, projectId, messages }) => {
+  'use server';
+
+  const res = await generate({
+    userId,
+    projectId,
+    messages,
+  });
+
+  if (res.handler === FunctionHandlers.creating) {
+    revalidatePath('/dashboard');
+  }
+
+  return res;
+};
