@@ -7,7 +7,7 @@ import { Button } from '@/components/ui/button';
 export default function DashboardHeader() {
   return (
     <header className="w-full py-2 border-b">
-      <div className="container flex items-center h-14 gap-x-8">
+      <div className="container flex items-center h-14 gap-x-6">
         <DashboadMainNav />
         <DashboardMobileNav />
         <Button size="lg" variant="gradient">
