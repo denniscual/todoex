@@ -7,6 +7,7 @@ import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
 import { Button } from '@/components/ui/button';
 import { ViewVerticalIcon } from '@radix-ui/react-icons';
 import { siteConfig } from '@/config/site';
+import * as AccessibleIcon from '@radix-ui/react-accessible-icon';
 
 export default function DashboardMobileNav() {
   const [open, setOpen] = useState(false);
@@ -18,8 +19,9 @@ export default function DashboardMobileNav() {
           variant="ghost"
           className="px-0 mr-2 text-base hover:bg-transparent focus-visible:bg-transparent focus-visible:ring-0 focus-visible:ring-offset-0 md:hidden"
         >
-          <ViewVerticalIcon className="w-5 h-5" />
-          <span className="sr-only">Toggle Menu</span>
+          <AccessibleIcon.Root label="Toggle Menu">
+            <ViewVerticalIcon className="w-5 h-5" />
+          </AccessibleIcon.Root>
         </Button>
       </SheetTrigger>
       <SheetContent side="left" className="pr-0">
