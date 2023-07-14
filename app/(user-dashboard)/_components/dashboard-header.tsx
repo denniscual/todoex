@@ -10,10 +10,7 @@ export default function DashboardHeader() {
       <div className="container flex items-center h-14 gap-x-8">
         <DashboadMainNav />
         <DashboardMobileNav />
-        <Button
-          size="lg"
-          className="dark:text-foreground dark:bg-gradient-to-r dark:from-cyan-500 dark:to-blue-500 hover:dark:from-cyan-600 hover:dark:to-blue-600"
-        >
+        <Button size="lg" variant="gradient">
           Create
         </Button>
         <nav className="flex items-center ml-auto gap-x-4">
