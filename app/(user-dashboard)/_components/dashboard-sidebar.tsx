@@ -10,7 +10,7 @@ export default function DashboardSidebar({ className, ...props }: SidebarProps) 
       <div className="py-2 md:px-6">
         <div className="space-y-3">
           <NavLink
-            href="/dashboard"
+            href="today"
             icon={
               <svg viewBox="0 0 24 24" className="w-4 h-4 mr-2 text-green-900 dark:text-green-500">
                 <g fill="currentColor" fill-rule="evenodd">

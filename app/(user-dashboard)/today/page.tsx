@@ -5,7 +5,7 @@ import { revalidatePath } from 'next/cache';
 import { cookies } from 'next/headers';
 import { Suspense } from 'react';
 
-export default async function Dashboard() {
+export default async function Today() {
   const cookieStore = cookies();
   const user = await currentUser();
   const userId = user?.id ?? '';
