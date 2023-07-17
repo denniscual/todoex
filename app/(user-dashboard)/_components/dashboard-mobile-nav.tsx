@@ -8,6 +8,7 @@ import { Button } from '@/components/ui/button';
 import { ViewVerticalIcon } from '@radix-ui/react-icons';
 import { siteConfig } from '@/config/site';
 import * as AccessibleIcon from '@radix-ui/react-accessible-icon';
+import DashboardSidebar from '@/app/(user-dashboard)/_components/dashboard-sidebar';
 
 export default function DashboardMobileNav() {
   const [open, setOpen] = useState(false);
@@ -25,10 +26,11 @@ export default function DashboardMobileNav() {
         </Button>
       </SheetTrigger>
       <SheetContent side="left" className="pr-0">
-        <MobileLink href="/dashboard" className="flex items-center" onOpenChange={setOpen}>
+        <MobileLink href="/dashboard" className="flex items-center mb-6" onOpenChange={setOpen}>
           {/* Add here the logo icon */}
           <span className="font-bold">{siteConfig.name}</span>
         </MobileLink>
+        <DashboardSidebar />
       </SheetContent>
     </Sheet>
   );

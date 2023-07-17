@@ -1,7 +1,7 @@
 import { UserButton } from '@clerk/nextjs';
 import { ThemeToggle } from '@/components/theme-toggle';
-import DashboadMainNav from './dashboard-main-nav';
-import DashboardMobileNav from './dashboard-mobile-nav';
+import DashboadMainNav from '@/app/(user-dashboard)/_components/dashboard-main-nav';
+import DashboardMobileNav from '@/app/(user-dashboard)/_components/dashboard-mobile-nav';
 import { Button } from '@/components/ui/button';
 
 export default function DashboardHeader() {
