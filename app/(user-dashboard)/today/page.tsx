@@ -4,6 +4,7 @@ import { currentUser } from '@clerk/nextjs';
 import { revalidatePath } from 'next/cache';
 import { cookies } from 'next/headers';
 import { Suspense } from 'react';
+import Link from 'next/link';
 
 export default async function Today() {
   const cookieStore = cookies();
@@ -22,6 +23,7 @@ export default async function Today() {
 
   return (
     <div className="space-y-8">
+      <Link href="/projects/1">Project 1</Link>
       <form
         action={async (formData) => {
           'use server';
