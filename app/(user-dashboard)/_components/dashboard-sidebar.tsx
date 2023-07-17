@@ -7,8 +7,8 @@ type SidebarProps = React.HTMLAttributes<HTMLDivElement>;
 export default function DashboardSidebar({ className, ...props }: SidebarProps) {
   return (
     <div {...props} className={cn('py-4 space-y-4', className)}>
-      <div className="py-2 pr-3 md:pl-3">
-        <div className="space-y-1">
+      <div className="py-2 md:px-6">
+        <div className="space-y-3">
           <NavLink
             href="/dashboard"
             icon={
@@ -50,9 +50,9 @@ export default function DashboardSidebar({ className, ...props }: SidebarProps) 
           </NavLink> */}
         </div>
       </div>
-      <div className="py-2 pr-3 md:pl-3">
-        <h2 className="px-4 mb-2 text-lg font-semibold tracking-tight">Projects</h2>
-        <div className="space-y-1">
+      <div className="py-2 md:px-6">
+        <h2 className="px-4 mb-4 text-lg font-semibold tracking-tight">Projects</h2>
+        <div className="space-y-3">
           <NavLink href="/projects/1">Daily Tasks</NavLink>
           <NavLink href="/projects/2">Agile Development Tracker</NavLink>
         </div>

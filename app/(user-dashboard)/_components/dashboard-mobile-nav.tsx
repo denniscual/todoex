@@ -25,7 +25,7 @@ export default function DashboardMobileNav() {
           </AccessibleIcon.Root>
         </Button>
       </SheetTrigger>
-      <SheetContent side="left" className="pr-0">
+      <SheetContent side="left">
         <MobileLink href="/dashboard" className="flex items-center mb-6" onOpenChange={setOpen}>
           {/* Add here the logo icon */}
           <span className="font-bold">{siteConfig.name}</span>
