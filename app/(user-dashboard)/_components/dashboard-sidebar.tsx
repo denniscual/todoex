@@ -1,7 +1,11 @@
 import { cn } from '@/lib/utils';
-import { ChatBubbleIcon } from '@radix-ui/react-icons';
+import { ChatBubbleIcon, DividerHorizontalIcon } from '@radix-ui/react-icons';
 import NavLink from '@/app/(user-dashboard)/_components/nav-link';
 import AddProjectDialog from './add-project-dialog';
+import { currentUser } from '@clerk/nextjs';
+import { getUserProjects } from '@/db';
+import { Suspense } from 'react';
+import { Skeleton } from '@/components/ui/skeleton';
 
 type SidebarProps = React.HTMLAttributes<HTMLDivElement>;
 
@@ -58,11 +62,31 @@ export default function DashboardSidebar({ className, ...props }: SidebarProps) 
             <AddProjectDialog />
           </div>
         </h2>
-        <div className="space-y-3">
-          <NavLink href="/projects/1">Daily Tasks</NavLink>
-          <NavLink href="/projects/2">Agile Development Tracker</NavLink>
-        </div>
+        <Suspense
+          fallback={
+            <div className="px-4 space-y-3">
+              <Skeleton className="h-4 w-[200px]" />
+              <Skeleton className="h-4 w-[200px]" />
+            </div>
+          }
+        >
+          <div className="space-y-3">
+            <Projects />
+          </div>
+        </Suspense>
       </div>
     </div>
   );
+}
+
+async function Projects() {
+  const user = await currentUser();
+  const userId = user?.id ?? '';
+  const projects = await getUserProjects(userId);
+
+  return projects.map((project) => (
+    <NavLink key={project.id} href={`/projects/${project.id}`}>
+      {project.title}
+    </NavLink>
+  ));
 }

@@ -1,5 +1,5 @@
 'use client';
-import { useState } from 'react';
+import { ReactNode, useState } from 'react';
 import Link, { LinkProps } from 'next/link';
 import { useRouter } from 'next/navigation';
 import { cn } from '@/lib/utils';
@@ -8,9 +8,12 @@ import { Button } from '@/components/ui/button';
 import { ViewVerticalIcon } from '@radix-ui/react-icons';
 import { siteConfig } from '@/config/site';
 import * as AccessibleIcon from '@radix-ui/react-accessible-icon';
-import DashboardSidebar from '@/app/(user-dashboard)/_components/dashboard-sidebar';
 
-export default function DashboardMobileNav() {
+type DashboardMobileNavProps = {
+  sidebar?: ReactNode;
+};
+
+export default function DashboardMobileNav({ sidebar }: DashboardMobileNavProps) {
   const [open, setOpen] = useState(false);
 
   return (
@@ -30,7 +33,7 @@ export default function DashboardMobileNav() {
           {/* Add here the logo icon */}
           <span className="font-bold">{siteConfig.name}</span>
         </MobileLink>
-        <DashboardSidebar />
+        {sidebar}
       </SheetContent>
     </Sheet>
   );

@@ -36,6 +36,7 @@ export const getUserProjects = cache((id: User['id']) => {
     .select({
       title: project.title,
       id: project.id,
+      description: project.description,
     })
     .from(project)
     .innerJoin(projectUser, eq(project.id, projectUser.projectId))

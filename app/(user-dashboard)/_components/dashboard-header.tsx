@@ -3,13 +3,14 @@ import { ThemeToggle } from '@/components/theme-toggle';
 import DashboadMainNav from '@/app/(user-dashboard)/_components/dashboard-main-nav';
 import DashboardMobileNav from '@/app/(user-dashboard)/_components/dashboard-mobile-nav';
 import { Button } from '@/components/ui/button';
+import DashboardSidebar from '@/app/(user-dashboard)/_components/dashboard-sidebar';
 
 export default function DashboardHeader() {
   return (
     <header className="w-full px-6 py-2 border-b">
       <div className="flex items-center h-14 gap-x-6">
         <DashboadMainNav />
-        <DashboardMobileNav />
+        <DashboardMobileNav sidebar={<DashboardSidebar />} />
         <Button size="lg" variant="gradient">
           Create
         </Button>
