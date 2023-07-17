@@ -30,7 +30,7 @@ export default async function Today() {
           };
           const cookieStore = cookies();
           cookieStore.set('projectId', values.projects);
-          revalidatePath('/dashboard');
+          revalidatePath('/today');
         }}
         className="flex items-center gap-4"
       >

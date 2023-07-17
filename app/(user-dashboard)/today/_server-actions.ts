@@ -514,7 +514,7 @@ export const generateResponseAction: typeof generate = async ({ userId, projectI
   });
 
   if (res.handler === FunctionHandlers.creating) {
-    revalidatePath('/dashboard');
+    revalidatePath('/today');
   }
 
   return res;

@@ -4,7 +4,7 @@ import Link from 'next/link';
 export default function DashboadMainNav() {
   return (
     <div className="hidden md:flex">
-      <Link href="/dashboard" className="flex items-center space-x-2">
+      <Link href="/today" className="flex items-center space-x-2">
         {/* Add here the logo icon */}
         <span className="hidden font-bold sm:inline-block">{siteConfig.name}</span>
       </Link>
