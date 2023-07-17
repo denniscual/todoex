@@ -12,7 +12,7 @@ export default function DashboardSidebar({ className, ...props }: SidebarProps) 
         <div className="space-y-1">
           <Button variant="secondary" className="justify-start w-full" asChild>
             <Link href="/">
-              <svg viewBox="0 0 24 24" className="w-4 h-4 mr-2 text-green-500">
+              <svg viewBox="0 0 24 24" className="w-4 h-4 mr-2 text-green-900 dark:text-green-500">
                 <g fill="currentColor" fill-rule="evenodd">
                   <path
                     fill-rule="nonzero"
