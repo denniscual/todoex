@@ -1,7 +1,6 @@
-import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import { ChatBubbleIcon } from '@radix-ui/react-icons';
-import Link from 'next/link';
+import NavLink from '@/app/(user-dashboard)/_components/nav-link';
 
 type SidebarProps = React.HTMLAttributes<HTMLDivElement>;
 
@@ -10,8 +9,9 @@ export default function DashboardSidebar({ className, ...props }: SidebarProps) 
     <div {...props} className={cn('py-4 space-y-4', className)}>
       <div className="py-2 pr-3 md:pl-3">
         <div className="space-y-1">
-          <Button variant="secondary" className="justify-start w-full" asChild>
-            <Link href="/">
+          <NavLink
+            href="/dashboard"
+            icon={
               <svg viewBox="0 0 24 24" className="w-4 h-4 mr-2 text-green-900 dark:text-green-500">
                 <g fill="currentColor" fill-rule="evenodd">
                   <path
@@ -35,32 +35,26 @@ export default function DashboardSidebar({ className, ...props }: SidebarProps) 
                   </text>
                 </g>
               </svg>
-              Today
-            </Link>
-          </Button>
-          {/* <Button variant="ghost" className="justify-start w-full" asChild>
-            <Link href="/">
-              <CalendarIcon className="w-4 h-5 mr-2 text-orange-500" />
-              Upcoming
-            </Link>
-          </Button> */}
-          <Button variant="ghost" className="justify-start w-full" asChild>
-            <Link href="/">
-              <ChatBubbleIcon className="w-4 h-5 mr-2 text-orange-500" />
-              AI Assistant
-            </Link>
-          </Button>
+            }
+          >
+            Today
+          </NavLink>
+          <NavLink href="/chat" icon={<ChatBubbleIcon className="w-4 h-5 mr-2 text-orange-500" />}>
+            AI Assistant
+          </NavLink>
+          {/* <NavLink
+            href="/upcoming"
+            icon={<CalendarIcon className="w-4 h-5 mr-2 text-orange-500" />}
+          >
+            Upcoming
+          </NavLink> */}
         </div>
       </div>
       <div className="py-2 pr-3 md:pl-3">
         <h2 className="px-4 mb-2 text-lg font-semibold tracking-tight">Projects</h2>
         <div className="space-y-1">
-          <Button variant="ghost" className="justify-start w-full" asChild>
-            <Link href="/">Daily Tasks</Link>
-          </Button>
-          <Button variant="ghost" className="justify-start w-full" asChild>
-            <Link href="/">Agile Development Tracker</Link>
-          </Button>
+          <NavLink href="/">Daily Tasks</NavLink>
+          <NavLink href="/">Agile Development Tracker</NavLink>
         </div>
       </div>
     </div>
