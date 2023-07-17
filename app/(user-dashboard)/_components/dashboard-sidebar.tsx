@@ -1,7 +1,7 @@
 import { cn } from '@/lib/utils';
-import { ChatBubbleIcon, PlusIcon } from '@radix-ui/react-icons';
+import { ChatBubbleIcon } from '@radix-ui/react-icons';
 import NavLink from '@/app/(user-dashboard)/_components/nav-link';
-import { Button } from '@/components/ui/button';
+import AddProjectDialog from './add-project-dialog';
 
 type SidebarProps = React.HTMLAttributes<HTMLDivElement>;
 
@@ -52,12 +52,10 @@ export default function DashboardSidebar({ className, ...props }: SidebarProps) 
         </div>
       </div>
       <div className="py-2 md:px-6">
-        <h2 className="flex items-center justify-between px-4 mb-4 text-lg font-semibold tracking-tight group">
+        <h2 className="flex items-center justify-between pl-4 mb-4 text-lg font-semibold tracking-tight">
           Projects
-          <div className="invisible group-hover:visible">
-            <Button variant="outline" size="icon" className="border-none shadow-none bg-none">
-              <PlusIcon className="w-5 h-5" />
-            </Button>
+          <div>
+            <AddProjectDialog />
           </div>
         </h2>
         <div className="space-y-3">
