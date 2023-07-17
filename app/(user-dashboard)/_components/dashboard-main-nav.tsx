@@ -1,6 +1,5 @@
 import { siteConfig } from '@/config/site';
 import Link from 'next/link';
-import { Button } from '@/components/ui/button';
 
 export default function DashboadMainNav() {
   return (
