@@ -53,8 +53,8 @@ export default function DashboardSidebar({ className, ...props }: SidebarProps) 
       <div className="py-2 pr-3 md:pl-3">
         <h2 className="px-4 mb-2 text-lg font-semibold tracking-tight">Projects</h2>
         <div className="space-y-1">
-          <NavLink href="/">Daily Tasks</NavLink>
-          <NavLink href="/">Agile Development Tracker</NavLink>
+          <NavLink href="/projects/1">Daily Tasks</NavLink>
+          <NavLink href="/projects/2">Agile Development Tracker</NavLink>
         </div>
       </div>
     </div>
