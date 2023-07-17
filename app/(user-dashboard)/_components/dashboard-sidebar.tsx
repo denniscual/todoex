@@ -1,6 +1,6 @@
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
-import { CalendarIcon } from '@radix-ui/react-icons';
+import { ChatBubbleIcon } from '@radix-ui/react-icons';
 import Link from 'next/link';
 
 type SidebarProps = React.HTMLAttributes<HTMLDivElement>;
@@ -38,10 +38,16 @@ export default function DashboardSidebar({ className, ...props }: SidebarProps) 
               Today
             </Link>
           </Button>
-          <Button variant="ghost" className="justify-start w-full" asChild>
+          {/* <Button variant="ghost" className="justify-start w-full" asChild>
             <Link href="/">
               <CalendarIcon className="w-4 h-5 mr-2 text-orange-500" />
               Upcoming
+            </Link>
+          </Button> */}
+          <Button variant="ghost" className="justify-start w-full" asChild>
+            <Link href="/">
+              <ChatBubbleIcon className="w-4 h-5 mr-2 text-orange-500" />
+              AI Assistant
             </Link>
           </Button>
         </div>
