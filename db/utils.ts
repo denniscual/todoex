@@ -74,6 +74,30 @@ export async function deleteTaskById(id: Task['id']) {
   await db.delete(task).where(eq(task.id, validId));
 }
 
+export async function updateTaskStatusById(id: Task['id'], status: Task['status']) {
+  const validValues = insertTaskSchema
+    .pick({
+      id: true,
+      status: true,
+      dueDate: true,
+    })
+    .parse({
+      id,
+      status,
+    });
+
+  await db
+    .update(task)
+    .set({
+      status: validValues.status,
+    })
+    .where(eq(task.id, validValues.id as number));
+}
+
+export function isTaskCompleted(task: Task) {
+  return task.status === 'completed';
+}
+
 // Schema validation for inserting a user.
 export const insertUserSchema = createInsertSchema(user, {
   emailAddress(schema) {

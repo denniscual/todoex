@@ -6,6 +6,7 @@ import {
   Project,
   User,
   getUserTodayTasks,
+  isTaskCompleted,
 } from '@/db';
 import { currentUser } from '@clerk/nextjs';
 import { revalidatePath } from 'next/cache';
@@ -15,6 +16,8 @@ import Link from 'next/link';
 import { formatDate, DATE_FORMATS } from '@/lib/utils';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Label } from '@/components/ui/label';
+import { updateTaskStatusAction } from './_server-actions';
+import { ErrorBoundary } from '@/components/error-boundary';
 
 export const revalidate = 0;
 
@@ -32,9 +35,23 @@ export default async function Today() {
       </div>
       <ul className="grid gap-6 list-none">
         {tasks.map((task) => (
-          <li key={task.id} className="flex items-center pb-4 space-x-3 border-b">
-            <Checkbox id={task.id.toString()} />
-            <Label htmlFor={task.id.toString()}>{task.title}</Label>
+          <li key={task.id} className="pb-4 border-b ">
+            <ErrorBoundary>
+              <form
+                className="flex items-center gap-3"
+                action={async () => {
+                  'use server';
+                  return await updateTaskStatusAction(task, '/today');
+                }}
+              >
+                <Checkbox
+                  type="submit"
+                  defaultChecked={isTaskCompleted(task)}
+                  id={task.id.toString()}
+                />
+                <Label htmlFor={task.id.toString()}>{task.title}</Label>
+              </form>
+            </ErrorBoundary>
           </li>
         ))}
       </ul>
