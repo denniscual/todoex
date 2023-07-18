@@ -26,9 +26,9 @@ export default async function Today() {
 
   return (
     <div className="space-y-8">
-      <div className="inline-flex items-center gap-4">
+      <div className="inline-flex items-center gap-3">
         <h1 className="text-xl font-semibold tracking-tight">Today</h1>
-        <span className="text-sm text-slate-400">{formattedDate}</span>
+        <span className="text-sm text-foreground/75">{formattedDate}</span>
       </div>
       <Card>
         <CardHeader>
