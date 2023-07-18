@@ -15,6 +15,8 @@ import {
 } from '@/components/ui/card';
 import { formatDate } from '@/lib/utils';
 
+export const revalidate = 0;
+
 export default async function Today() {
   const user = await currentUser();
   const userId = user?.id ?? '';
