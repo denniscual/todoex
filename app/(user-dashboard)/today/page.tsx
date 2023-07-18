@@ -1,28 +1,28 @@
 import ChatForm from './_chat-form';
-import { getUserProjectTasks, getUserProjects, getProject, Project, User, Task } from '@/db';
+import {
+  getUserProjectTasks,
+  getUserProjects,
+  getProject,
+  Project,
+  User,
+  getUserTodayTasks,
+} from '@/db';
 import { currentUser } from '@clerk/nextjs';
 import { revalidatePath } from 'next/cache';
 import { cookies } from 'next/headers';
 import { Suspense } from 'react';
 import Link from 'next/link';
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from '@/components/ui/card';
-import { formatDate } from '@/lib/utils';
+import { formatDate, DATE_FORMATS } from '@/lib/utils';
+import { Checkbox } from '@/components/ui/checkbox';
+import { Label } from '@/components/ui/label';
 
 export const revalidate = 0;
 
 export default async function Today() {
   const user = await currentUser();
   const userId = user?.id ?? '';
-  console.log({ userId });
-
-  const formattedDate = formatDate(new Date());
+  const tasks = await getUserTodayTasks(userId);
+  const formattedDate = formatDate(new Date(), DATE_FORMATS.WEEKDAY_DATE_FORMAT);
 
   return (
     <div className="space-y-8">
@@ -30,18 +30,14 @@ export default async function Today() {
         <h1 className="text-xl font-semibold tracking-tight">Today</h1>
         <span className="text-sm text-foreground/75">{formattedDate}</span>
       </div>
-      <Card>
-        <CardHeader>
-          <CardTitle>Card Title</CardTitle>
-          <CardDescription>Card Description</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <p>Card Content</p>
-        </CardContent>
-        <CardFooter>
-          <p>Card Footer</p>
-        </CardFooter>
-      </Card>
+      <ul className="grid gap-6 list-none">
+        {tasks.map((task) => (
+          <li key={task.id} className="flex items-center pb-4 space-x-3 border-b">
+            <Checkbox id={task.id.toString()} />
+            <Label htmlFor={task.id.toString()}>{task.title}</Label>
+          </li>
+        ))}
+      </ul>
     </div>
   );
 }

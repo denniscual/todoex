@@ -3,7 +3,7 @@ import { db, task, User, user, project, projectUser, Project, Task } from '@/db'
 import { eq, and } from 'drizzle-orm';
 import { createInsertSchema } from 'drizzle-zod';
 import { z } from 'zod';
-import { areDatesEqualOrGreater } from '@/lib/utils';
+import { DATE_FORMATS, areDatesEqualOrGreater, formatDate } from '@/lib/utils';
 
 export async function upsertUser(upsertedUser: z.infer<typeof insertUserSchema>) {
   const validUpsertedUser = insertUserSchema.parse(upsertedUser);
@@ -17,6 +17,19 @@ export const getUserProjectTasks = cache((userId: User['id'], projectId: Project
     .select()
     .from(task)
     .where(and(eq(task.userId, userId), eq(task.projectId, projectId)));
+  return tasks;
+});
+
+export const getUserTodayTasks = cache((userId: User['id']) => {
+  const tasks = db
+    .select()
+    .from(task)
+    .where(
+      and(
+        eq(task.userId, userId),
+        eq(task.dueDate, formatDate(new Date(), DATE_FORMATS.ISO_DATE_FORMAT))
+      )
+    );
   return tasks;
 });
 

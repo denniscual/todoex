@@ -22,6 +22,7 @@ const model = new OpenAIApi(configuration);
 /**
  * TODO:
  *
+ * - add color color and list view style type in project.
  * - review the new app layout including the codes, the added Components/codes (we just copy and paste), and the added shadcdn ui components in our app.
  * - add function defintion for handling couting and aggregating result. Make sure to add good function description to this
  *   to distinguish this function to "seaching" function. I think we can use the same function `ask_database` and call the `createChatCompletion`
