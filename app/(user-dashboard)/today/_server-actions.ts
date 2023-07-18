@@ -237,6 +237,7 @@ function createFunctionsDefinitions({ date }: { date: string }) {
           ${createStringifyDbSchema()}
           The query should be returned in plain text, not in JSON. 
           The current date is ${date} in UTC format. Use this date if the user's question includes a relative date.
+          E.g "Get my todos today". We are going to use the current date to get all todos where the due date is set today.
           `,
           },
           successMessage: {
