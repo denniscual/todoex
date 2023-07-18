@@ -1,5 +1,5 @@
 import { cn } from '@/lib/utils';
-import { ChatBubbleIcon, DividerHorizontalIcon } from '@radix-ui/react-icons';
+import { ChatBubbleIcon } from '@radix-ui/react-icons';
 import NavLink from '@/app/(user-dashboard)/_components/nav-link';
 import AddProjectDialog from './add-project-dialog';
 import { currentUser } from '@clerk/nextjs';

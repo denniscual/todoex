@@ -25,6 +25,7 @@ const model = new OpenAIApi(configuration);
 /**
  * TODO:
  *
+ * - update the due date. I think we can make it to timestamp and add timezone. we can use UTC format.
  * - add color color and list view style type in project.
  * - review the new app layout including the codes, the added Components/codes (we just copy and paste), and the added shadcdn ui components in our app.
  * - add function defintion for handling couting and aggregating result. Make sure to add good function description to this
@@ -272,7 +273,7 @@ function createFunctionsDefinitions({ date }: { date: string }) {
           dueDate: {
             type: 'string',
             description:
-              'The due date of the todo. Make sure the value is compatible to Mysql date type.',
+              'The due date of the todo. Make sure the value is compatible to Mysql date type. The field is optional.',
           },
           projectId: {
             type: 'number',

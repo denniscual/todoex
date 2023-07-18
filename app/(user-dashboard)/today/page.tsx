@@ -6,7 +6,6 @@ import {
   Project,
   User,
   getUserTodayTasks,
-  isTaskCompleted,
 } from '@/db';
 import { currentUser } from '@clerk/nextjs';
 import { revalidatePath } from 'next/cache';
@@ -14,17 +13,12 @@ import { cookies } from 'next/headers';
 import { Suspense } from 'react';
 import Link from 'next/link';
 import { formatDate, DATE_FORMATS } from '@/lib/utils';
-import { Checkbox } from '@/components/ui/checkbox';
-import { Label } from '@/components/ui/label';
-import { updateTaskStatusAction } from './_server-actions';
-import { ErrorBoundary } from '@/components/error-boundary';
+import Tasks from '@/app/(user-dashboard)/_components/tasks';
+import { Skeleton } from '@/components/ui/skeleton';
 
 export const revalidate = 0;
 
 export default async function Today() {
-  const user = await currentUser();
-  const userId = user?.id ?? '';
-  const tasks = await getUserTodayTasks(userId);
   const formattedDate = formatDate(new Date(), DATE_FORMATS.WEEKDAY_DATE_FORMAT);
 
   return (
@@ -33,30 +27,27 @@ export default async function Today() {
         <h1 className="text-xl font-semibold tracking-tight">Today</h1>
         <span className="text-sm text-foreground/75">{formattedDate}</span>
       </div>
-      <ul className="grid gap-6 list-none">
-        {tasks.map((task) => (
-          <li key={task.id} className="pb-4 border-b ">
-            <ErrorBoundary>
-              <form
-                className="flex items-center gap-3"
-                action={async () => {
-                  'use server';
-                  return await updateTaskStatusAction(task, '/today');
-                }}
-              >
-                <Checkbox
-                  type="submit"
-                  defaultChecked={isTaskCompleted(task)}
-                  id={task.id.toString()}
-                />
-                <Label htmlFor={task.id.toString()}>{task.title}</Label>
-              </form>
-            </ErrorBoundary>
-          </li>
-        ))}
-      </ul>
+      <Suspense
+        fallback={
+          <div className="grid gap-6">
+            <Skeleton className="w-full h-8" />
+            <Skeleton className="w-full h-8" />
+          </div>
+        }
+      >
+        <UserTodayTasks />
+      </Suspense>
+      {/* <OldToday /> */}
     </div>
   );
+}
+
+async function UserTodayTasks() {
+  const user = await currentUser();
+  const userId = user?.id ?? '';
+  const tasks = await getUserTodayTasks(userId);
+
+  return <Tasks tasks={tasks} />;
 }
 
 async function OldToday() {
