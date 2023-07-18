@@ -3,7 +3,7 @@ import { db, task, User, user, project, projectUser, Project, Task } from '@/db'
 import { eq, and } from 'drizzle-orm';
 import { createInsertSchema } from 'drizzle-zod';
 import { z } from 'zod';
-import { areDatesEqualOrGreater } from '@/utils/dates';
+import { areDatesEqualOrGreater } from '@/lib/utils';
 
 export async function upsertUser(upsertedUser: z.infer<typeof insertUserSchema>) {
   const validUpsertedUser = insertUserSchema.parse(upsertedUser);

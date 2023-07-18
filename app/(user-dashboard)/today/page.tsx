@@ -13,15 +13,21 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
+import { formatDate } from '@/lib/utils';
 
 export default async function Today() {
-  const cookieStore = cookies();
   const user = await currentUser();
   const userId = user?.id ?? '';
+  console.log({ userId });
+
+  const formattedDate = formatDate(new Date());
 
   return (
-    <div>
-      <p>Today</p>
+    <div className="space-y-8">
+      <div className="inline-flex items-center gap-4">
+        <h1 className="text-xl font-semibold tracking-tight">Today</h1>
+        <span className="text-sm text-slate-400">{formattedDate}</span>
+      </div>
       <Card>
         <CardHeader>
           <CardTitle>Card Title</CardTitle>
