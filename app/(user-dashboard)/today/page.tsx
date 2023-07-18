@@ -5,8 +5,40 @@ import { revalidatePath } from 'next/cache';
 import { cookies } from 'next/headers';
 import { Suspense } from 'react';
 import Link from 'next/link';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card';
 
 export default async function Today() {
+  const cookieStore = cookies();
+  const user = await currentUser();
+  const userId = user?.id ?? '';
+
+  return (
+    <div>
+      <p>Today</p>
+      <Card>
+        <CardHeader>
+          <CardTitle>Card Title</CardTitle>
+          <CardDescription>Card Description</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <p>Card Content</p>
+        </CardContent>
+        <CardFooter>
+          <p>Card Footer</p>
+        </CardFooter>
+      </Card>
+    </div>
+  );
+}
+
+async function OldToday() {
   const cookieStore = cookies();
   const user = await currentUser();
   const userId = user?.id ?? '';

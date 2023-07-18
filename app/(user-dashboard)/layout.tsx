@@ -13,10 +13,8 @@ export default async function DashboardLayout({ children }: { children: React.Re
         <aside className="hidden w-[300px] md:block flex-none">
           <DashboardSidebar />
         </aside>
-        <div className="w-full h-full md:border-l">
-          <div className="px-4 py-10">
-            <div className="container mx-auto">{children}</div>
-          </div>
+        <div className="w-full h-full px-6 py-6 mx-auto md:px-16 lg:px-24 md:border-l">
+          {children}
         </div>
       </main>
     </div>

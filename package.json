@@ -29,6 +29,7 @@
     "class-variance-authority": "^0.6.1",
     "clsx": "^1.2.1",
     "cva": "npm:class-variance-authority@^0.6.1",
+    "date-fns": "^2.30.0",
     "dotenv": "^16.2.0",
     "drizzle-orm": "^0.27.2",
     "drizzle-zod": "^0.4.4",
