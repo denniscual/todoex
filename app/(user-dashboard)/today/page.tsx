@@ -14,7 +14,7 @@ import { cookies } from 'next/headers';
 import { Suspense } from 'react';
 import Link from 'next/link';
 import { formatDate, DATE_FORMATS } from '@/lib/utils';
-import Tasks from '@/app/(user-dashboard)/_components/tasks';
+import UserTasks from '@/app/(user-dashboard)/_components/user-tasks';
 import { Skeleton } from '@/components/ui/skeleton';
 import { updateTaskStatusAction } from '@/app/(user-dashboard)/today/_server-actions';
 
@@ -50,7 +50,7 @@ async function UserTodayTasks() {
   const tasks = await getUserTodayTasks(userId);
 
   return (
-    <Tasks
+    <UserTasks
       tasks={tasks}
       updateTaskStatusAction={async (task: Task) => {
         'use server';

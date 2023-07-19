@@ -8,7 +8,7 @@ import { UpdateTaskStatusAction } from '@/app/(user-dashboard)/today/_server-act
 import Link from 'next/link';
 import TaskRowAction from '@/app/(user-dashboard)/_components/task-row-action';
 
-export default function Tasks({
+export default function UserTasks({
   tasks,
   // This function is a server action so we can ignore the warning.
   updateTaskStatusAction,
