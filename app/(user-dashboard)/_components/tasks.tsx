@@ -1,11 +1,12 @@
 'use client';
 import { Task } from '@/db';
 import { Checkbox } from '@/components/ui/checkbox';
-import { Label } from '@/components/ui/label';
 import { useToast } from '@/components/ui/use-toast';
 import { ToastAction } from '@/components/ui/toast';
 import { TASK_STATUS_TEXTS, isTaskCompleted } from '@/lib/db';
 import { UpdateTaskStatusAction } from '@/app/(user-dashboard)/today/_server-actions';
+import Link from 'next/link';
+import TaskRowAction from '@/app/(user-dashboard)/_components/task-row-action';
 
 export default function Tasks({
   tasks,
@@ -79,14 +80,22 @@ function UserTask({
   }
 
   return (
-    <form className="flex items-center gap-3" action={() => action(task)}>
-      <Checkbox
-        type="submit"
-        key={task.status}
-        defaultChecked={isTaskCompleted(task)}
-        id={task.id.toString()}
-      />
-      <Label htmlFor={task.id.toString()}>{task.title}</Label>
-    </form>
+    <div className="flex justify-between">
+      <form className="flex items-center flex-1 gap-4" action={() => action(task)}>
+        <Checkbox
+          type="submit"
+          key={task.status}
+          defaultChecked={isTaskCompleted(task)}
+          id={task.id.toString()}
+        />
+        <Link href="/" className="grid flex-1 gap-2 cursor-pointer">
+          <span className="text-base font-semibold">{task.title}</span>
+          <span className="text-sm font-medium leading-none text-foreground/75">Project link</span>
+        </Link>
+      </form>
+      <div>
+        <TaskRowAction />
+      </div>
+    </div>
   );
 }

@@ -15,8 +15,8 @@ export default function AddProjectDialog() {
   return (
     <Dialog>
       <DialogTrigger asChild>
-        <Button variant="outline" size="icon" className="border-none shadow-none bg-none">
-          <PlusIcon className="w-5 h-5" />
+        <Button variant="ghost" size="icon">
+          <PlusIcon className="w-4 h-4" />
         </Button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-[425px]">
