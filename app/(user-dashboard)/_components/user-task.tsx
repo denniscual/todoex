@@ -84,12 +84,14 @@ export default function UserTask({
         />
         <button
           type="button"
-          onClick={() => console.log('click')}
+          onClick={() => router.push(`/tasks/${task.id}`)}
           className="flex flex-col items-start flex-1 cursor-pointer"
         >
           <span className="text-base font-semibold">{task.title}</span>
           <Button variant="link" className="p-0 text-foreground/60" asChild>
-            <Link href={`/projects/${task.projectId}`}>{task.projectTitle}</Link>
+            <Link onClick={(event) => event.stopPropagation()} href={`/projects/${task.projectId}`}>
+              {task.projectTitle}
+            </Link>
           </Button>
         </button>
       </form>
