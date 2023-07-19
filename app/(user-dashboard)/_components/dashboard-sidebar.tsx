@@ -1,5 +1,5 @@
 import { cn } from '@/lib/utils';
-import { ChatBubbleIcon } from '@radix-ui/react-icons';
+import { ChatBubbleIcon, ReaderIcon } from '@radix-ui/react-icons';
 import NavLink from '@/app/(user-dashboard)/_components/nav-link';
 import AddProjectDialog from './add-project-dialog';
 import { currentUser } from '@clerk/nextjs';
@@ -47,6 +47,9 @@ export default function DashboardSidebar({ className, ...props }: SidebarProps) 
           </NavLink>
           <NavLink href="/chat" icon={<ChatBubbleIcon className="w-4 h-5 mr-2 text-orange-500" />}>
             AI Assistant
+          </NavLink>
+          <NavLink href="/tasks" icon={<ReaderIcon className="w-4 h-5 mr-2 text-purple-500" />}>
+            Tasks
           </NavLink>
           {/* <NavLink
             href="/upcoming"
