@@ -96,13 +96,13 @@ export default function UserTask({
         </button>
       </form>
       <div>
-        <UserTaskAction />
+        <UserTaskAction task={task} />
       </div>
     </div>
   );
 }
 
-function UserTaskAction() {
+function UserTaskAction({ task }: { task: TaskWithProject }) {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
@@ -113,7 +113,7 @@ function UserTaskAction() {
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" className="w-[160px]">
         <DropdownMenuItem asChild>
-          <Link href="/">Edit</Link>
+          <Link href={`/tasks/${task.id}`}>Edit</Link>
         </DropdownMenuItem>
         <DropdownMenuItem>
           <span className="text-red-500">Delete</span>

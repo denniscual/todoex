@@ -26,7 +26,7 @@ const model = new OpenAIApi(configuration);
 /**
  * TODO:
  *
- * - make sure the pages like today will always get the latest data whenever the user navigates on it.
+ * - make sure the pages like today will always get the latest data whenever the user navigates on it. This is related to nextjs client-caching.
  * - update the due date. I think we can make it to timestamp and add timezone. we can use UTC format.
  * - add color color and list view style type in project.
  * - review the new app layout including the codes, the added Components/codes (we just copy and paste), and the added shadcdn ui components in our app.
