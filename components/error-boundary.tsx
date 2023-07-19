@@ -27,7 +27,7 @@ function FallbackComponent({
   useEffect(() => {
     toast({
       variant: 'destructive',
-      title: 'Uh oh! Something went wrong.',
+      title: 'Something went wrong.',
       description: 'There was a problem with your request.',
       action: (
         <ToastAction onClick={resetErrorBoundary} altText="Try again">

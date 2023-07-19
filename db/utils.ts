@@ -94,10 +94,6 @@ export async function updateTaskStatusById(id: Task['id'], status: Task['status'
     .where(eq(task.id, validValues.id as number));
 }
 
-export function isTaskCompleted(task: Task) {
-  return task.status === 'completed';
-}
-
 // Schema validation for inserting a user.
 export const insertUserSchema = createInsertSchema(user, {
   emailAddress(schema) {

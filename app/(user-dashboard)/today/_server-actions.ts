@@ -10,12 +10,12 @@ import {
   Task,
   insertTask,
   updateTaskStatusById,
-  isTaskCompleted,
 } from '@/db';
 import { sql } from 'drizzle-orm';
 import { FunctionHandlers } from './_utils.shared';
 import { revalidatePath } from 'next/cache';
 import { ZodError } from 'zod';
+import { isTaskCompleted } from '@/lib/db';
 
 const configuration = new Configuration({
   apiKey: process.env.OPENAI_API_KEY,
@@ -526,13 +526,23 @@ export const generateResponseAction: typeof generate = async ({ userId, projectI
   return res;
 };
 
-export async function updateTaskStatusAction(task: Task, path: string) {
+export type UpdateTaskStatusAction = (task: Task) => Promise<{
+  result: {
+    message: string;
+    status: Task['status'];
+  };
+}>;
+
+export const updateTaskStatusAction: UpdateTaskStatusAction = async function updateTaskStatusAction(
+  task: Task
+) {
   try {
-    await updateTaskStatusById(task.id, isTaskCompleted(task) ? 'pending' : 'completed');
-    revalidatePath(path);
+    const newStatus: Task['status'] = isTaskCompleted(task) ? 'pending' : 'completed';
+    await updateTaskStatusById(task.id, newStatus);
     return {
       result: {
         message: 'Task status is updated successfully.',
+        status: newStatus,
       },
     };
   } catch (err) {
@@ -544,4 +554,4 @@ export async function updateTaskStatusAction(task: Task, path: string) {
       throw new Error('Server error');
     }
   }
-}
+};

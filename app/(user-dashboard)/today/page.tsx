@@ -6,6 +6,7 @@ import {
   Project,
   User,
   getUserTodayTasks,
+  Task,
 } from '@/db';
 import { currentUser } from '@clerk/nextjs';
 import { revalidatePath } from 'next/cache';
@@ -15,6 +16,7 @@ import Link from 'next/link';
 import { formatDate, DATE_FORMATS } from '@/lib/utils';
 import Tasks from '@/app/(user-dashboard)/_components/tasks';
 import { Skeleton } from '@/components/ui/skeleton';
+import { updateTaskStatusAction } from '@/app/(user-dashboard)/today/_server-actions';
 
 export const revalidate = 0;
 
@@ -47,7 +49,17 @@ async function UserTodayTasks() {
   const userId = user?.id ?? '';
   const tasks = await getUserTodayTasks(userId);
 
-  return <Tasks tasks={tasks} />;
+  return (
+    <Tasks
+      tasks={tasks}
+      updateTaskStatusAction={async (task: Task) => {
+        'use server';
+        const res = await updateTaskStatusAction(task);
+        revalidatePath('/today');
+        return res;
+      }}
+    />
+  );
 }
 
 async function OldToday() {
