@@ -10,6 +10,7 @@ import {
   Task,
   insertTask,
   updateTaskStatusById,
+  TaskWithProject,
 } from '@/db';
 import { sql } from 'drizzle-orm';
 import { FunctionHandlers } from './_utils.shared';
@@ -527,32 +528,34 @@ export const generateResponseAction: typeof generate = async ({ userId, projectI
   return res;
 };
 
-export type UpdateTaskStatusAction = (task: Task) => Promise<{
+export type UpdateTaskStatusAction = (task: { id: Task['id']; status: Task['status'] }) => Promise<{
   result: {
     message: string;
     status: Task['status'];
   };
 }>;
 
-export const updateTaskStatusAction: UpdateTaskStatusAction = async function updateTaskStatusAction(
-  task: Task
-) {
-  try {
-    const newStatus: Task['status'] = isTaskCompleted(task) ? 'pending' : 'completed';
-    await updateTaskStatusById(task.id, newStatus);
-    return {
-      result: {
-        message: 'Task status is updated successfully.',
+export const updateTaskStatusAction: UpdateTaskStatusAction =
+  async function updateTaskStatusAction({ id, status }) {
+    try {
+      const newStatus: Task['status'] = isTaskCompleted(status) ? 'pending' : 'completed';
+      await updateTaskStatusById({
+        id,
         status: newStatus,
-      },
-    };
-  } catch (err) {
-    if (err instanceof ZodError) {
-      console.log('Zod error: ', err.issues);
-      throw new Error(JSON.stringify(err.issues));
-    } else {
-      console.log('Error when generating response: ', (err as Error).toString());
-      throw new Error('Server error');
+      });
+      return {
+        result: {
+          message: 'Task status is updated successfully.',
+          status: newStatus,
+        },
+      };
+    } catch (err) {
+      if (err instanceof ZodError) {
+        console.log('Zod error: ', err.issues);
+        throw new Error(JSON.stringify(err.issues));
+      } else {
+        console.log('Error when generating response: ', (err as Error).toString());
+        throw new Error('Server error');
+      }
     }
-  }
-};
+  };

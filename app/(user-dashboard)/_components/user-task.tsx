@@ -1,5 +1,5 @@
 'use client';
-import { Task } from '@/db';
+import { TaskWithProject } from '@/db';
 import { Checkbox } from '@/components/ui/checkbox';
 import { useToast } from '@/components/ui/use-toast';
 import { ToastAction } from '@/components/ui/toast';
@@ -15,19 +15,24 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { DotsHorizontalIcon } from '@radix-ui/react-icons';
 import { Button } from '@/components/ui/button';
+import { useRouter } from 'next/navigation';
 
 export default function UserTask({
   task,
   updateTaskStatusAction,
 }: {
-  task: Task;
+  task: TaskWithProject;
   updateTaskStatusAction: UpdateTaskStatusAction;
 }) {
   const { toast } = useToast();
+  const router = useRouter();
 
-  async function action(_task: Task, hideSuccessToast = false) {
+  async function action(_task: TaskWithProject, hideSuccessToast = false) {
     try {
-      const res = await updateTaskStatusAction(_task);
+      const res = await updateTaskStatusAction({
+        id: _task.id,
+        status: _task.status,
+      });
       if (!hideSuccessToast) {
         toast({
           title: `1 task is ${
@@ -74,13 +79,19 @@ export default function UserTask({
         <Checkbox
           type="submit"
           key={task.status}
-          defaultChecked={isTaskCompleted(task)}
+          defaultChecked={isTaskCompleted(task.status)}
           id={task.id.toString()}
         />
-        <Link href="/" className="grid flex-1 gap-2 cursor-pointer">
+        <button
+          type="button"
+          onClick={() => console.log('click')}
+          className="flex flex-col items-start flex-1 cursor-pointer"
+        >
           <span className="text-base font-semibold">{task.title}</span>
-          <span className="text-sm font-medium leading-none text-foreground/75">Project link</span>
-        </Link>
+          <Button variant="link" className="p-0 text-foreground/60" asChild>
+            <Link href={`/projects/${task.projectId}`}>{task.projectTitle}</Link>
+          </Button>
+        </button>
       </form>
       <div>
         <UserTaskAction />

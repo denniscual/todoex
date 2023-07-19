@@ -1,7 +1,7 @@
 import { Task } from '@/db';
 
-export function isTaskCompleted(task: Task) {
-  return task.status === 'completed';
+export function isTaskCompleted(status: Task['status']) {
+  return status === 'completed';
 }
 
 export const TASK_STATUS_TEXTS = {

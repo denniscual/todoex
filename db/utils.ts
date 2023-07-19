@@ -22,8 +22,20 @@ export const getUserProjectTasks = cache((userId: User['id'], projectId: Project
 
 export const getUserTodayTasks = cache((userId: User['id']) => {
   const tasks = db
-    .select()
+    .select({
+      projectId: task.projectId,
+      id: task.id,
+      title: task.title,
+      description: task.description,
+      dueDate: task.dueDate,
+      userId: task.userId,
+      createdAt: task.createdAt,
+      status: task.status,
+      projectTitle: project.title,
+      projectDescription: project.description,
+    })
     .from(task)
+    .innerJoin(project, eq(project.id, task.projectId))
     .where(
       and(
         eq(task.userId, userId),
@@ -32,6 +44,8 @@ export const getUserTodayTasks = cache((userId: User['id']) => {
     );
   return tasks;
 });
+
+export type TaskWithProject = Awaited<ReturnType<typeof getUserTodayTasks>>[0];
 
 export const getProject = cache(async (id: Project['id']) => {
   const projects = await db
@@ -74,7 +88,13 @@ export async function deleteTaskById(id: Task['id']) {
   await db.delete(task).where(eq(task.id, validId));
 }
 
-export async function updateTaskStatusById(id: Task['id'], status: Task['status']) {
+export async function updateTaskStatusById({
+  id,
+  status,
+}: {
+  id: Task['id'];
+  status: Task['status'];
+}) {
   const validValues = insertTaskSchema
     .pick({
       id: true,

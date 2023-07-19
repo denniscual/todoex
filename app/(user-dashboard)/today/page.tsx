@@ -6,7 +6,7 @@ import {
   Project,
   User,
   getUserTodayTasks,
-  Task,
+  TaskWithProject,
 } from '@/db';
 import { currentUser } from '@clerk/nextjs';
 import { revalidatePath } from 'next/cache';
@@ -24,16 +24,17 @@ export default async function Today() {
   const formattedDate = formatDate(new Date(), DATE_FORMATS.WEEKDAY_DATE_FORMAT);
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-10">
       <div className="inline-flex items-center gap-3">
         <h1 className="text-xl font-semibold tracking-tight">Today</h1>
-        <span className="text-sm text-foreground/75">{formattedDate}</span>
+        <span className="text-sm text-foreground/60">{formattedDate}</span>
       </div>
       <Suspense
         fallback={
           <div className="grid gap-6">
-            <Skeleton className="w-full h-8" />
-            <Skeleton className="w-full h-8" />
+            <Skeleton className="w-full h-10" />
+            <Skeleton className="w-full h-10" />
+            <Skeleton className="w-full h-10" />
           </div>
         }
       >
@@ -52,7 +53,7 @@ async function UserTodayTasks() {
   return (
     <UserTasks
       tasks={tasks}
-      updateTaskStatusAction={async (task: Task) => {
+      updateTaskStatusAction={async (task) => {
         'use server';
         const res = await updateTaskStatusAction(task);
         revalidatePath('/today');
