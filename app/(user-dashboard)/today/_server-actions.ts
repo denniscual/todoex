@@ -26,6 +26,7 @@ const model = new OpenAIApi(configuration);
 /**
  * TODO:
  *
+ * - add optimistic updates in Toggling user task (Checkbox and line-through text).
  * - make sure the pages like today will always get the latest data whenever the user navigates on it. This is related to nextjs client-caching.
  * - update the due date. I think we can make it to timestamp and add timezone. we can use UTC format.
  * - add color color and list view style type in project.

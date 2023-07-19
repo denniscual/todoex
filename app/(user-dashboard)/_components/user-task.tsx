@@ -16,6 +16,7 @@ import {
 import { DotsHorizontalIcon } from '@radix-ui/react-icons';
 import { Button } from '@/components/ui/button';
 import { useRouter } from 'next/navigation';
+import { cn } from '@/lib/utils';
 
 export default function UserTask({
   task,
@@ -78,7 +79,6 @@ export default function UserTask({
       <form className="flex items-center flex-1 gap-4" action={() => action(task)}>
         <Checkbox
           type="submit"
-          key={task.status}
           defaultChecked={isTaskCompleted(task.status)}
           id={task.id.toString()}
         />
@@ -87,7 +87,14 @@ export default function UserTask({
           onClick={() => router.push(`/tasks/${task.id}`)}
           className="flex flex-col items-start flex-1 cursor-pointer"
         >
-          <span className="text-base font-semibold">{task.title}</span>
+          <span
+            className={cn(
+              'md:max-w-screen-md',
+              isTaskCompleted(task.status) ? 'line-through' : 'no-underline'
+            )}
+          >
+            {task.title}
+          </span>
           <Button variant="link" className="p-0 text-foreground/60" asChild>
             <Link onClick={(event) => event.stopPropagation()} href={`/projects/${task.projectId}`}>
               {task.projectTitle}

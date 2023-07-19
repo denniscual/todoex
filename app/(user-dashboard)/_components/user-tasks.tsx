@@ -15,7 +15,7 @@ export default function UserTasks({
     <ul className="grid gap-6 list-none">
       {tasks.map((task) => (
         <li key={task.id} className="pb-4 border-b ">
-          <UserTask task={task} updateTaskStatusAction={updateTaskStatusAction} />
+          <UserTask key={task.status} task={task} updateTaskStatusAction={updateTaskStatusAction} />
         </li>
       ))}
     </ul>
