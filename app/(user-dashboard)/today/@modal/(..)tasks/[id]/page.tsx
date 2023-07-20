@@ -12,6 +12,7 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { Label } from '@/components/ui/label';
+import { Task } from '@/db';
 // import { CaretSortIcon, CheckIcon } from '@radix-ui/react-icons';
 // import { cn } from '@/lib/utils';
 // import {
@@ -53,6 +54,12 @@ export default function TaskDialog() {
           </div>
           <div className="w-[300px] p-6 border-l self-stretch space-y-4">
             <div className="flex flex-col gap-2">
+              <Label className="text-xs text-foreground/60" htmlFor="select-status">
+                Status
+              </Label>
+              <SelectStatus />
+            </div>
+            <div className="flex flex-col gap-2">
               <Label className="text-xs text-foreground/60" htmlFor="select-project">
                 Project
               </Label>
@@ -84,6 +91,42 @@ export default function TaskDialog() {
         </div>
       </DialogContent>
     </Dialog>
+  );
+}
+
+function SelectStatus() {
+  const [value, setValue] = useState('pending');
+
+  const selectTriggerStyles: Record<string, string> = {
+    pending: 'text-blue-500',
+    completed: 'text-green-500',
+  };
+
+  return (
+    <Select
+      value={value}
+      onValueChange={(value) => {
+        setValue(value);
+      }}
+    >
+      <SelectTrigger id="select-status" className={selectTriggerStyles[value]}>
+        <SelectValue placeholder="Select status" />
+      </SelectTrigger>
+      <SelectContent>
+        <SelectItem
+          className="text-blue-500 data-[highlighted]:bg-blue-500 data-[highlighted]:text-white"
+          value="pending"
+        >
+          Pending
+        </SelectItem>
+        <SelectItem
+          className="text-green-500 data-[highlighted]:bg-green-500 data-[highlighted]:text-white"
+          value="completed"
+        >
+          Completed
+        </SelectItem>
+      </SelectContent>
+    </Select>
   );
 }
 
