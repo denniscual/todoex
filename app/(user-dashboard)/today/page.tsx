@@ -21,7 +21,7 @@ import { updateTaskStatusAction } from '@/app/(user-dashboard)/today/_server-act
 export const revalidate = 0;
 
 export default async function Today() {
-  const formattedDate = formatDate(new Date(), DATE_FORMATS.WEEKDAY_DATE_FORMAT);
+  const formattedDate = formatDate(new Date(), DATE_FORMATS.LONG_DATE_FORMAT);
 
   return (
     <div className="space-y-10">
