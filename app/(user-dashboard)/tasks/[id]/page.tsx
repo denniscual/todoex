@@ -1,6 +1,8 @@
 import { getTaskById } from '@/db';
 import UserTaskDetails from '@/app/(user-dashboard)/_components/user-task-details';
-import { Card, CardContent } from '@/components/ui/card';
+import { Card, CardContent, CardDescription, CardHeader } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import Link from 'next/link';
 
 export default async function Task({
   params,
@@ -17,6 +19,13 @@ export default async function Task({
 
   return (
     <Card>
+      <CardHeader className="px-6 pt-2 pb-2 border-b">
+        <CardDescription>
+          <Button variant="link" className="p-0 text-foreground/60" asChild>
+            <Link href={`/projects/${userTask.projectId}`}>{userTask.projectTitle}</Link>
+          </Button>
+        </CardDescription>
+      </CardHeader>
       <CardContent className="p-0">
         <UserTaskDetails id={parseInt(params.id)} />
       </CardContent>

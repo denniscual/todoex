@@ -1,5 +1,5 @@
 import { Button } from '@/components/ui/button';
-import { DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { DialogContent, DialogHeader, DialogDescription } from '@/components/ui/dialog';
 import Link from 'next/link';
 import TaskDialog from './_task-dialog';
 import { getTaskById } from '@/db';
@@ -22,11 +22,11 @@ export default async function Task({
     <TaskDialog>
       <DialogContent className="max-w-[864px] h-[calc(100%-96px)] flex flex-col gap-0 p-0">
         <DialogHeader className="px-6 pt-2 pb-2 border-b">
-          <DialogTitle>
+          <DialogDescription>
             <Button variant="link" className="p-0 text-foreground/60" asChild>
               <Link href={`/projects/${userTask.projectId}`}>{userTask.projectTitle}</Link>
             </Button>
-          </DialogTitle>
+          </DialogDescription>
         </DialogHeader>
         <UserTaskDetails id={parseInt(params.id)} />
       </DialogContent>
