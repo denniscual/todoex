@@ -22,7 +22,7 @@ export default function StatusSelect({ id, status }: Pick<Task, 'id' | 'status'>
     <Select
       value={value}
       onValueChange={(value) => {
-        setValue(value);
+        setValue(value as Task['status']);
       }}
     >
       <SelectTrigger id="select-status" className={selectTriggerStyles[value]}>

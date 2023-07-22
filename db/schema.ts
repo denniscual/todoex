@@ -59,7 +59,7 @@ export const task = mysqlTable(
     title: varchar('title', { length: 255 }).notNull(),
     description: text('description'),
     dueDate: date('due_date', { mode: 'string' }),
-    status: mysqlEnum('status', ['pending', 'completed']).default('pending'),
+    status: mysqlEnum('status', ['pending', 'completed']).default('pending').notNull(),
     createdAt: timestamp('created_at', { mode: 'string' }).defaultNow(),
     updatedAt: timestamp('updated_at', { mode: 'string' }).defaultNow().onUpdateNow(),
   },
