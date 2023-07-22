@@ -6,10 +6,12 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
+import { Task } from '@/db';
 import { useState } from 'react';
 
-export default function StatusSelect() {
-  const [value, setValue] = useState('pending');
+export default function StatusSelect({ id, status }: Pick<Task, 'id' | 'status'>) {
+  const [value, setValue] = useState(status);
+  console.log({ id });
 
   const selectTriggerStyles: Record<string, string> = {
     pending: 'text-blue-500',

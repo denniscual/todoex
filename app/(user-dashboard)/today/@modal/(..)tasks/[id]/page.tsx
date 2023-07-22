@@ -47,7 +47,7 @@ export default async function Task({
               <Label className="text-xs text-foreground/60" htmlFor="select-status">
                 Status
               </Label>
-              <StatusSelect />
+              <StatusSelect id={userTask.id} status={userTask.status} />
             </div>
             <div className="flex flex-col gap-2">
               <Label className="text-xs text-foreground/60" htmlFor="select-project">
