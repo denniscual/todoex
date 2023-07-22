@@ -45,8 +45,8 @@ export const getUserTodayTasks = cache((userId: User['id']) => {
   return tasks;
 });
 
-export const getTaskById = cache((id: Task['id']) => {
-  return db
+export const getTaskById = cache(async (id: Task['id']) => {
+  const tasks = await db
     .select({
       projectId: task.projectId,
       id: task.id,
@@ -62,6 +62,12 @@ export const getTaskById = cache((id: Task['id']) => {
     .from(task)
     .innerJoin(project, eq(project.id, task.projectId))
     .where(eq(task.id, id));
+
+  if (tasks.length === 0) {
+    return null;
+  }
+
+  return tasks[0];
 });
 
 export const getProject = cache(async (id: Project['id']) => {
@@ -72,6 +78,11 @@ export const getProject = cache(async (id: Project['id']) => {
     })
     .from(project)
     .where(eq(project.id, id));
+
+  if (projects.length === 0) {
+    return null;
+  }
+
   return projects[0];
 });
 
