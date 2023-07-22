@@ -1,9 +1,6 @@
-'use client';
 import { Button } from '@/components/ui/button';
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
-import { useState } from 'react';
 import {
   Select,
   SelectContent,
@@ -13,21 +10,12 @@ import {
 } from '@/components/ui/select';
 import { Label } from '@/components/ui/label';
 import DueDateCombobox from '@/app/(user-dashboard)/_components/due-date-combobox';
+import TaskDialog from './_task-dialog';
+import StatusSelect from '@/app/(user-dashboard)/_components/status-select';
 
-export default function TaskDialog() {
-  const router = useRouter();
-  const [open, setOpen] = useState(true);
+export default function Task() {
   return (
-    <Dialog
-      open={open}
-      onOpenChange={(open) => {
-        setOpen(open);
-        // If the new state is not open, then navigate back.
-        if (!open) {
-          router.back();
-        }
-      }}
-    >
+    <TaskDialog>
       <DialogContent className="max-w-[864px] h-[calc(100%-96px)] flex flex-col gap-0 p-0">
         <DialogHeader className="px-6 pt-2 pb-2 border-b">
           <DialogTitle>
@@ -46,7 +34,7 @@ export default function TaskDialog() {
               <Label className="text-xs text-foreground/60" htmlFor="select-status">
                 Status
               </Label>
-              <SelectStatus />
+              <StatusSelect />
             </div>
             <div className="flex flex-col gap-2">
               <Label className="text-xs text-foreground/60" htmlFor="select-project">
@@ -71,42 +59,6 @@ export default function TaskDialog() {
           </div>
         </div>
       </DialogContent>
-    </Dialog>
-  );
-}
-
-function SelectStatus() {
-  const [value, setValue] = useState('pending');
-
-  const selectTriggerStyles: Record<string, string> = {
-    pending: 'text-blue-500',
-    completed: 'text-green-500',
-  };
-
-  return (
-    <Select
-      value={value}
-      onValueChange={(value) => {
-        setValue(value);
-      }}
-    >
-      <SelectTrigger id="select-status" className={selectTriggerStyles[value]}>
-        <SelectValue placeholder="Select status" />
-      </SelectTrigger>
-      <SelectContent>
-        <SelectItem
-          className="text-blue-500 data-[highlighted]:bg-blue-500 data-[highlighted]:text-white"
-          value="pending"
-        >
-          Pending
-        </SelectItem>
-        <SelectItem
-          className="text-green-500 data-[highlighted]:bg-green-500 data-[highlighted]:text-white"
-          value="completed"
-        >
-          Completed
-        </SelectItem>
-      </SelectContent>
-    </Select>
+    </TaskDialog>
   );
 }
