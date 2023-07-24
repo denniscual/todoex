@@ -51,12 +51,16 @@ async function generate({
   messages: ChatCompletionRequestMessage[];
 }) {
   const date = new Date().toISOString();
+  const userProject = await getProject(projectId);
+
+  if (!userProject) {
+    throw new Error(`Project with an id ${projectId} is not found.`);
+  }
 
   try {
-    const [userTasks, userProjects, userProject] = await Promise.all([
+    const [userTasks, userProjects] = await Promise.all([
       getUserProjectTasks(userId, projectId),
       getUserProjects(userId),
-      getProject(projectId),
     ]);
 
     const functionsDefinitions = createFunctionsDefinitions({
