@@ -6,7 +6,6 @@ import {
   Project,
   User,
   getUserTodayTasks,
-  TaskWithProject,
 } from '@/db';
 import { currentUser } from '@clerk/nextjs';
 import { revalidatePath } from 'next/cache';

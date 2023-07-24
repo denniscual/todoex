@@ -9,6 +9,8 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import DueDateCombobox from './due-date-combobox';
+import { updateTaskStatusAction } from '../today/_server-actions';
+import { revalidatePath } from 'next/cache';
 
 export default async function UserTaskDetails({ id }: { id: Task['id'] }) {
   const userTask = await getTaskById(id);
@@ -25,10 +27,19 @@ export default async function UserTaskDetails({ id }: { id: Task['id'] }) {
       </div>
       <div className="w-[300px] p-6 border-l self-stretch space-y-4">
         <div className="flex flex-col gap-2">
-          <Label className="text-xs text-foreground/60" htmlFor="select-status">
+          <Label className="text-xs text-foreground/60" htmlFor={`select-status-${userTask.id}`}>
             Status
           </Label>
-          <StatusSelect id={userTask.id} status={userTask.status} />
+          <StatusSelect
+            updateTaskStatusAction={async (task) => {
+              'use server';
+              revalidatePath('/today');
+              const res = await updateTaskStatusAction(task);
+              return res;
+            }}
+            id={userTask.id}
+            status={userTask.status}
+          />
         </div>
         <div className="flex flex-col gap-2">
           <Label className="text-xs text-foreground/60" htmlFor="select-project">
