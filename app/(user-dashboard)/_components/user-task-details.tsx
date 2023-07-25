@@ -9,6 +9,8 @@ import { currentUser } from '@clerk/nextjs';
 import { redirect } from 'next/navigation';
 import { Suspense } from 'react';
 import { Skeleton } from '@/components/ui/skeleton';
+import { Input } from '@/components/ui/input';
+import EditTitle from './edit-title';
 
 export default async function UserTaskDetails({ id }: { id: Task['id'] }) {
   const user = await currentUser();
@@ -34,7 +36,7 @@ export default async function UserTaskDetails({ id }: { id: Task['id'] }) {
   return (
     <div className="flex items-start flex-1">
       <div className="grid flex-1 gap-4 p-6">
-        <span className="text-xl font-semibold tracking-tight">{userTask.title}</span>
+        <EditTitle task={userTask} />
         <p className="text-sm">{userTask.description}</p>
       </div>
       <div className="w-[300px] p-6 border-l self-stretch space-y-4">
