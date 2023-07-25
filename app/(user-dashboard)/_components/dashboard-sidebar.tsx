@@ -45,9 +45,9 @@ export default function DashboardSidebar({ className, ...props }: SidebarProps) 
           >
             Today
           </NavLink>
-          <NavLink href="/tasks" icon={<ReaderIcon className="w-4 h-5 mr-2 text-purple-500" />}>
+          {/* <NavLink href="/tasks" icon={<ReaderIcon className="w-4 h-5 mr-2 text-purple-500" />}>
             Tasks
-          </NavLink>
+          </NavLink> */}
           <NavLink href="/chat" icon={<ChatBubbleIcon className="w-4 h-5 mr-2 text-orange-500" />}>
             AI Assistant
           </NavLink>
