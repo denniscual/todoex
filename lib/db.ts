@@ -1,5 +1,9 @@
 import { Task } from '@/db';
 
+export function toggleStatus(status: Task['status']) {
+  return isTaskCompleted(status) ? 'pending' : 'completed';
+}
+
 export function isTaskCompleted(status: Task['status']) {
   return status === 'completed';
 }

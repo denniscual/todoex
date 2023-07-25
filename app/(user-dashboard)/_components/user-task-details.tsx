@@ -33,7 +33,7 @@ export default async function UserTaskDetails({ id }: { id: Task['id'] }) {
           <StatusSelect
             updateTaskStatusAction={async (task) => {
               'use server';
-              revalidatePath('/today');
+              revalidatePath(`/tasks/${task.id}`);
               const res = await updateTaskStatusAction(task);
               return res;
             }}

@@ -544,15 +544,14 @@ export type UpdateTaskStatusAction = (task: { id: Task['id']; status: Task['stat
 export const updateTaskStatusAction: UpdateTaskStatusAction =
   async function updateTaskStatusAction({ id, status }) {
     try {
-      const newStatus: Task['status'] = isTaskCompleted(status) ? 'pending' : 'completed';
       await updateTaskStatusById({
         id,
-        status: newStatus,
+        status,
       });
       return {
         result: {
           message: 'Task status is updated successfully.',
-          status: newStatus,
+          status,
         },
       };
     } catch (err) {

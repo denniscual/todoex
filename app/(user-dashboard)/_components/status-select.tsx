@@ -8,7 +8,10 @@ import {
 } from '@/components/ui/select';
 import { Task } from '@/db';
 import { UpdateTaskStatusAction } from '../today/_server-actions';
-import { experimental_useOptimistic as useOptimistic, startTransition } from 'react';
+import { useToast } from '@/components/ui/use-toast';
+import { ToastAction } from '@/components/ui/toast';
+import { TASK_STATUS_TEXTS } from '@/lib/db';
+import { startTransition } from 'react';
 
 export default function StatusSelect({
   id,
@@ -17,32 +20,52 @@ export default function StatusSelect({
 }: Pick<Task, 'id' | 'status'> & {
   updateTaskStatusAction: UpdateTaskStatusAction;
 }) {
-  const [optimisticStatus, setOptimisticStatus] = useOptimistic(status);
+  const { toast } = useToast();
 
   const selectTriggerStyles: Record<string, string> = {
     pending: 'text-blue-500',
     completed: 'text-green-500',
   };
 
-  async function action() {
-    await updateTaskStatusAction({
-      id,
-      status,
-    });
+  async function action(_status: Task['status'], hideSuccessToast = false) {
+    try {
+      const res = await updateTaskStatusAction({
+        id,
+        status: _status,
+      });
+      if (!hideSuccessToast) {
+        toast({
+          title: `1 task is ${
+            res.result.status === 'completed'
+              ? TASK_STATUS_TEXTS.COMPLETED
+              : TASK_STATUS_TEXTS.OPENED
+          }.`,
+          duration: 5000,
+        });
+      }
+    } catch (err) {
+      toast({
+        variant: 'destructive',
+        title: 'Something went wrong.',
+        description: 'There was a problem with your request.',
+        action: <ToastAction altText="Try again">Try again</ToastAction>,
+        duration: 5000,
+      });
+      console.error('Server Error: ', err);
+    }
   }
 
   return (
     <div>
       <Select
-        value={optimisticStatus}
+        value={status}
         onValueChange={(val) => {
-          setOptimisticStatus(val as Task['status']);
           startTransition(() => {
-            action();
+            action(val as Task['status']);
           });
         }}
       >
-        <SelectTrigger id={`select-status-${id}`} className={selectTriggerStyles[optimisticStatus]}>
+        <SelectTrigger id={`select-status-${id}`} className={selectTriggerStyles[status]}>
           <SelectValue placeholder="Select status" />
         </SelectTrigger>
         <SelectContent>
