@@ -1,16 +1,10 @@
 import { Label } from '@/components/ui/label';
 import { Task, getTaskById } from '@/db';
 import StatusSelect from './status-select';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
 import DueDateCombobox from './due-date-combobox';
 import { updateTaskByIdAction } from '@/lib/actions';
 import { revalidatePath } from 'next/cache';
+import ProjectSelect from './project-select';
 
 export default async function UserTaskDetails({ id }: { id: Task['id'] }) {
   const userTask = await getTaskById(id);
@@ -42,18 +36,10 @@ export default async function UserTaskDetails({ id }: { id: Task['id'] }) {
           />
         </div>
         <div className="flex flex-col gap-2">
-          <Label className="text-xs text-foreground/60" htmlFor="select-project">
+          <Label className="text-xs text-foreground/60" htmlFor={`select-project-${userTask.id}`}>
             Project
           </Label>
-          <Select defaultValue="daily">
-            <SelectTrigger id="select-project">
-              <SelectValue placeholder="Select project" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="daily">Daily Tasks</SelectItem>
-              <SelectItem value="agile">Agile Automation Tracker</SelectItem>
-            </SelectContent>
-          </Select>
+          <ProjectSelect id={userTask.id} />
         </div>
         <div className="flex flex-col gap-2">
           <Label className="text-xs text-foreground/60" htmlFor="select-due-date">
