@@ -31,7 +31,7 @@ export default function UserTask({
   async function action() {
     try {
       const res = await updateTaskByIdAction({
-        id: task.id,
+        ...task,
         status: toggleStatus(task.status),
       });
       toast({

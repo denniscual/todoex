@@ -1,27 +1,29 @@
 'use server';
-import { Task, updateTaskById } from '@/db';
+import { TaskWithProject, updateTaskById } from '@/db';
 import { ZodError } from 'zod';
 
-export type UpdateTaskByIdAction = (task: { id: Task['id']; status: Task['status'] }) => Promise<{
+export type UpdateTaskByIdAction = (task: TaskWithProject) => Promise<{
   result: {
     message: string;
-    status: Task['status'];
-  };
+  } & TaskWithProject;
 }>;
 
-export const updateTaskByIdAction: UpdateTaskByIdAction = async function updateTaskByIdAction({
-  id,
-  status,
-}) {
+export const updateTaskByIdAction: UpdateTaskByIdAction = async function updateTaskByIdAction(
+  task
+) {
   try {
     await updateTaskById({
-      id,
-      status,
+      id: task.id,
+      status: task.status,
+      dueDate: task.dueDate,
+      title: task.title,
+      description: task.description,
+      projectId: task.projectId,
     });
     return {
       result: {
         message: 'Task status is updated successfully.',
-        status,
+        ...task,
       },
     };
   } catch (err) {

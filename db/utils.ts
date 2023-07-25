@@ -4,6 +4,7 @@ import { eq, and } from 'drizzle-orm';
 import { createInsertSchema } from 'drizzle-zod';
 import { z } from 'zod';
 import { DATE_FORMATS, areDatesEqualOrGreater, formatDate } from '@/lib/utils';
+import { RequiredKeys } from '@/lib/types';
 
 export async function upsertUser(upsertedUser: z.infer<typeof insertUserSchema>) {
   const validUpsertedUser = insertUserSchema.parse(upsertedUser);
@@ -116,23 +117,35 @@ export async function deleteTaskById(id: Task['id']) {
   await db.delete(task).where(eq(task.id, validId));
 }
 
-export async function updateTaskById({ id, status }: { id: Task['id']; status: Task['status'] }) {
+export async function updateTaskById({
+  id,
+  status,
+  dueDate,
+  title,
+  description,
+  projectId,
+}: RequiredKeys<Partial<z.infer<typeof insertTaskSchema>>, 'id'>) {
   const validValues = insertTaskSchema
     .pick({
       id: true,
       status: true,
       dueDate: true,
+      title: true,
+      description: true,
+      projectId: true,
     })
     .parse({
       id,
       status,
+      dueDate,
+      title,
+      description,
+      projectId,
     });
 
   await db
     .update(task)
-    .set({
-      status: validValues.status,
-    })
+    .set(validValues)
     .where(eq(task.id, validValues.id as number));
 }
 
@@ -164,6 +177,8 @@ export const insertTaskSchema = createInsertSchema(task, {
       )
       .refine(
         (val) => {
+          // TODO:
+          // use date-fns to do the dates equality checking.
           const dueDate = new Date(val);
           const currentDate = new Date();
           console.log({
@@ -180,4 +195,5 @@ export const insertTaskSchema = createInsertSchema(task, {
   },
 });
 
+export type UserProject = Awaited<ReturnType<typeof getUserProjects>>[0];
 export type TaskWithProject = Awaited<ReturnType<typeof getUserTodayTasks>>[0];

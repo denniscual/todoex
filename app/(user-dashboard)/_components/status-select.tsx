@@ -6,7 +6,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { Task } from '@/db';
+import { Task, TaskWithProject } from '@/db';
 import { useToast } from '@/components/ui/use-toast';
 import { ToastAction } from '@/components/ui/toast';
 import { TASK_STATUS_TEXTS } from '@/lib/db';
@@ -15,9 +15,11 @@ import { UpdateTaskByIdAction } from '@/lib/actions';
 
 export default function StatusSelect({
   id,
-  status,
+  task,
   updateTaskByIdAction,
-}: Pick<Task, 'id' | 'status'> & {
+}: {
+  task: TaskWithProject;
+  id: string;
   updateTaskByIdAction: UpdateTaskByIdAction;
 }) {
   const { toast } = useToast();
@@ -30,7 +32,7 @@ export default function StatusSelect({
   async function action(_status: Task['status']) {
     try {
       const res = await updateTaskByIdAction({
-        id,
+        ...task,
         status: _status,
       });
       toast({
@@ -53,14 +55,14 @@ export default function StatusSelect({
 
   return (
     <Select
-      value={status}
+      value={task.status}
       onValueChange={(val) => {
         startTransition(() => {
           action(val as Task['status']);
         });
       }}
     >
-      <SelectTrigger id={`select-status-${id}`} className={selectTriggerStyles[status]}>
+      <SelectTrigger id={id} className={selectTriggerStyles[task.status]}>
         <SelectValue placeholder="Select status" />
       </SelectTrigger>
       <SelectContent>
