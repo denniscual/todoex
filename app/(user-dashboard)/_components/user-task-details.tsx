@@ -9,7 +9,7 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import DueDateCombobox from './due-date-combobox';
-import { updateTaskStatusAction } from '../today/_server-actions';
+import { updateTaskByIdAction } from '@/lib/actions';
 import { revalidatePath } from 'next/cache';
 
 export default async function UserTaskDetails({ id }: { id: Task['id'] }) {
@@ -31,10 +31,10 @@ export default async function UserTaskDetails({ id }: { id: Task['id'] }) {
             Status
           </Label>
           <StatusSelect
-            updateTaskStatusAction={async (task) => {
+            updateTaskByIdAction={async (task) => {
               'use server';
               revalidatePath(`/tasks/${task.id}`);
-              const res = await updateTaskStatusAction(task);
+              const res = await updateTaskByIdAction(task);
               return res;
             }}
             id={userTask.id}

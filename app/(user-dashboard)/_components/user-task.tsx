@@ -4,7 +4,6 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { useToast } from '@/components/ui/use-toast';
 import { ToastAction } from '@/components/ui/toast';
 import { TASK_STATUS_TEXTS, isTaskCompleted, toggleStatus } from '@/lib/db';
-import { UpdateTaskStatusAction } from '@/app/(user-dashboard)/today/_server-actions';
 import Link from 'next/link';
 import {
   DropdownMenu,
@@ -17,20 +16,21 @@ import { DotsHorizontalIcon } from '@radix-ui/react-icons';
 import { Button } from '@/components/ui/button';
 import { useRouter } from 'next/navigation';
 import { cn } from '@/lib/utils';
+import { UpdateTaskByIdAction } from '@/lib/actions';
 
 export default function UserTask({
   task,
-  updateTaskStatusAction,
+  updateTaskByIdAction,
 }: {
   task: TaskWithProject;
-  updateTaskStatusAction: UpdateTaskStatusAction;
+  updateTaskByIdAction: UpdateTaskByIdAction;
 }) {
   const { toast } = useToast();
   const router = useRouter();
 
   async function action() {
     try {
-      const res = await updateTaskStatusAction({
+      const res = await updateTaskByIdAction({
         id: task.id,
         status: toggleStatus(task.status),
       });

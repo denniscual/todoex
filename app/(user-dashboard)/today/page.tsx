@@ -15,7 +15,7 @@ import Link from 'next/link';
 import { formatDate, DATE_FORMATS } from '@/lib/utils';
 import UserTasks from '@/app/(user-dashboard)/_components/user-tasks';
 import { Skeleton } from '@/components/ui/skeleton';
-import { updateTaskStatusAction } from '@/app/(user-dashboard)/today/_server-actions';
+import { updateTaskByIdAction } from '@/lib/actions';
 
 export const revalidate = 0;
 
@@ -52,9 +52,9 @@ async function UserTodayTasks() {
   return (
     <UserTasks
       tasks={tasks}
-      updateTaskStatusAction={async (task) => {
+      updateTaskByIdAction={async (task) => {
         'use server';
-        const res = await updateTaskStatusAction(task);
+        const res = await updateTaskByIdAction(task);
         revalidatePath('/today');
         return res;
       }}

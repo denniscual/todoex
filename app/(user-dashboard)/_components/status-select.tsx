@@ -7,18 +7,18 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { Task } from '@/db';
-import { UpdateTaskStatusAction } from '../today/_server-actions';
 import { useToast } from '@/components/ui/use-toast';
 import { ToastAction } from '@/components/ui/toast';
 import { TASK_STATUS_TEXTS } from '@/lib/db';
 import { startTransition } from 'react';
+import { UpdateTaskByIdAction } from '@/lib/actions';
 
 export default function StatusSelect({
   id,
   status,
-  updateTaskStatusAction,
+  updateTaskByIdAction,
 }: Pick<Task, 'id' | 'status'> & {
-  updateTaskStatusAction: UpdateTaskStatusAction;
+  updateTaskByIdAction: UpdateTaskByIdAction;
 }) {
   const { toast } = useToast();
 
@@ -29,7 +29,7 @@ export default function StatusSelect({
 
   async function action(_status: Task['status']) {
     try {
-      const res = await updateTaskStatusAction({
+      const res = await updateTaskByIdAction({
         id,
         status: _status,
       });

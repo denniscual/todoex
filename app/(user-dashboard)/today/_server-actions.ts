@@ -9,12 +9,10 @@ import {
   task,
   Task,
   insertTask,
-  updateTaskById,
 } from '@/db';
 import { sql } from 'drizzle-orm';
 import { FunctionHandlers } from './_utils.shared';
 import { revalidatePath } from 'next/cache';
-import { ZodError } from 'zod';
 
 const configuration = new Configuration({
   apiKey: process.env.OPENAI_API_KEY,
@@ -530,34 +528,3 @@ export const generateResponseAction: typeof generate = async ({ userId, projectI
 
   return res;
 };
-
-export type UpdateTaskStatusAction = (task: { id: Task['id']; status: Task['status'] }) => Promise<{
-  result: {
-    message: string;
-    status: Task['status'];
-  };
-}>;
-
-export const updateTaskStatusAction: UpdateTaskStatusAction =
-  async function updateTaskStatusAction({ id, status }) {
-    try {
-      await updateTaskById({
-        id,
-        status,
-      });
-      return {
-        result: {
-          message: 'Task status is updated successfully.',
-          status,
-        },
-      };
-    } catch (err) {
-      if (err instanceof ZodError) {
-        console.log('Zod error: ', err.issues);
-        throw new Error(JSON.stringify(err.issues));
-      } else {
-        console.log('Error when generating response: ', (err as Error).toString());
-        throw new Error('Server error');
-      }
-    }
-  };
