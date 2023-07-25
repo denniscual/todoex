@@ -116,13 +116,7 @@ export async function deleteTaskById(id: Task['id']) {
   await db.delete(task).where(eq(task.id, validId));
 }
 
-export async function updateTaskStatusById({
-  id,
-  status,
-}: {
-  id: Task['id'];
-  status: Task['status'];
-}) {
+export async function updateTaskById({ id, status }: { id: Task['id']; status: Task['status'] }) {
   const validValues = insertTaskSchema
     .pick({
       id: true,

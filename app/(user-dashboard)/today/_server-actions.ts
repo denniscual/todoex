@@ -9,7 +9,7 @@ import {
   task,
   Task,
   insertTask,
-  updateTaskStatusById,
+  updateTaskById,
 } from '@/db';
 import { sql } from 'drizzle-orm';
 import { FunctionHandlers } from './_utils.shared';
@@ -541,7 +541,7 @@ export type UpdateTaskStatusAction = (task: { id: Task['id']; status: Task['stat
 export const updateTaskStatusAction: UpdateTaskStatusAction =
   async function updateTaskStatusAction({ id, status }) {
     try {
-      await updateTaskStatusById({
+      await updateTaskById({
         id,
         status,
       });
