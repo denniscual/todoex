@@ -27,22 +27,18 @@ export default function StatusSelect({
     completed: 'text-green-500',
   };
 
-  async function action(_status: Task['status'], hideSuccessToast = false) {
+  async function action(_status: Task['status']) {
     try {
       const res = await updateTaskStatusAction({
         id,
         status: _status,
       });
-      if (!hideSuccessToast) {
-        toast({
-          title: `1 task is ${
-            res.result.status === 'completed'
-              ? TASK_STATUS_TEXTS.COMPLETED
-              : TASK_STATUS_TEXTS.OPENED
-          }.`,
-          duration: 5000,
-        });
-      }
+      toast({
+        title: `1 task is ${
+          res.result.status === 'completed' ? TASK_STATUS_TEXTS.COMPLETED : TASK_STATUS_TEXTS.OPENED
+        }.`,
+        duration: 5000,
+      });
     } catch (err) {
       toast({
         variant: 'destructive',

@@ -3,7 +3,7 @@ import { TaskWithProject } from '@/db';
 import { Checkbox } from '@/components/ui/checkbox';
 import { useToast } from '@/components/ui/use-toast';
 import { ToastAction } from '@/components/ui/toast';
-import { TASK_STATUS_TEXTS, isTaskCompleted } from '@/lib/db';
+import { TASK_STATUS_TEXTS, isTaskCompleted, toggleStatus } from '@/lib/db';
 import { UpdateTaskStatusAction } from '@/app/(user-dashboard)/today/_server-actions';
 import Link from 'next/link';
 import {
@@ -28,39 +28,18 @@ export default function UserTask({
   const { toast } = useToast();
   const router = useRouter();
 
-  async function action(_task: TaskWithProject, hideSuccessToast = false) {
+  async function action() {
     try {
       const res = await updateTaskStatusAction({
-        id: _task.id,
-        status: _task.status,
+        id: task.id,
+        status: toggleStatus(task.status),
       });
-      if (!hideSuccessToast) {
-        toast({
-          title: `1 task is ${
-            res.result.status === 'completed'
-              ? TASK_STATUS_TEXTS.COMPLETED
-              : TASK_STATUS_TEXTS.OPENED
-          }.`,
-          duration: 5000,
-          action: (
-            <form
-              action={() => {
-                action(
-                  {
-                    ..._task,
-                    status: res.result.status,
-                  },
-                  true
-                );
-              }}
-            >
-              <ToastAction type="submit" altText="Undo">
-                Undo
-              </ToastAction>
-            </form>
-          ),
-        });
-      }
+      toast({
+        title: `1 task is ${
+          res.result.status === 'completed' ? TASK_STATUS_TEXTS.COMPLETED : TASK_STATUS_TEXTS.OPENED
+        }.`,
+        duration: 5000,
+      });
     } catch (err) {
       toast({
         variant: 'destructive',
@@ -69,19 +48,14 @@ export default function UserTask({
         action: <ToastAction altText="Try again">Try again</ToastAction>,
         duration: 5000,
       });
-
       console.error('Server Error: ', err);
     }
   }
 
   return (
     <div className="flex justify-between">
-      <form className="flex items-center flex-1 gap-4" action={() => action(task)}>
-        <Checkbox
-          type="submit"
-          defaultChecked={isTaskCompleted(task.status)}
-          id={task.id.toString()}
-        />
+      <form className="flex items-center flex-1 gap-4" action={action}>
+        <Checkbox type="submit" checked={isTaskCompleted(task.status)} />
         <button
           type="button"
           onClick={() => router.push(`/tasks/${task.id}`)}
