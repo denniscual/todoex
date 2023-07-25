@@ -10,13 +10,11 @@ import {
   Task,
   insertTask,
   updateTaskStatusById,
-  TaskWithProject,
 } from '@/db';
 import { sql } from 'drizzle-orm';
 import { FunctionHandlers } from './_utils.shared';
 import { revalidatePath } from 'next/cache';
 import { ZodError } from 'zod';
-import { isTaskCompleted } from '@/lib/db';
 
 const configuration = new Configuration({
   apiKey: process.env.OPENAI_API_KEY,

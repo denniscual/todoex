@@ -52,33 +52,31 @@ export default function StatusSelect({
   }
 
   return (
-    <div>
-      <Select
-        value={status}
-        onValueChange={(val) => {
-          startTransition(() => {
-            action(val as Task['status']);
-          });
-        }}
-      >
-        <SelectTrigger id={`select-status-${id}`} className={selectTriggerStyles[status]}>
-          <SelectValue placeholder="Select status" />
-        </SelectTrigger>
-        <SelectContent>
-          <SelectItem
-            className="text-blue-500 data-[highlighted]:bg-blue-500 data-[highlighted]:text-white"
-            value="pending"
-          >
-            Pending
-          </SelectItem>
-          <SelectItem
-            className="text-green-500 data-[highlighted]:bg-green-500 data-[highlighted]:text-white"
-            value="completed"
-          >
-            Completed
-          </SelectItem>
-        </SelectContent>
-      </Select>
-    </div>
+    <Select
+      value={status}
+      onValueChange={(val) => {
+        startTransition(() => {
+          action(val as Task['status']);
+        });
+      }}
+    >
+      <SelectTrigger id={`select-status-${id}`} className={selectTriggerStyles[status]}>
+        <SelectValue placeholder="Select status" />
+      </SelectTrigger>
+      <SelectContent>
+        <SelectItem
+          className="text-blue-500 data-[highlighted]:bg-blue-500 data-[highlighted]:text-white"
+          value="pending"
+        >
+          Pending
+        </SelectItem>
+        <SelectItem
+          className="text-green-500 data-[highlighted]:bg-green-500 data-[highlighted]:text-white"
+          value="completed"
+        >
+          Completed
+        </SelectItem>
+      </SelectContent>
+    </Select>
   );
 }
