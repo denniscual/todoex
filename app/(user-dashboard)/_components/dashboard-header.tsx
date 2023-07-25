@@ -16,7 +16,7 @@ export default function DashboardHeader() {
         </Button>
         <nav className="flex items-center ml-auto gap-x-4">
           <ThemeToggle />
-          <UserButton afterSignOutUrl={`${process.env.NEXT_PUBLIC_HOST}/sign-in`} />
+          <UserButton afterSignOutUrl="/sign-in" />
         </nav>
       </div>
     </header>

@@ -22,19 +22,20 @@ const model = new OpenAIApi(configuration);
 /**
  * TODO:
  *
+ * - show a fallback Component while the UserButton or other Components are still loading. Right now, even using Suspense, it didn't suspend. Maybe we need to disable the SSR?
+ *   Do a research regarding this. I think in the nectxjs docs there is a hint there.
  * - make sure the pages like today will always get the latest data whenever the user navigates on it. This is related to nextjs client-caching.
  * - do a schema migration. Fix the issues in drizzle migration script.
  * - update the due date. I think we can make it to timestamp and add timezone. we can use UTC format.
- * - add color color and list view style type in project.
- * - review the new app layout including the codes, the added Components/codes (we just copy and paste), and the added shadcdn ui components in our app.
+ * - add color and list view style type in project.
  * - add function defintion for handling couting and aggregating result. Make sure to add good function description to this
  *   to distinguish this function to "seaching" function. I think we can use the same function `ask_database` and call the `createChatCompletion`
  *   to pass message with role: "function" and append the `functionResponse` as the content. We let openai to generate the result for us and parse it by RSC.
  * - fine tune again the prompts like increase or more fine tuning the model to avoid doing destructive actions like dropping a table or moving a todo to another user. And also
  *   enhancing the prompts for better creation, updating task, suggesting todo, etc.
+ * - add optimistic updates or maybe use 3rd party lib like react-hook-form to handle forms.
  * - improve typescript.
  * - use Zod to validate the form.
- * - remove PUBLIC_HOST env var. We don't need this for clerk.
  */
 async function generate({
   userId,
