@@ -22,6 +22,9 @@ const model = new OpenAIApi(configuration);
 /**
  * TODO:
  *
+ * - we need to show a loader/progressbar, just like with Youtube or Vercel, whenever we navigate to other page.
+ * - update the page content layout. We need to add max width for the content to avoid huge space in large viewport. Huge space is not good for the page content. Maybe
+ *   in the future, some routes will require huge space. But for now, add max width for the page content.
  * - show a fallback Component while the UserButton or other Components are still loading. Right now, even using Suspense, it didn't suspend. Maybe we need to disable the SSR?
  *   Do a research regarding this. I think in the nectxjs docs there is a hint there.
  * - make sure the pages like today will always get the latest data whenever the user navigates on it. This is related to nextjs client-caching.

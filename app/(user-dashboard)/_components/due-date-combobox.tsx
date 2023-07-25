@@ -1,6 +1,6 @@
 'use client';
 import { Button } from '@/components/ui/button';
-import { ComponentPropsWithoutRef, ReactNode, useState } from 'react';
+import { ComponentPropsWithoutRef, ReactNode, startTransition, useState } from 'react';
 import {
   ReaderIcon,
   CalendarIcon,
@@ -21,7 +21,10 @@ import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover
 import { Calendar } from '@/components/ui/calendar';
 import { addDays, isToday, isTomorrow } from 'date-fns';
 import { DATE_FORMATS, isWithinSevenDays, formatDate, cn } from '@/lib/utils';
-import { ValueOf } from '@/lib/types';
+import { TaskWithProject } from '@/db';
+import { UpdateTaskByIdAction } from '@/lib/actions';
+import { useToast } from '@/components/ui/use-toast';
+import { ToastAction } from '@/components/ui/toast';
 
 export type DueDateOptionValue = 'today' | 'tomorrow' | 'date picker' | 'no date';
 
@@ -49,70 +52,66 @@ const dueDateOptionsObject: Record<DueDateOptionValue, DueDateOption> = {
   },
   'no date': {
     value: 'no date',
-    label: 'No Date',
+    label: 'Select due date',
     icon: <CircleBackslashIcon className="text-slate-500" />,
   },
 } satisfies Record<DueDateOptionValue, DueDateOption>;
 
 const dueDateOptions = Object.values(dueDateOptionsObject);
 
-export default function DueDateCombobox({ dueDate = new Date() }: { dueDate?: Date | null }) {
+export default function DueDateCombobox({
+  task,
+  updateTaskByIdAction,
+  id,
+}: {
+  task: TaskWithProject;
+  updateTaskByIdAction: UpdateTaskByIdAction;
+  id: string;
+}) {
+  const { toast } = useToast();
   const [open, setOpen] = useState(false);
-  const [date, setDate] = useState<Date | undefined>(() => (dueDate ? dueDate : undefined));
-  const [dueDateOptionsValue, setDueDateOptionsValue] = useState<
-    ValueOf<typeof dueDateOptionsObject>['value']
-  >(() => {
-    if (!date) {
-      return dueDateOptionsObject['no date'].value;
-    }
-    if (isToday(date)) {
-      return dueDateOptionsObject.today.value;
-    }
-    if (isTomorrow(date)) {
-      return dueDateOptionsObject.tomorrow.value;
-    }
-    return dueDateOptionsObject['date picker'].value;
-  });
+  const { dueDate } = task;
+  const date = dueDate ? new Date(dueDate) : undefined;
 
-  let comboboxLabel = '';
-  switch (dueDateOptionsValue) {
-    case dueDateOptionsObject.today.value: {
-      comboboxLabel = dueDateOptionsObject.today.label;
-      break;
-    }
-    case dueDateOptionsObject.tomorrow.value: {
-      comboboxLabel = dueDateOptionsObject.tomorrow.label;
-      break;
-    }
-    case dueDateOptionsObject['no date'].value: {
-      comboboxLabel = 'Select due date';
-      break;
-    }
-    default: {
-      if (!date) {
-        comboboxLabel = 'Select due date';
-      } else {
-        if (isWithinSevenDays(date)) {
-          comboboxLabel = formatDate(date, DATE_FORMATS.WEEKDAY_DATE_FORMAT);
-        } else {
-          comboboxLabel = formatDate(date, DATE_FORMATS.LONG_DATE_FORMAT);
-        }
-      }
+  const currentDueDateOption = getCurrentDueDateOption(date);
+
+  async function action(_date?: Date | null) {
+    try {
+      await updateTaskByIdAction({
+        ...task,
+        dueDate: _date ? formatDate(_date, DATE_FORMATS.ISO_DATE_FORMAT) : null,
+      });
+      const updatedDueDateOption = getCurrentDueDateOption(_date);
+      toast({
+        title:
+          updatedDueDateOption.value === dueDateOptionsObject['no date'].value
+            ? 'Due date updated.'
+            : `Due date updated to ${updatedDueDateOption.label}.`,
+        duration: 5000,
+      });
+    } catch (err) {
+      toast({
+        variant: 'destructive',
+        title: 'Something went wrong.',
+        description: 'There was a problem with your request.',
+        action: <ToastAction altText="Try again">Try again</ToastAction>,
+        duration: 5000,
+      });
+      console.error('Server Error: ', err);
     }
   }
 
   return (
     <Popover open={open} onOpenChange={setOpen}>
-      <PopoverTrigger asChild id="select-due-date">
+      <PopoverTrigger asChild id={id}>
         <Button
           variant="outline"
           role="combobox"
           aria-expanded={open}
           className="justify-start hover:bg-transparent"
         >
-          <span className="w-4 h-4 mr-2">{dueDateOptionsObject[dueDateOptionsValue].icon}</span>
-
-          {comboboxLabel}
+          <span className="w-4 h-4 mr-2">{currentDueDateOption.icon}</span>
+          {currentDueDateOption.label}
         </Button>
       </PopoverTrigger>
       <PopoverContent className="p-0">
@@ -127,15 +126,12 @@ export default function DueDateCombobox({ dueDate = new Date() }: { dueDate?: Da
                     <DatePickerCommandItem
                       {...dateOption}
                       key={dateOption.value}
-                      isSelected={dateOption.value === dueDateOptionsValue}
-                      onDatePickerSelect={(date) => {
-                        setDate(date);
+                      isSelected={dateOption.value === currentDueDateOption.value}
+                      onDatePickerSelect={(_date) => {
                         setOpen(false);
-                        if (date && isTomorrow(date)) {
-                          setDueDateOptionsValue(dueDateOptionsObject.tomorrow.value);
-                        } else {
-                          setDueDateOptionsValue(dueDateOptionsObject['date picker'].value);
-                        }
+                        startTransition(() => {
+                          action(_date);
+                        });
                       }}
                       date={date}
                     />
@@ -144,26 +140,24 @@ export default function DueDateCombobox({ dueDate = new Date() }: { dueDate?: Da
                 return (
                   <CommandItem
                     key={dateOption.value}
-                    onSelect={(ownValue) => {
-                      const currentDate = new Date();
-                      switch (dateOption.value) {
-                        case dueDateOptionsObject['no date'].value: {
-                          setDate(undefined);
-                          break;
-                        }
-                        case dueDateOptionsObject.today.value: {
-                          setDate(currentDate);
-                          break;
-                        }
-                        case dueDateOptionsObject.tomorrow.value: {
-                          setDate(addDays(currentDate, 1));
-                          break;
-                        }
-                        default: {
-                        }
-                      }
-                      setDueDateOptionsValue(ownValue as DueDateOption['value']);
+                    onSelect={() => {
                       setOpen(false);
+                      startTransition(() => {
+                        const currentDate = new Date();
+                        switch (dateOption.value) {
+                          case dueDateOptionsObject.today.value: {
+                            action(currentDate);
+                            break;
+                          }
+                          case dueDateOptionsObject.tomorrow.value: {
+                            action(addDays(currentDate, 1));
+                            break;
+                          }
+                          default: {
+                            action(null);
+                          }
+                        }
+                      });
                     }}
                   >
                     <span className="w-4 h-4 mr-2">{dateOption.icon}</span>
@@ -171,7 +165,9 @@ export default function DueDateCombobox({ dueDate = new Date() }: { dueDate?: Da
                     <CheckIcon
                       className={cn(
                         'ml-auto h-4 w-4',
-                        dueDateOptionsValue === dateOption.value ? 'opacity-100' : 'opacity-0'
+                        currentDueDateOption.value === dateOption.value
+                          ? 'opacity-100'
+                          : 'opacity-0'
                       )}
                     />
                   </CommandItem>
@@ -184,6 +180,25 @@ export default function DueDateCombobox({ dueDate = new Date() }: { dueDate?: Da
       </PopoverContent>
     </Popover>
   );
+}
+
+function getCurrentDueDateOption(date?: Date | null) {
+  if (!date) {
+    return dueDateOptionsObject['no date'];
+  }
+  if (isToday(date)) {
+    return dueDateOptionsObject.today;
+  }
+  if (isTomorrow(date)) {
+    return dueDateOptionsObject.tomorrow;
+  }
+  return {
+    value: dueDateOptionsObject['date picker'].value,
+    label: isWithinSevenDays(date)
+      ? formatDate(date, DATE_FORMATS.WEEKDAY_DATE_FORMAT)
+      : formatDate(date, DATE_FORMATS.LONG_DATE_FORMAT),
+    icon: dueDateOptionsObject['date picker'].icon,
+  };
 }
 
 type DatePickerCommandItemProps = ComponentPropsWithoutRef<typeof CommandItem> & {

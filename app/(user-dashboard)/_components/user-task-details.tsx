@@ -24,6 +24,13 @@ export default async function UserTaskDetails({ id }: { id: Task['id'] }) {
     return <div>No task found.</div>;
   }
 
+  async function action(updatedTask: TaskWithProject) {
+    'use server';
+    const res = await updateTaskByIdAction(updatedTask);
+    revalidatePath(`/tasks/${updatedTask.id}`);
+    return res;
+  }
+
   return (
     <div className="flex items-start flex-1">
       <div className="grid flex-1 gap-4 p-6">
@@ -46,12 +53,7 @@ export default async function UserTaskDetails({ id }: { id: Task['id'] }) {
               Status
             </Label>
             <StatusSelect
-              updateTaskByIdAction={async (updatedTask) => {
-                'use server';
-                const res = await updateTaskByIdAction(updatedTask);
-                revalidatePath(`/tasks/${updatedTask.id}`);
-                return res;
-              }}
+              updateTaskByIdAction={action}
               id={`select-status-${userTask.id}`}
               task={userTask}
             />
@@ -67,10 +69,17 @@ export default async function UserTaskDetails({ id }: { id: Task['id'] }) {
             />
           </div>
           <div className="flex flex-col gap-2">
-            <Label className="text-xs text-foreground/60" htmlFor="select-due-date">
+            <Label
+              className="text-xs text-foreground/60"
+              htmlFor={`select-due-date-${userTask.id}`}
+            >
               Due date
             </Label>
-            <DueDateCombobox />
+            <DueDateCombobox
+              id={`select-due-date-${userTask.id}`}
+              updateTaskByIdAction={action}
+              task={userTask}
+            />
           </div>
         </Suspense>
       </div>
