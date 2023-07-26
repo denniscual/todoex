@@ -5,6 +5,9 @@ import '@/styles/editor.css';
 
 // TODO:
 // - opt this Component into SSR.
+// - review the codes and do some refactoring.
+// - add optional content JSON column type into Task table. Use the field instead of the existing `description` field.
+// - integrate mutation.
 export function Editor({ title = '', content }: any) {
   const ref = React.useRef<EditorJS>();
   const [isMounted, setIsMounted] = React.useState<boolean>(false);
@@ -62,5 +65,5 @@ export function Editor({ title = '', content }: any) {
     return null;
   }
 
-  return <div id="editor" className="min-h-[500px]" />;
+  return <div id="editor" className="min-h-[500px] text-sm" />;
 }
