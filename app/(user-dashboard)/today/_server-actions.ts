@@ -265,6 +265,7 @@ function createFunctionsDefinitions({ date }: { date: string }) {
       description: `
           Use this function to do a MySQL INSERT on the database.
           The current date is ${date} in UTC format. Use this date if the user's question includes a relative date.
+          This function can only add 1 task a time.
       `,
       parameters: {
         type: 'object',
@@ -526,9 +527,7 @@ export const generateResponseAction: typeof generate = async ({ userId, projectI
     messages,
   });
 
-  if (res.handler === FunctionHandlers.creating) {
-    revalidatePath('/today');
-  }
+  revalidatePath('/today');
 
   return res;
 };

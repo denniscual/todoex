@@ -39,7 +39,7 @@ export default async function Today() {
       >
         <UserTodayTasks />
       </Suspense>
-      {/* <OldToday /> */}
+      <OldToday />
     </div>
   );
 }
