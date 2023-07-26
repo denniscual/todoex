@@ -1,4 +1,4 @@
-import './globals.css';
+import '@/styles/globals.css';
 import { fontSans } from '@/lib/fonts';
 import { cn } from '@/lib/utils';
 import { AppThemeProvider } from '@/components/providers';

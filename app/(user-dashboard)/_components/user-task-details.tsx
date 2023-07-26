@@ -10,6 +10,7 @@ import { redirect } from 'next/navigation';
 import { Suspense } from 'react';
 import { Skeleton } from '@/components/ui/skeleton';
 import EditTitle from './edit-title';
+import { Editor } from '@/components/editor';
 
 export default async function UserTaskDetails({ id }: { id: Task['id'] }) {
   const user = await currentUser();
@@ -36,7 +37,8 @@ export default async function UserTaskDetails({ id }: { id: Task['id'] }) {
     <div className="flex items-start flex-1">
       <div className="grid flex-1 gap-4 p-6">
         <EditTitle updateTaskByIdAction={updateTaskByIdAction} task={userTask} />
-        <p className="text-sm">{userTask.description}</p>
+        {/* <p className="text-sm">{userTask.description}</p> */}
+        <Editor />
       </div>
       <div className="w-[300px] p-6 border-l self-stretch space-y-4">
         <Suspense
