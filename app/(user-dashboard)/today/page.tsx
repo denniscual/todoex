@@ -5,49 +5,48 @@ import {
   getProject,
   Project,
   User,
-  getUserTodayTasks,
+  getUserTasks,
 } from '@/db';
 import { currentUser } from '@clerk/nextjs';
 import { revalidatePath } from 'next/cache';
 import { cookies } from 'next/headers';
 import { Suspense } from 'react';
 import Link from 'next/link';
-import { formatDate, DATE_FORMATS } from '@/lib/utils';
 import UserTasks from '@/app/(user-dashboard)/_components/user-tasks';
 import { Skeleton } from '@/components/ui/skeleton';
 import { updateTaskByIdAction } from '@/lib/actions';
+import TodayActions from './_today-actions';
 
 export const revalidate = 0;
 
 export default async function Today() {
-  const formattedDate = formatDate(new Date(), DATE_FORMATS.LONG_DATE_FORMAT);
-
   return (
-    <div className="space-y-10">
-      <div className="inline-flex items-center gap-3">
-        <h1 className="text-2xl font-semibold tracking-tight">Today</h1>
-        <span className="text-sm text-foreground/60">{formattedDate}</span>
-      </div>
+    <>
       <Suspense
         fallback={
-          <div className="grid gap-6">
-            <Skeleton className="w-full h-10" />
-            <Skeleton className="w-full h-10" />
-            <Skeleton className="w-full h-10" />
+          <div className="space-y-10">
+            <Skeleton className="h-8 w-[160px]" />
+            <div className="grid gap-6">
+              <Skeleton className="w-full h-10" />
+              <Skeleton className="w-full h-10" />
+              <Skeleton className="w-full h-10" />
+            </div>
           </div>
         }
       >
-        <UserTodayTasks />
+        <TodayActions>
+          <UserTodayTasks />
+        </TodayActions>
       </Suspense>
       <OldToday />
-    </div>
+    </>
   );
 }
 
 async function UserTodayTasks() {
   const user = await currentUser();
   const userId = user?.id ?? '';
-  const tasks = await getUserTodayTasks(userId);
+  const tasks = await getUserTasks(userId);
 
   return (
     <UserTasks

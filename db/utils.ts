@@ -46,6 +46,26 @@ export const getUserTodayTasks = cache((userId: User['id']) => {
   return tasks;
 });
 
+export const getUserTasks = cache((userId: User['id']) => {
+  const tasks = db
+    .select({
+      projectId: task.projectId,
+      id: task.id,
+      title: task.title,
+      description: task.description,
+      dueDate: task.dueDate,
+      userId: task.userId,
+      createdAt: task.createdAt,
+      status: task.status,
+      projectTitle: project.title,
+      projectDescription: project.description,
+    })
+    .from(task)
+    .innerJoin(project, eq(project.id, task.projectId))
+    .where(eq(task.userId, userId));
+  return tasks;
+});
+
 export const getTaskById = cache(async (id: Task['id']) => {
   const tasks = await db
     .select({
