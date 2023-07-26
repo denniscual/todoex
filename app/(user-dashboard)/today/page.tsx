@@ -1,174 +1,40 @@
-import ChatForm from './_chat-form';
-import {
-  getUserProjectTasks,
-  getUserProjects,
-  getProject,
-  Project,
-  User,
-  getUserTasks,
-} from '@/db';
+import { getUserTasks } from '@/db';
 import { currentUser } from '@clerk/nextjs';
 import { revalidatePath } from 'next/cache';
-import { cookies } from 'next/headers';
-import { Suspense } from 'react';
-import Link from 'next/link';
-import UserTasks from '@/app/(user-dashboard)/_components/user-tasks';
-import { Skeleton } from '@/components/ui/skeleton';
 import { updateTaskByIdAction } from '@/lib/actions';
-import TodayActions from './_today-actions';
+import TodayUserTasks from './_today-user-tasks';
+import { Skeleton } from '@/components/ui/skeleton';
+import { Suspense } from 'react';
 
 export const revalidate = 0;
 
 export default async function Today() {
-  return (
-    <>
-      <Suspense
-        fallback={
-          <div className="space-y-10">
-            <Skeleton className="h-8 w-[160px]" />
-            <div className="grid gap-6">
-              <Skeleton className="w-full h-10" />
-              <Skeleton className="w-full h-10" />
-              <Skeleton className="w-full h-10" />
-            </div>
-          </div>
-        }
-      >
-        <TodayActions>
-          <UserTodayTasks />
-        </TodayActions>
-      </Suspense>
-      <OldToday />
-    </>
-  );
-}
-
-async function UserTodayTasks() {
   const user = await currentUser();
   const userId = user?.id ?? '';
   const tasks = await getUserTasks(userId);
 
   return (
-    <UserTasks
-      tasks={tasks}
-      updateTaskByIdAction={async (task) => {
-        'use server';
-        const res = await updateTaskByIdAction(task);
-        revalidatePath('/today');
-        return res;
-      }}
-    />
-  );
-}
-
-async function OldToday() {
-  const cookieStore = cookies();
-  const user = await currentUser();
-  const userId = user?.id ?? '';
-
-  // preload current project and tasks.
-  const projectId = cookieStore.get('projectId')?.value as string | undefined;
-  if (!!projectId) {
-    const parsedProjectId = parseInt(projectId);
-    preloadProject(parsedProjectId);
-    preloadUserProjectTasks(userId, parsedProjectId);
-  }
-
-  const projects = await getUserProjects(userId);
-
-  return (
-    <div className="space-y-8">
-      <Link href="/projects/1">Project 1</Link>
-      <form
-        action={async (formData) => {
+    <Suspense
+      fallback={
+        <div className="space-y-10">
+          <Skeleton className="h-8 w-[160px]" />
+          <div className="grid gap-6">
+            <Skeleton className="w-full h-10" />
+            <Skeleton className="w-full h-10" />
+            <Skeleton className="w-full h-10" />
+          </div>
+        </div>
+      }
+    >
+      <TodayUserTasks
+        tasks={tasks}
+        updateTaskByIdAction={async (task) => {
           'use server';
-          const values = Object.fromEntries(formData.entries()) as {
-            projects: string;
-          };
-          const cookieStore = cookies();
-          cookieStore.set('projectId', values.projects);
+          const res = await updateTaskByIdAction(task);
           revalidatePath('/today');
+          return res;
         }}
-        className="flex items-center gap-4"
-      >
-        <label htmlFor="project-select">Choose a project:</label>
-        <select defaultValue={projectId} name="projects" id="project-select">
-          <option value="">--Please choose an option--</option>
-          {projects.map((project) => (
-            <option key={project.id} value={project.id}>
-              {project.title}
-            </option>
-          ))}
-        </select>
-        <button className="px-4 py-2 font-bold text-white bg-blue-500 rounded hover:bg-blue-700">
-          Pick
-        </button>
-      </form>
-      {!!projectId && (
-        <Suspense fallback={<div>Loading project...</div>}>
-          <UserProject projectId={parseInt(projectId)} userId={userId} />
-        </Suspense>
-      )}
-    </div>
+      />
+    </Suspense>
   );
-}
-
-async function UserProject({
-  projectId,
-  userId,
-}: {
-  projectId: Project['id'];
-  userId: User['id'];
-}) {
-  const userProject = await getProject(projectId);
-
-  if (!userProject) {
-    return <div>Current project is not found.</div>;
-  }
-
-  return (
-    <>
-      <p className="mb-4 font-semibold">{userProject.title}</p>
-      <Suspense fallback={<div>Loading user tasks...</div>}>
-        <UserProjectTasks projectId={projectId} userId={userId} />
-      </Suspense>
-      <div>
-        <p className="mb-4 font-semibold">Chat Form</p>
-        <ChatForm key={projectId} projectId={projectId} userId={userId} />
-      </div>
-    </>
-  );
-}
-
-async function UserProjectTasks({
-  userId,
-  projectId,
-}: {
-  userId: User['id'];
-  projectId: Project['id'];
-}) {
-  const tasks = await getUserProjectTasks(userId, projectId);
-
-  if (tasks.length === 0) {
-    return <div>No existing tasks</div>;
-  }
-
-  return (
-    <ul>
-      {tasks.map((task, idx) => (
-        <li key={task.id}>
-          <span className="font-medium">{idx + 1}.</span> Title: {task.title} - Status:{' '}
-          {task.status} - Due date: {task.dueDate}
-        </li>
-      ))}
-    </ul>
-  );
-}
-
-function preloadUserProjectTasks(userId: User['id'], projectId: Project['id']) {
-  void getUserProjectTasks(userId, projectId);
-}
-
-function preloadProject(projectId: Project['id']) {
-  void getProject(projectId);
 }
