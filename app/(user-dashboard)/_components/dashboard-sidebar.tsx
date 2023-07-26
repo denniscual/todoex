@@ -13,7 +13,7 @@ export default function DashboardSidebar({ className, ...props }: SidebarProps) 
   return (
     <div {...props} className={cn('py-4 space-y-4', className)}>
       <div className="py-2 md:px-6">
-        <div className="space-y-1">
+        <div className="space-y-2">
           <NavLink
             prefetch={false}
             href="/today"
@@ -74,7 +74,7 @@ export default function DashboardSidebar({ className, ...props }: SidebarProps) 
             </div>
           }
         >
-          <div className="space-y-1">
+          <div className="space-y-2">
             <Projects />
           </div>
         </Suspense>
