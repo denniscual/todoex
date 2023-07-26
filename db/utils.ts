@@ -201,11 +201,6 @@ export const insertTaskSchema = createInsertSchema(task, {
           // use date-fns to do the dates equality checking.
           const dueDate = new Date(val);
           const currentDate = new Date();
-          console.log({
-            dueDate,
-            currentDate,
-            val,
-          });
           return areDatesEqualOrGreater(dueDate, currentDate);
         },
         {

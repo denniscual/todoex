@@ -1,12 +1,10 @@
 'use client';
-import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { ToastAction } from '@/components/ui/toast';
 import { useToast } from '@/components/ui/use-toast';
 import { TaskWithProject } from '@/db';
 import { UpdateTaskByIdAction } from '@/lib/actions';
-import { CheckIcon, Cross2Icon } from '@radix-ui/react-icons';
-import { useState, experimental_useOptimistic as useOptimistic, useRef, ElementRef } from 'react';
+import { useState, useRef, ElementRef } from 'react';
 
 export default function EditTitle({
   task,
