@@ -22,6 +22,8 @@ const model = new OpenAIApi(configuration);
 /**
  * TODO:
  *
+ * - we need to create a default project for every users. So for the first time user, they don't need to create new project just to add tasks. All new tasks will
+ *   fall to the default project. This project is not deletable. In todoist, it is named "inbox".
  * - we need to show a loader/progressbar, just like with Youtube or Vercel, whenever we navigate to other page.
  *   We can achieve this via adding Loader or progress bar inside the loading.tsx file.
  * - update the page content layout. We need to add max width for the content to avoid huge space in large viewport. Huge space is not good for the page content. Maybe
