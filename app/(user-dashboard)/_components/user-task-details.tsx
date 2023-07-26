@@ -25,6 +25,8 @@ export default async function UserTaskDetails({ id }: { id: Task['id'] }) {
     return <div>No task found.</div>;
   }
 
+  console.log({ userTask });
+
   async function action(updatedTask: TaskWithProject) {
     'use server';
     const res = await updateTaskByIdAction(updatedTask);

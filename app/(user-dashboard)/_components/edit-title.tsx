@@ -1,18 +1,13 @@
 'use client';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { ToastAction } from '@/components/ui/toast';
+import { useToast } from '@/components/ui/use-toast';
 import { TaskWithProject } from '@/db';
 import { UpdateTaskByIdAction } from '@/lib/actions';
 import { CheckIcon, Cross2Icon } from '@radix-ui/react-icons';
-import { useState } from 'react';
+import { useState, experimental_useOptimistic as useOptimistic, useRef, ElementRef } from 'react';
 
-/**
- * TODO:
- * - fix the issue about the form action buttons. When clicking one of the buttons, it doesn't trigger an action.
- *   To solve the problem, we are going to use absolute layout for the action buttons then don't use "peer" and "focus". Use
- *   JS to show the action buttons not CSS.
- * - add state variable for the input element.
- */
 export default function EditTitle({
   task,
   updateTaskByIdAction,
@@ -20,31 +15,58 @@ export default function EditTitle({
   task: TaskWithProject;
   updateTaskByIdAction: UpdateTaskByIdAction;
 }) {
-  const [open, setOpen] = useState(false);
+  const { toast } = useToast();
+  const [title, setTitle] = useState(task.title);
+  const inputRef = useRef<ElementRef<'input'>>(null);
+  // This state variable is used in Cancel button and reverting if there is server error request. This capture the current title.
+  const [taskTitle, setTaskTitle] = useState(title);
 
   return (
     <form
       className="relative"
-      action={() => {
-        console.log('Send');
+      action={async () => {
+        try {
+          const res = await updateTaskByIdAction({
+            ...task,
+            title,
+          });
+          inputRef.current?.blur();
+          // Capture the latest title.
+          setTaskTitle(res.result.title);
+          toast({
+            title: 'Title updated.',
+            duration: 5000,
+          });
+        } catch (err) {
+          toast({
+            variant: 'destructive',
+            title: 'Something went wrong.',
+            description: 'There was a problem with your request.',
+            action: <ToastAction altText="Try again">Try again</ToastAction>,
+            duration: 5000,
+          });
+          console.error('Server Error: ', err);
+          // Revert it to the current task title.
+          setTitle(taskTitle);
+        }
       }}
     >
       <Input
-        onFocus={() => setOpen(true)}
-        onBlur={() => setOpen(false)}
+        placeholder="Add the task title"
+        ref={inputRef}
+        name="title"
         className="py-5 text-xl font-semibold tracking-tight [&:not(:focus)]:border-none [&:not(:focus)]:p-0 [&:not(:focus)]:shadow-none peer"
-        value={task.title}
+        value={title}
+        onChange={(event) => setTitle(event.target.value)}
+        onKeyDown={(event) => {
+          if (event.key !== 'Escape') {
+            return;
+          }
+          // Revert it to the current task title.
+          setTitle(taskTitle);
+          inputRef.current?.blur();
+        }}
       />
-      {open && (
-        <div className="absolute right-0 flex justify-end space-x-2 -bottom-12">
-          <Button variant="outline" size="icon">
-            <CheckIcon className="w-4 h-4" />
-          </Button>
-          <Button type="button" variant="outline" size="icon">
-            <Cross2Icon className="w-4 h-4" />
-          </Button>
-        </div>
-      )}
     </form>
   );
 }
