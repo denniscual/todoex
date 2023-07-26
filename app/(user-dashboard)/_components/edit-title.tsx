@@ -4,7 +4,7 @@ import { Input } from '@/components/ui/input';
 import { TaskWithProject } from '@/db';
 import { UpdateTaskByIdAction } from '@/lib/actions';
 import { CheckIcon, Cross2Icon } from '@radix-ui/react-icons';
-import { useRef } from 'react';
+import { useState } from 'react';
 
 /**
  * TODO:
@@ -20,33 +20,31 @@ export default function EditTitle({
   task: TaskWithProject;
   updateTaskByIdAction: UpdateTaskByIdAction;
 }) {
-  const inputRef = useRef<HTMLInputElement | null>(null);
+  const [open, setOpen] = useState(false);
+
   return (
     <form
-      className="space-y-3"
+      className="relative"
       action={() => {
         console.log('Send');
       }}
     >
       <Input
-        ref={inputRef}
-        onKeyDown={(event) => {
-          if (event.key !== 'Escape') {
-            return;
-          }
-          inputRef.current?.blur();
-        }}
+        onFocus={() => setOpen(true)}
+        onBlur={() => setOpen(false)}
         className="py-5 text-xl font-semibold tracking-tight [&:not(:focus)]:border-none [&:not(:focus)]:p-0 [&:not(:focus)]:shadow-none peer"
         value={task.title}
       />
-      <div className="hidden space-x-1 peer-focus:flex peer-focus:justify-end">
-        <Button variant="outline" size="icon">
-          <CheckIcon className="w-4 h-4" />
-        </Button>
-        <Button type="button" variant="outline" size="icon">
-          <Cross2Icon className="w-4 h-4" />
-        </Button>
-      </div>
+      {open && (
+        <div className="absolute right-0 flex justify-end space-x-2 -bottom-12">
+          <Button variant="outline" size="icon">
+            <CheckIcon className="w-4 h-4" />
+          </Button>
+          <Button type="button" variant="outline" size="icon">
+            <Cross2Icon className="w-4 h-4" />
+          </Button>
+        </div>
+      )}
     </form>
   );
 }
