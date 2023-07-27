@@ -160,8 +160,8 @@ devDependencies:
     specifier: ^0.5.3
     version: 0.5.3(tailwindcss@3.3.3)
   drizzle-kit:
-    specifier: ^0.19.4
-    version: 0.19.4
+    specifier: ^0.19.12
+    version: 0.19.12
   eslint-config-prettier:
     specifier: ^8.8.0
     version: 8.8.0(eslint@8.40.0)
@@ -275,8 +275,8 @@ packages:
     resolution: {integrity: sha512-L7Q5PET8PjKcBT5wp7VR+FCjwCi5PUp7rd/XjsgQ0CI5FJz0DphyHGRILMuDUdCW2MQT9NHbVr4QP31vwAkS/A==}
     dev: false
 
-  /@drizzle-team/studio@0.0.1:
-    resolution: {integrity: sha512-cHgGezy2ojBFMaU6PZyBkksgFsg2CQ8IRN4mS7WdbA/Zv6xUK6fCNmpEWS/FftbxoA4B8Z0XGnuKsaTJEZsGgA==}
+  /@drizzle-team/studio@0.0.5:
+    resolution: {integrity: sha512-ps5qF0tMxWRVu+V5gvCRrQNqlY92aTnIKdq27gm9LZMSdaKYZt6AVvSK1dlUMzs6Rt0Jm80b+eWct6xShBKhIw==}
     dev: true
 
   /@editorjs/code@2.8.0:
@@ -2709,11 +2709,11 @@ packages:
       wordwrap: 1.0.0
     dev: true
 
-  /drizzle-kit@0.19.4:
-    resolution: {integrity: sha512-mbWdaGcYGLGM+HLGhLv5gH3h4ZMD+dil6T2fS36IAt72XmCn3snw1mVxGVHJPDzSKIzz3W7vABe4PbIpRqLM2A==}
+  /drizzle-kit@0.19.12:
+    resolution: {integrity: sha512-rcsmh5gUIkvuD0WrbEc+aLpqY2q2J8ltynRcJiJo2l01hhsYvPnX0sgxWlFXlfAIa5ZXNw2nJZhYlslI6tG3MA==}
     hasBin: true
     dependencies:
-      '@drizzle-team/studio': 0.0.1
+      '@drizzle-team/studio': 0.0.5
       '@esbuild-kit/esm-loader': 2.5.5
       camelcase: 7.0.1
       chalk: 5.2.0

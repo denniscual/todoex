@@ -8,6 +8,7 @@ import {
   mysqlEnum,
   timestamp,
   primaryKey,
+  json,
 } from 'drizzle-orm/mysql-core';
 import { InferModel } from 'drizzle-orm';
 
@@ -58,6 +59,7 @@ export const task = mysqlTable(
     projectId: int('project_id').notNull(),
     title: varchar('title', { length: 255 }).notNull(),
     description: text('description'),
+    content: json('content'),
     dueDate: date('due_date', { mode: 'string' }),
     status: mysqlEnum('status', ['pending', 'completed']).default('pending').notNull(),
     createdAt: timestamp('created_at', { mode: 'string' }).defaultNow(),
