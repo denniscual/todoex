@@ -6,32 +6,27 @@ import {
   useEffect,
   experimental_useEffectEvent as useEffectEvent,
   HTMLAttributes,
+  useLayoutEffect,
 } from 'react';
 import EditorJS, { API, OutputData } from '@editorjs/editorjs';
 import '@/styles/editor.css';
 import { BlockMutationEvent } from '@editorjs/editorjs/types/events/block';
 
-// TODO:
-// - opt this Component into SSR.
-// - review the codes and do some refactoring.
-// - add optional content JSON column type into Task table. Use the field instead of the existing `description` field.
-// - integrate mutation.
-
 export function Editor({
   content,
-  onReady,
-  onChange,
+  onEditorReady,
+  onEditorChange,
   ...props
 }: {
-  content?: OutputData;
-  onReady?: (editor: EditorJS) => void;
-  onChange?: (api: API, event: BlockMutationEvent | BlockMutationEvent[]) => void;
+  content: string | null;
+  onEditorReady?: (editor: EditorJS) => void;
+  onEditorChange?: (api: API, event: BlockMutationEvent | BlockMutationEvent[]) => void;
 } & HTMLAttributes<HTMLDivElement>) {
   const editorRef = useRef<EditorJS>();
   const [isMounted, setIsMounted] = useState(false);
-  const onEditorReady = useEffectEvent((editor: EditorJS) => onReady?.(editor));
-  const onEditorChange = useEffectEvent(
-    (api: API, event: BlockMutationEvent | BlockMutationEvent[]) => onChange?.(api, event)
+  const _onEditorReady = useEffectEvent((editor: EditorJS) => onEditorReady?.(editor));
+  const _onEditorChange = useEffectEvent(
+    (api: API, event: BlockMutationEvent | BlockMutationEvent[]) => onEditorChange?.(api, event)
   );
 
   const initializeEditor = useCallback(async () => {
@@ -51,13 +46,13 @@ export function Editor({
       const editor = new EditorJS({
         holder: 'editor',
         onReady() {
-          onEditorReady?.(editor);
+          _onEditorReady?.(editor);
           editorRef.current = editor;
         },
-        onChange: onEditorChange,
+        onChange: _onEditorChange,
         placeholder: 'Add the description here...',
         inlineToolbar: true,
-        data: content,
+        data: JSON.parse(content as any),
         tools: {
           header: Header,
           list: List,
@@ -70,6 +65,12 @@ export function Editor({
     // Effect Events are not reactive and must be omitted from dependencies.
     // Ref - https://react.dev/learn/separating-events-from-effects#declaring-an-effect-event
     // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  useLayoutEffect(() => {
+    if (editorRef.current) {
+      editorRef.current?.render(JSON.parse(content as any));
+    }
   }, [content]);
 
   useEffect(() => {

@@ -37,7 +37,6 @@ export default async function UserTaskDetails({ id }: { id: Task['id'] }) {
     <div className="flex items-start flex-1">
       <div className="grid flex-1 gap-4 p-6">
         <EditTitle updateTaskByIdAction={action} task={userTask} />
-        {/* <p className="text-sm">{userTask.description}</p> */}
         <EditContent updateTaskByIdAction={action} task={userTask} />
       </div>
       <div className="w-[300px] p-6 border-l self-stretch space-y-4">

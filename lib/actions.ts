@@ -19,6 +19,9 @@ export const updateTaskByIdAction: UpdateTaskByIdAction = async function updateT
       title: task.title,
       description: task.description,
       projectId: task.projectId,
+      // TODO:
+      // - change to its correct type
+      content: task.content as any,
     });
     return {
       result: {
