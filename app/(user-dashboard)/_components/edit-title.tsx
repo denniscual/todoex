@@ -4,7 +4,7 @@ import { ToastAction } from '@/components/ui/toast';
 import { useToast } from '@/components/ui/use-toast';
 import { TaskWithProject } from '@/db';
 import { UpdateTaskByIdAction } from '@/lib/actions';
-import { useState, useRef, ElementRef } from 'react';
+import { useRef, ElementRef } from 'react';
 
 export default function EditTitle({
   task,
@@ -39,6 +39,7 @@ export default function EditTitle({
             action: <ToastAction altText="Try again">Try again</ToastAction>,
             duration: 5000,
           });
+          (inputRef.current as HTMLInputElement).value = task.title;
           console.error('Server Error: ', err);
         }
       }}
