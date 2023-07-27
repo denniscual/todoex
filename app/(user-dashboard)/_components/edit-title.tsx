@@ -14,23 +14,19 @@ export default function EditTitle({
   updateTaskByIdAction: UpdateTaskByIdAction;
 }) {
   const { toast } = useToast();
-  const [title, setTitle] = useState(task.title);
   const inputRef = useRef<ElementRef<'input'>>(null);
-  // This state variable is used in Cancel button and reverting if there is server error request. This capture the current title.
-  const [taskTitle, setTaskTitle] = useState(title);
 
   return (
     <form
       className="relative"
-      action={async () => {
+      action={async (formData) => {
+        const values = Object.fromEntries(formData.entries());
         try {
-          const res = await updateTaskByIdAction({
+          await updateTaskByIdAction({
             ...task,
-            title,
+            title: values.title as string,
           });
           inputRef.current?.blur();
-          // Capture the latest title.
-          setTaskTitle(res.result.title);
           toast({
             title: 'Title updated.',
             duration: 5000,
@@ -44,26 +40,16 @@ export default function EditTitle({
             duration: 5000,
           });
           console.error('Server Error: ', err);
-          // Revert it to the current task title.
-          setTitle(taskTitle);
         }
       }}
     >
       <Input
+        key={task.title}
         placeholder="Add the task title"
         ref={inputRef}
         name="title"
         className="py-5 text-xl font-semibold tracking-tight [&:not(:focus)]:border-none [&:not(:focus)]:p-0 [&:not(:focus)]:shadow-none peer"
-        value={title}
-        onChange={(event) => setTitle(event.target.value)}
-        onKeyDown={(event) => {
-          if (event.key !== 'Escape') {
-            return;
-          }
-          // Revert it to the current task title.
-          setTitle(taskTitle);
-          inputRef.current?.blur();
-        }}
+        defaultValue={task.title}
       />
     </form>
   );
