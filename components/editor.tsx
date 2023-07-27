@@ -1,6 +1,12 @@
 'use client';
-import * as React from 'react';
-import EditorJS from '@editorjs/editorjs';
+import {
+  useState,
+  useRef,
+  useCallback,
+  useEffect,
+  experimental_useEffectEvent as useEffectEvent,
+} from 'react';
+import EditorJS, { OutputData } from '@editorjs/editorjs';
 import '@/styles/editor.css';
 
 // TODO:
@@ -8,11 +14,19 @@ import '@/styles/editor.css';
 // - review the codes and do some refactoring.
 // - add optional content JSON column type into Task table. Use the field instead of the existing `description` field.
 // - integrate mutation.
-export function Editor({ title = '', content }: any) {
-  const ref = React.useRef<EditorJS>();
-  const [isMounted, setIsMounted] = React.useState<boolean>(false);
 
-  const initializeEditor = React.useCallback(async () => {
+export function Editor({
+  content,
+  onReady,
+}: {
+  content?: OutputData;
+  onReady: (editor: EditorJS) => void;
+}) {
+  const editorRef = useRef<EditorJS>();
+  const [isMounted, setIsMounted] = useState(false);
+  const onEditorReady = useEffectEvent((editor: EditorJS) => onReady(editor));
+
+  const initializeEditor = useCallback(async () => {
     const EditorJS = (await import('@editorjs/editorjs')).default;
     // @ts-expect-error no declaration file
     const Header = (await import('@editorjs/header')).default;
@@ -25,11 +39,12 @@ export function Editor({ title = '', content }: any) {
     // @ts-expect-error no declaration file
     const InlineCode = (await import('@editorjs/inline-code')).default;
 
-    if (!ref.current) {
+    if (!editorRef.current) {
       const editor = new EditorJS({
         holder: 'editor',
         onReady() {
-          ref.current = editor;
+          onEditorReady(editor);
+          editorRef.current = editor;
         },
         placeholder: 'Add the description here...',
         inlineToolbar: true,
@@ -43,20 +58,23 @@ export function Editor({ title = '', content }: any) {
         },
       });
     }
+    // Effect Events are not reactive and must be omitted from dependencies.
+    // Ref - https://react.dev/learn/separating-events-from-effects#declaring-an-effect-event
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [content]);
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (typeof window !== 'undefined') {
       setIsMounted(true);
     }
   }, []);
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (isMounted) {
       initializeEditor();
       return () => {
-        ref.current?.destroy();
-        ref.current = undefined;
+        editorRef.current?.destroy();
+        editorRef.current = undefined;
       };
     }
   }, [isMounted, initializeEditor]);
@@ -65,5 +83,5 @@ export function Editor({ title = '', content }: any) {
     return null;
   }
 
-  return <div id="editor" className="min-h-[500px] text-sm" />;
+  return <div id="editor" className="min-h-[400px] text-sm" />;
 }

@@ -22,6 +22,8 @@ const model = new OpenAIApi(configuration);
 /**
  * TODO:
  *
+ * - theres a bug whenever we update let say the task status after updating the task title. The task pass into <StatusSelect /> is not updated even
+ *    the task in <UserTaskDetails /> is already updated after the task title mutation.
  * - we need to create a default project for every users. So for the first time user, they don't need to create new project just to add tasks. All new tasks will
  *   fall to the default project. This project is not deletable. In todoist, it is named "inbox".
  * - we need to show a loader/progressbar, just like with Youtube or Vercel, whenever we navigate to other page.
