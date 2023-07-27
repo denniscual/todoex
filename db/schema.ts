@@ -56,7 +56,7 @@ export const task = mysqlTable(
   {
     id: int('id').autoincrement().primaryKey().notNull(),
     userId: varchar('user_id', { length: 50 }).notNull(),
-    projectId: int('project_id').notNull(),
+    projectId: int('project_id'),
     title: varchar('title', { length: 255 }).notNull(),
     description: text('description'),
     content: json('content'),

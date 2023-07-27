@@ -1,0 +1,1 @@
+ALTER TABLE `task` MODIFY COLUMN `project_id` int;
