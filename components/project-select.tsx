@@ -9,7 +9,7 @@ import {
 import { SelectProps } from '@radix-ui/react-select';
 import { UserProject } from '@/db';
 
-export default function ProjectSelect({
+export function ProjectSelect({
   id,
   projects,
   ...props

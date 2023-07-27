@@ -4,7 +4,7 @@ import { DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { User, UserProject } from '@/db';
-import ProjectSelect from './project.select';
+import { ProjectSelect } from '@/components/project-select';
 import { ReloadIcon } from '@radix-ui/react-icons';
 import { experimental_useFormStatus as useFormStatus } from 'react-dom';
 import { InsertTaskAction } from '@/lib/actions';

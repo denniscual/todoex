@@ -1,16 +1,17 @@
 import { Label } from '@/components/ui/label';
 import { Task, TaskWithProject, User, getTaskById, getUserProjects } from '@/db';
-import StatusSelect from './status-select';
 import DueDateCombobox from './due-date-combobox';
 import { updateTaskByIdAction } from '@/lib/actions';
 import { revalidatePath } from 'next/cache';
-import ProjectSelect from './project-select';
 import { currentUser } from '@clerk/nextjs';
 import { redirect } from 'next/navigation';
 import { Suspense } from 'react';
 import { Skeleton } from '@/components/ui/skeleton';
+
 import EditTitle from './edit-title';
 import EditContent from './edit-content';
+import ProjectSelect from './project-select';
+import StatusSelect from './status-select';
 
 export default async function UserTaskDetails({ id }: { id: Task['id'] }) {
   const user = await currentUser();

@@ -1,25 +1,19 @@
 'use server';
-import { TaskWithProject, updateTaskById, insertTask, Task } from '@/db';
-import { ZodError } from 'zod';
+import { TaskWithProject, updateTaskById, insertTask, insertTaskSchema } from '@/db';
+import { ZodError, z } from 'zod';
 
-export type InsertTaskAction = (task: Task) => Promise<{
+export type InsertTaskAction = (task: z.infer<typeof insertTaskSchema>) => Promise<{
   result: {
     message: string;
-  } & Task;
+  };
 }>;
 
 export const insertTaskAction: InsertTaskAction = async function (task) {
   try {
-    await insertTask({
-      ...task,
-      // TODO:
-      // - change to its correct type
-      content: task.content as any,
-    });
+    await insertTask(task);
     return {
       result: {
         message: 'Task status is added successfully.',
-        ...task,
       },
     };
   } catch (err) {
