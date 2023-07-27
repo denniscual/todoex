@@ -13,7 +13,7 @@ export default function ProjectSelect({
   id,
   projects,
   ...props
-}: { id: string; projects: UserProject[] } & SelectProps) {
+}: { id?: string; projects: UserProject[] } & SelectProps) {
   return (
     <Select {...props}>
       <SelectTrigger id={`select-project-${id}`}>

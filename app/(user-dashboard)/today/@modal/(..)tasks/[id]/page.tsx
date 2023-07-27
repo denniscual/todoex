@@ -1,11 +1,11 @@
 import { Button } from '@/components/ui/button';
 import { DialogContent, DialogHeader, DialogDescription } from '@/components/ui/dialog';
 import Link from 'next/link';
-import TaskDialog from './_task-dialog';
+import { SegmentDialogRoot } from '@/components/segment-dialog-root';
 import { getTaskById } from '@/db';
 import UserTaskDetails from '@/app/(user-dashboard)/_components/user-task-details';
 
-export default async function Task({
+export default async function EditTask({
   params,
 }: {
   params: {
@@ -19,7 +19,7 @@ export default async function Task({
   }
 
   return (
-    <TaskDialog>
+    <SegmentDialogRoot>
       <DialogContent className="max-w-[864px] h-[calc(100%-96px)] flex flex-col gap-0 p-0">
         <DialogHeader className="px-6 pt-2 pb-2 border-b">
           <DialogDescription>
@@ -30,6 +30,6 @@ export default async function Task({
         </DialogHeader>
         <UserTaskDetails id={parseInt(params.id)} />
       </DialogContent>
-    </TaskDialog>
+    </SegmentDialogRoot>
   );
 }

@@ -22,10 +22,11 @@ const model = new OpenAIApi(configuration);
 /**
  * TODO:
  *
- * - we need to create a default project for every users. So for the first time user, they don't need to create new project just to add tasks. All new tasks will
- *   fall to the default project. This project is not deletable. In todoist, it is named "inbox".
- * - we need to show a loader/progressbar, just like with Youtube or Vercel, whenever we navigate to other page.
- *   We can achieve this via adding Loader or progress bar inside the loading.tsx file.
+ * - fix the problem in our AddTask modal route (parallel route). Because there is no route for
+ *   for add task modal that can be intersected, when the user reloads the page and the user is currently
+ *   in add task modal route, nextjs throws an error. Even with default.ts file its nont working or maybe
+ *   we miss something here.
+ * - change the spinning icon into ReloadIcon from radix in the instant loading state files.
  * - update the page content layout. We need to add max width for the content to avoid huge space in large viewport. Huge space is not good for the page content. Maybe
  *   in the future, some routes will require huge space. But for now, add max width for the page content.
  * - show a fallback Component while the UserButton or other Components are still loading. Right now, even using Suspense, it didn't suspend. Maybe we need to disable the SSR?

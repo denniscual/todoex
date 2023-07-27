@@ -4,6 +4,9 @@ import UserTasks from '@/app/(user-dashboard)/_components/user-tasks';
 import { TaskWithProject } from '@/db';
 import { UpdateTaskByIdAction } from '@/lib/actions';
 import { isSameDay } from 'date-fns';
+import { Button } from '@/components/ui/button';
+import { PlusIcon } from '@radix-ui/react-icons';
+import Link from 'next/link';
 
 export default function TodayUserTasks({
   tasks,
@@ -29,7 +32,17 @@ export default function TodayUserTasks({
         <h1 className="text-2xl font-semibold tracking-tight">Today</h1>
         <span className="text-sm text-foreground/60">{formattedDate}</span>
       </div>
-      <UserTasks tasks={todayUserTasks} updateTaskByIdAction={updateTaskByIdAction} />
+      {todayUserTasks.length > 0 ? (
+        <UserTasks tasks={todayUserTasks} updateTaskByIdAction={updateTaskByIdAction} />
+      ) : (
+        <p>You dont have tasks for today</p>
+      )}
+      <Button asChild>
+        <Link href="/today/add">
+          <PlusIcon className="w-4 h-4 mr-2" />
+          Add Task
+        </Link>
+      </Button>
     </section>
   );
 }
