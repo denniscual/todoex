@@ -28,6 +28,7 @@ export const getUserTodayTasks = cache((userId: User['id']) => {
       id: task.id,
       title: task.title,
       description: task.description,
+      content: task.content,
       dueDate: task.dueDate,
       userId: task.userId,
       createdAt: task.createdAt,
@@ -53,6 +54,7 @@ export const getUserTasks = cache((userId: User['id']) => {
       id: task.id,
       title: task.title,
       description: task.description,
+      content: task.content,
       dueDate: task.dueDate,
       userId: task.userId,
       createdAt: task.createdAt,
@@ -73,6 +75,7 @@ export const getTaskById = cache(async (id: Task['id']) => {
       id: task.id,
       title: task.title,
       description: task.description,
+      content: task.content,
       dueDate: task.dueDate,
       userId: task.userId,
       createdAt: task.createdAt,
@@ -144,6 +147,7 @@ export async function updateTaskById({
   title,
   description,
   projectId,
+  content,
 }: RequiredKeys<Partial<z.infer<typeof insertTaskSchema>>, 'id'>) {
   const validValues = insertTaskSchema
     .pick({
@@ -153,6 +157,7 @@ export async function updateTaskById({
       title: true,
       description: true,
       projectId: true,
+      content: true,
     })
     .parse({
       id,
@@ -161,6 +166,7 @@ export async function updateTaskById({
       title,
       description,
       projectId,
+      content,
     });
 
   await db
