@@ -13,19 +13,9 @@ export default function EditContent({
   task: TaskWithProject;
 }) {
   const [editor, setEditor] = useState<EditorJS>();
-  return (
-    <div>
-      <button
-        onClick={async () => {
-          if (editor) {
-            const blocks = await editor.save();
-            console.log({ blocks });
-          }
-        }}
-      >
-        Get the data
-      </button>
-      <Editor onReady={setEditor} />
-    </div>
-  );
+
+  // const blocks = await editor.save();
+  // console.log({ blocks });
+
+  return <Editor onReady={setEditor} className="text-sm" />;
 }

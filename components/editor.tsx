@@ -5,9 +5,11 @@ import {
   useCallback,
   useEffect,
   experimental_useEffectEvent as useEffectEvent,
+  HTMLAttributes,
 } from 'react';
-import EditorJS, { OutputData } from '@editorjs/editorjs';
+import EditorJS, { API, OutputData } from '@editorjs/editorjs';
 import '@/styles/editor.css';
+import { BlockMutationEvent } from '@editorjs/editorjs/types/events/block';
 
 // TODO:
 // - opt this Component into SSR.
@@ -18,13 +20,19 @@ import '@/styles/editor.css';
 export function Editor({
   content,
   onReady,
+  onChange,
+  ...props
 }: {
   content?: OutputData;
-  onReady: (editor: EditorJS) => void;
-}) {
+  onReady?: (editor: EditorJS) => void;
+  onChange?: (api: API, event: BlockMutationEvent | BlockMutationEvent[]) => void;
+} & HTMLAttributes<HTMLDivElement>) {
   const editorRef = useRef<EditorJS>();
   const [isMounted, setIsMounted] = useState(false);
-  const onEditorReady = useEffectEvent((editor: EditorJS) => onReady(editor));
+  const onEditorReady = useEffectEvent((editor: EditorJS) => onReady?.(editor));
+  const onEditorChange = useEffectEvent(
+    (api: API, event: BlockMutationEvent | BlockMutationEvent[]) => onChange?.(api, event)
+  );
 
   const initializeEditor = useCallback(async () => {
     const EditorJS = (await import('@editorjs/editorjs')).default;
@@ -43,9 +51,10 @@ export function Editor({
       const editor = new EditorJS({
         holder: 'editor',
         onReady() {
-          onEditorReady(editor);
+          onEditorReady?.(editor);
           editorRef.current = editor;
         },
+        onChange: onEditorChange,
         placeholder: 'Add the description here...',
         inlineToolbar: true,
         data: content,
@@ -83,5 +92,5 @@ export function Editor({
     return null;
   }
 
-  return <div id="editor" className="min-h-[400px] text-sm" />;
+  return <div id="editor" {...props} />;
 }
