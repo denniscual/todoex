@@ -1,5 +1,12 @@
 'use server';
-import { TaskWithProject, updateTaskById, insertTask, insertTaskSchema } from '@/db';
+import {
+  TaskWithProject,
+  updateTaskById,
+  insertTask,
+  insertTaskSchema,
+  Task,
+  deleteTaskById,
+} from '@/db';
 import { ZodError, z } from 'zod';
 
 export type InsertTaskAction = (task: z.infer<typeof insertTaskSchema>) => Promise<{
@@ -50,6 +57,25 @@ export const updateTaskByIdAction: UpdateTaskByIdAction = async function (task) 
       result: {
         message: 'Task status is updated successfully.',
         ...task,
+      },
+    };
+  } catch (err) {
+    if (err instanceof ZodError) {
+      console.log('Zod error: ', err.issues);
+      throw new Error(JSON.stringify(err.issues));
+    } else {
+      console.log('Error when generating response: ', (err as Error).toString());
+      throw new Error('Server error');
+    }
+  }
+};
+
+export const deleteTaskByIdAction = async function (id: Task['id']) {
+  try {
+    await deleteTaskById(id);
+    return {
+      result: {
+        message: 'Task status is delete successfully.',
       },
     };
   } catch (err) {
