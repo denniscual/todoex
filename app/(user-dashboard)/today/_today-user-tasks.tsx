@@ -4,19 +4,18 @@ import UserTasks from '@/app/(user-dashboard)/_components/user-tasks';
 import { TaskWithProject } from '@/db';
 import { DeleteTaskByIdAction, UpdateTaskByIdAction } from '@/lib/actions';
 import { isSameDay } from 'date-fns';
-import { Button } from '@/components/ui/button';
-import { PlusIcon } from '@radix-ui/react-icons';
-import Link from 'next/link';
+import { PropsWithChildren } from 'react';
 
 export default function TodayUserTasks({
   tasks,
   updateTaskByIdAction,
   deleteTaskByIdAction,
-}: {
+  children,
+}: PropsWithChildren<{
   tasks: TaskWithProject[];
   updateTaskByIdAction: UpdateTaskByIdAction;
   deleteTaskByIdAction: DeleteTaskByIdAction;
-}) {
+}>) {
   const currentDate = new Date();
   const formattedDate = formatDate(currentDate, DATE_FORMATS.LONG_DATE_FORMAT);
 
@@ -42,12 +41,7 @@ export default function TodayUserTasks({
       ) : (
         <p>You dont have tasks for today</p>
       )}
-      <Button asChild>
-        <Link href="/today/add">
-          <PlusIcon className="w-4 h-4 mr-2" />
-          Add Task
-        </Link>
-      </Button>
+      {children}
     </section>
   );
 }

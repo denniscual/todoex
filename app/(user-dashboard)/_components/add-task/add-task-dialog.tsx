@@ -1,38 +1,42 @@
-import { SegmentDialogRoot } from '@/components/segment-dialog-root';
-import { DialogContent } from '@/components/ui/dialog';
-import { getUserProjects } from '@/db';
-import { currentUser } from '@clerk/nextjs';
-import { redirect } from 'next/navigation';
+'use client';
+import { Dialog, DialogContent, DialogTrigger } from '@/components/ui/dialog';
+import { User, UserProject } from '@/db';
 import AddTaskDialogForm from '@/app/(user-dashboard)/_components/add-task/add-task-dialog-form';
-import { insertTaskAction } from '@/lib/actions';
+import { InsertTaskAction } from '@/lib/actions';
+import { Button } from '@/components/ui/button';
+import { PlusIcon } from '@radix-ui/react-icons';
+import { useState } from 'react';
 
 // TODO:
 // - add client-side validation with `insertTaskSchema Zod`.
-export default async function AddTaskDialog() {
-  const user = await currentUser();
-
-  if (!user) {
-    return redirect('/sign-in');
-  }
-
-  const projects = await getUserProjects(user.id);
+export default function AddTaskDialog({
+  insertTaskAction,
+  projects,
+  userId,
+}: {
+  insertTaskAction: InsertTaskAction;
+  projects: UserProject[];
+  userId: User['id'];
+}) {
+  const [open, setOpen] = useState(false);
 
   return (
-    <SegmentDialogRoot>
+    <Dialog onOpenChange={setOpen} open={open}>
+      <DialogTrigger asChild>
+        <Button>
+          <PlusIcon className="w-4 h-4 mr-2" />
+          Add Task
+        </Button>
+      </DialogTrigger>
       <DialogContent className="sm:max-w-[425px]">
         <AddTaskDialogForm
-          userId={user.id}
-          insertTaskAction={async (newTask) => {
-            'use server';
-            const res = await insertTaskAction(newTask);
-            // TODO:
-            // - should revalidate the today page. but for now we remove
-            //   it because even with revalidate, the today page is not updating.
-            return res;
-          }}
+          userId={userId}
+          insertTaskAction={insertTaskAction}
           projects={projects}
+          onCancel={() => setOpen(false)}
+          onSuccess={() => setOpen(false)}
         />
       </DialogContent>
-    </SegmentDialogRoot>
+    </Dialog>
   );
 }

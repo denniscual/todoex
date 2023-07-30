@@ -8,7 +8,6 @@ import { ProjectSelect } from '@/components/project-select';
 import { ReloadIcon } from '@radix-ui/react-icons';
 import { experimental_useFormStatus as useFormStatus } from 'react-dom';
 import { InsertTaskAction } from '@/lib/actions';
-import { useRouter } from 'next/navigation';
 import { useToast } from '@/components/ui/use-toast';
 import { ToastAction } from '@/components/ui/toast';
 import { DATE_FORMATS, formatDate } from '@/lib/utils';
@@ -17,12 +16,15 @@ export default function AddTaskDialogForm({
   userId,
   projects,
   insertTaskAction,
+  onCancel,
+  onSuccess,
 }: {
   userId: User['id'];
   projects: UserProject[];
   insertTaskAction: InsertTaskAction;
+  onCancel?: () => void;
+  onSuccess?: () => void;
 }) {
-  const router = useRouter();
   const { toast } = useToast();
 
   return (
@@ -32,7 +34,7 @@ export default function AddTaskDialogForm({
           const values = Object.fromEntries(formData.entries());
           await insertTaskAction({
             userId,
-            title: values.title as string,
+            title: (values.title as string).trim(),
             projectId: parseInt(values.project as string),
             dueDate: formatDate(new Date(), DATE_FORMATS.ISO_DATE_FORMAT),
           });
@@ -40,7 +42,7 @@ export default function AddTaskDialogForm({
             title: '1 task is added.',
             duration: 5000,
           });
-          router.back();
+          onSuccess?.();
         } catch (err) {
           toast({
             variant: 'destructive',
@@ -80,7 +82,7 @@ export default function AddTaskDialogForm({
         </div>
       </div>
       <DialogFooter>
-        <Button type="button" variant="outline" onClick={() => router.back()}>
+        <Button type="button" variant="outline" onClick={onCancel}>
           Cancel
         </Button>
         <FormSubmitButton />
