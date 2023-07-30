@@ -2,7 +2,7 @@
 import { DATE_FORMATS, formatDate } from '@/lib/utils';
 import UserTasks from '@/app/(user-dashboard)/_components/user-tasks';
 import { TaskWithProject } from '@/db';
-import { UpdateTaskByIdAction } from '@/lib/actions';
+import { DeleteTaskByIdAction, UpdateTaskByIdAction } from '@/lib/actions';
 import { isSameDay } from 'date-fns';
 import { Button } from '@/components/ui/button';
 import { PlusIcon } from '@radix-ui/react-icons';
@@ -10,11 +10,12 @@ import Link from 'next/link';
 
 export default function TodayUserTasks({
   tasks,
-  // This function is a server action so we can ignore the warning.
   updateTaskByIdAction,
+  deleteTaskByIdAction,
 }: {
   tasks: TaskWithProject[];
   updateTaskByIdAction: UpdateTaskByIdAction;
+  deleteTaskByIdAction: DeleteTaskByIdAction;
 }) {
   const currentDate = new Date();
   const formattedDate = formatDate(currentDate, DATE_FORMATS.LONG_DATE_FORMAT);
@@ -33,7 +34,11 @@ export default function TodayUserTasks({
         <span className="text-sm text-foreground/60">{formattedDate}</span>
       </div>
       {todayUserTasks.length > 0 ? (
-        <UserTasks tasks={todayUserTasks} updateTaskByIdAction={updateTaskByIdAction} />
+        <UserTasks
+          tasks={todayUserTasks}
+          updateTaskByIdAction={updateTaskByIdAction}
+          deleteTaskByIdAction={deleteTaskByIdAction}
+        />
       ) : (
         <p>You dont have tasks for today</p>
       )}

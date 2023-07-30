@@ -9,21 +9,22 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
-  DropdownMenuShortcut,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { DotsHorizontalIcon } from '@radix-ui/react-icons';
 import { Button } from '@/components/ui/button';
 import { useRouter } from 'next/navigation';
 import { cn } from '@/lib/utils';
-import { UpdateTaskByIdAction } from '@/lib/actions';
+import { DeleteTaskByIdAction, UpdateTaskByIdAction } from '@/lib/actions';
 
 export default function UserTask({
   task,
   updateTaskByIdAction,
+  deleteTaskByIdAction,
 }: {
   task: TaskWithProject;
   updateTaskByIdAction: UpdateTaskByIdAction;
+  deleteTaskByIdAction: DeleteTaskByIdAction;
 }) {
   const { toast } = useToast();
   const router = useRouter();
@@ -77,13 +78,20 @@ export default function UserTask({
         </button>
       </form>
       <div>
-        <UserTaskAction task={task} />
+        <UserTaskAction task={task} deleteTaskByIdAction={deleteTaskByIdAction} />
       </div>
     </div>
   );
 }
 
-function UserTaskAction({ task }: { task: TaskWithProject }) {
+function UserTaskAction({
+  task,
+  deleteTaskByIdAction,
+}: {
+  task: TaskWithProject;
+  deleteTaskByIdAction: DeleteTaskByIdAction;
+}) {
+  const { toast } = useToast();
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
@@ -94,11 +102,34 @@ function UserTaskAction({ task }: { task: TaskWithProject }) {
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" className="w-[160px]">
         <DropdownMenuItem asChild>
-          <Link href={`/tasks/${task.id}`}>Edit</Link>
+          <Link className="cursor-pointer" href={`/tasks/${task.id}`}>
+            Edit
+          </Link>
         </DropdownMenuItem>
         <DropdownMenuItem>
-          <span className="text-red-500">Delete</span>
-          <DropdownMenuShortcut>⌘⌫</DropdownMenuShortcut>
+          <form
+            action={async () => {
+              try {
+                await deleteTaskByIdAction(task.id);
+                toast({
+                  title: 'A task is deleted.',
+                  duration: 5000,
+                });
+              } catch (err) {
+                toast({
+                  variant: 'destructive',
+                  title: 'Something went wrong.',
+                  description: 'There was a problem with your request.',
+                  action: <ToastAction altText="Try again">Try again</ToastAction>,
+                  duration: 5000,
+                });
+                console.error('Server Error: ', err);
+              }
+            }}
+            className="w-full"
+          >
+            <button className="w-full text-left text-red-500">Delete</button>
+          </form>
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>

@@ -60,7 +60,15 @@ export const updateTaskByIdAction: UpdateTaskByIdAction = actionWrapper(async fu
   };
 });
 
-export const deleteTaskByIdAction = actionWrapper(async function (id: Task['id']) {
+export type DeleteTaskByIdAction = (id: Task['id']) => Promise<{
+  result: {
+    message: string;
+  };
+}>;
+
+export const deleteTaskByIdAction: DeleteTaskByIdAction = actionWrapper(async function (
+  id: Task['id']
+) {
   await deleteTaskById(id);
   return {
     result: {
@@ -70,7 +78,7 @@ export const deleteTaskByIdAction = actionWrapper(async function (id: Task['id']
 });
 
 /**
- * A Wrapper function that extends the passed `action`. E.g it handles the error
+ *A Wrapper function that extends the passed `action`. E.g it handles the error
  * message throws by the `action.
  */
 function actionWrapper<T extends (...args: any[]) => Promise<any>>(action: T): T {
