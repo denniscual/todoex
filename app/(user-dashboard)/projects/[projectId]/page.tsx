@@ -1,12 +1,17 @@
 import { currentUser } from '@clerk/nextjs';
-import { getProjectById, getUserProjectTasks } from '@/db';
+import { User, getProjectById, getUserProjectTasks, getUserProjects } from '@/db';
 import { redirect } from 'next/navigation';
 import UserTasks from '@/app/(user-dashboard)/_components/user-tasks';
-import { deleteTaskByIdAction, updateTaskByIdAction } from '@/lib/actions';
+import { deleteTaskByIdAction, updateTaskByIdAction, insertTaskAction } from '@/lib/actions';
 import { revalidatePath } from 'next/cache';
+import RootAddTaskDialog from '@/app/(user-dashboard)/_components/add-task/add-task-dialog';
+import { P } from 'drizzle-orm/select.types.d-b947a018';
 
-export default async function Project({ params }: { params: { id: string } }) {
-  const { id: projectId } = params;
+export default async function Project({
+  params: { projectId },
+}: {
+  params: { projectId: string };
+}) {
   const [user, project] = await Promise.all([currentUser(), getProjectById(projectId)]);
   const userId = user?.id ?? '';
 
@@ -20,6 +25,7 @@ export default async function Project({ params }: { params: { id: string } }) {
     return redirect('/sign-in', 'replace');
   }
 
+  preloadUserProjects(userId);
   const userProjectTasks = await getUserProjectTasks(userId, project.id);
   const pathname = `/projects/${project.id}`;
 
@@ -47,6 +53,27 @@ export default async function Project({ params }: { params: { id: string } }) {
       ) : (
         <p>{`Your schedule is clear today - no tasks! Feel free to add some or enjoy your day off.`}</p>
       )}
+      <AddTaskDialog userId={userId} pathname={pathname} />
     </section>
   );
+}
+
+async function AddTaskDialog({ userId, pathname }: { userId: User['id']; pathname: string }) {
+  const userProjects = await getUserProjects(userId);
+  return (
+    <RootAddTaskDialog
+      userId={userId}
+      projects={userProjects}
+      insertTaskAction={async (newTask) => {
+        'use server';
+        const res = await insertTaskAction(newTask);
+        revalidatePath(pathname);
+        return res;
+      }}
+    />
+  );
+}
+
+function preloadUserProjects(userId: User['id']) {
+  void getUserProjects(userId);
 }
