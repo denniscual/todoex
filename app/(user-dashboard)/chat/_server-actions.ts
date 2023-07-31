@@ -10,6 +10,7 @@ import {
   Task,
   insertTask,
   Project,
+  TaskWithProject,
 } from '@/db';
 import { sql } from 'drizzle-orm';
 import { FunctionHandlers } from './_utils.shared';
@@ -23,16 +24,16 @@ const model = new OpenAIApi(configuration);
 /**
  * TODO:
  *
+ * - fix the Update problem in EditTask when this Component gets render in project intercepted route.
+ *   The edit/mutation is working but it throws an error after mutation.
  * - create edit-task folder and then move all related Components including the EditTaskDialog and UserTaskDetails.
- * - show the OldToday into AI Assitant page.
  * - change the spinning icon into ReloadIcon from radix in the instant loading state files.
  * - update the page content layout. We need to add max width for the content to avoid huge space in large viewport. Huge space is not good for the page content. Maybe
  *   in the future, some routes will require huge space. But for now, add max width for the page content.
  * - show a fallback Component while the UserButton or other Components are still loading. Right now, even using Suspense, it didn't suspend. Maybe we need to disable the SSR?
  *   Do a research regarding this. I think in the nectxjs docs there is a hint there.
- * - make sure the pages like today will always get the latest data whenever the user navigates on it. This is related to nextjs client-caching.
+ * - Review: make sure the pages like today will always get the latest data whenever the user navigates on it. This is related to nextjs client-caching.
  * - update the due date. I think we can make it to timestamp and add timezone. we can use UTC format.
- * - make the edit-task/due-date-combobox generic. All presentational ui can be generic.
  * - make the edit-task/status-select generic. All presentational ui can be generic
  * - add function defintion for handling couting and aggregating result. Make sure to add good function description to this
  *   to distinguish this function to "seaching" function. I think we can use the same function `ask_database` and call the `createChatCompletion`
@@ -505,14 +506,13 @@ type InferHandlerReturnType<F extends keyof typeof FunctionHandlers> = Awaited<
   ReturnType<(typeof handlers)[F]>
 >;
 
-function mapTasksFieldsToDbFields(tasks: Task[]) {
+function mapTasksFieldsToDbFields(tasks: TaskWithProject[]) {
   // TODO:
   // - don't manually map the fields.
   return tasks.map((task) => ({
     id: task.id,
     user_id: task.userId,
     created_at: task.createdAt,
-    updated_at: task.updatedAt,
     due_date: task.dueDate,
     status: task.status,
     title: task.title,

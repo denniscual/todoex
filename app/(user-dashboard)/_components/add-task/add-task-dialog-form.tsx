@@ -11,6 +11,7 @@ import { InsertTaskAction } from '@/lib/actions';
 import { useToast } from '@/components/ui/use-toast';
 import { ToastAction } from '@/components/ui/toast';
 import { DATE_FORMATS, formatDate } from '@/lib/utils';
+import { useParams } from 'next/navigation';
 
 export default function AddTaskDialogForm({
   userId,
@@ -26,6 +27,8 @@ export default function AddTaskDialogForm({
   onSuccess?: () => void;
 }) {
   const { toast } = useToast();
+  const params = useParams();
+  const projectId = params.projectId as string | null;
 
   return (
     <form
@@ -35,7 +38,7 @@ export default function AddTaskDialogForm({
           await insertTaskAction({
             userId,
             title: (values.title as string).trim(),
-            projectId: values.project as string,
+            projectId: projectId ? projectId : (values.project as string),
             dueDate: formatDate(new Date(), DATE_FORMATS.ISO_DATE_FORMAT),
           });
           toast({
@@ -72,14 +75,16 @@ export default function AddTaskDialogForm({
             />
           </div>
         </div>
-        <div className="grid items-center grid-cols-4 gap-4">
-          <Label htmlFor="select-project" className="text-right">
-            Project
-          </Label>
-          <div className="col-span-3">
-            <ProjectSelect name="project" id="select-project" projects={projects} />
+        {!projectId && (
+          <div className="grid items-center grid-cols-4 gap-4">
+            <Label htmlFor="select-project" className="text-right">
+              Project
+            </Label>
+            <div className="col-span-3">
+              <ProjectSelect name="project" id="select-project" projects={projects} />
+            </div>
           </div>
-        </div>
+        )}
       </div>
       <DialogFooter>
         <Button type="button" variant="outline" onClick={onCancel}>

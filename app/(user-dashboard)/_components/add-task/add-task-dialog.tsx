@@ -1,6 +1,6 @@
 'use client';
 import { Dialog, DialogContent, DialogTrigger } from '@/components/ui/dialog';
-import { User, UserProject } from '@/db';
+import { Project, User, UserProject } from '@/db';
 import AddTaskDialogForm from '@/app/(user-dashboard)/_components/add-task/add-task-dialog-form';
 import { InsertTaskAction } from '@/lib/actions';
 import { Button } from '@/components/ui/button';
