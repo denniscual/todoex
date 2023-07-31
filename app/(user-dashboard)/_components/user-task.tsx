@@ -22,10 +22,12 @@ export default function UserTask({
   task,
   updateTaskByIdAction,
   deleteTaskByIdAction,
+  hideProjectLink = false,
 }: {
   task: TaskWithProject;
   updateTaskByIdAction: UpdateTaskByIdAction;
   deleteTaskByIdAction: DeleteTaskByIdAction;
+  hideProjectLink?: boolean;
 }) {
   const { toast } = useToast();
   const router = useRouter();
@@ -71,11 +73,16 @@ export default function UserTask({
           >
             {task.title}
           </span>
-          <Button variant="link" className="p-0 text-foreground/60" asChild>
-            <Link onClick={(event) => event.stopPropagation()} href={`/projects/${task.projectId}`}>
-              {task.projectTitle}
-            </Link>
-          </Button>
+          {!hideProjectLink && (
+            <Button variant="link" className="p-0 text-foreground/60" asChild>
+              <Link
+                onClick={(event) => event.stopPropagation()}
+                href={`/projects/${task.projectId}`}
+              >
+                {task.projectTitle}
+              </Link>
+            </Button>
+          )}
         </button>
       </form>
       <div>

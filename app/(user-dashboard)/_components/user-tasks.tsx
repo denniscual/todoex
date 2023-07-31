@@ -6,10 +6,12 @@ export default function UserTasks({
   tasks,
   updateTaskByIdAction,
   deleteTaskByIdAction,
+  hideProjectLink = false,
 }: {
   tasks: TaskWithProject[];
   deleteTaskByIdAction: DeleteTaskByIdAction;
   updateTaskByIdAction: UpdateTaskByIdAction;
+  hideProjectLink?: boolean;
 }) {
   return (
     <ul className="grid gap-6 list-none">
@@ -19,6 +21,7 @@ export default function UserTasks({
             task={task}
             updateTaskByIdAction={updateTaskByIdAction}
             deleteTaskByIdAction={deleteTaskByIdAction}
+            hideProjectLink={hideProjectLink}
           />
         </li>
       ))}

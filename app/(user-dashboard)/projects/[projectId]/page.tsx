@@ -36,6 +36,7 @@ export default async function Project({
       </div>
       {userProjectTasks.length > 0 ? (
         <UserTasks
+          hideProjectLink
           updateTaskByIdAction={async (task) => {
             'use server';
             const res = await updateTaskByIdAction(task);
