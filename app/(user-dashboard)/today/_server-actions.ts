@@ -23,13 +23,7 @@ const model = new OpenAIApi(configuration);
 /**
  * TODO:
  *
- * - integrate project mutation in the AddProjectDialog.
  * - create edit-task folder and then move all related Components including the EditTaskDialog and UserTaskDetails.
- * - we need a default project so that the user don't need to create project just to add task. This is the same in Todoist "inbox" project.
- * - fix the problem in our AddTask modal route (parallel route). Because there is no route for
- *   for add task modal that can be intersected, when the user reloads the page and the user is currently
- *   in add task modal route, nextjs throws an error. Even with default.ts file its nont working or maybe
- *   we miss something here.
  * - show the OldToday into AI Assitant page.
  * - change the spinning icon into ReloadIcon from radix in the instant loading state files.
  * - update the page content layout. We need to add max width for the content to avoid huge space in large viewport. Huge space is not good for the page content. Maybe

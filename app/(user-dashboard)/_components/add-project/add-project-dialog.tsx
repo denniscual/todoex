@@ -3,19 +3,23 @@ import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogTrigger } from '@/components/ui/dialog';
 import { PlusIcon } from '@radix-ui/react-icons';
 import AddProjectDialogForm from './add-project-dialog-form';
-import { useState } from 'react';
+import { ReactNode, useState } from 'react';
 import { useRouter } from 'next/navigation';
 
-export default function AddProjectDialog() {
+export default function AddProjectDialog({ addButton }: { addButton?: ReactNode }) {
   const [open, setOpen] = useState(false);
   const router = useRouter();
 
   return (
     <Dialog onOpenChange={setOpen} open={open}>
       <DialogTrigger asChild>
-        <Button variant="ghost" size="icon">
-          <PlusIcon className="w-4 h-4" />
-        </Button>
+        {addButton ? (
+          addButton
+        ) : (
+          <Button variant="ghost" size="icon">
+            <PlusIcon className="w-4 h-4" />
+          </Button>
+        )}
       </DialogTrigger>
       <DialogContent className="sm:max-w-[425px]">
         <AddProjectDialogForm

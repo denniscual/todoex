@@ -91,7 +91,7 @@ function FormSubmitButton() {
   return (
     <Button type="submit" disabled={pending}>
       {pending && <ReloadIcon className="w-4 h-4 mr-2 animate-spin" />}
-      Add Task
+      Add Project
     </Button>
   );
 }

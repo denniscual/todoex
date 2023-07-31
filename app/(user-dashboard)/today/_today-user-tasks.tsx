@@ -39,7 +39,7 @@ export default function TodayUserTasks({
           deleteTaskByIdAction={deleteTaskByIdAction}
         />
       ) : (
-        <p>You dont have tasks for today</p>
+        <p>{`Your schedule is clear today - no tasks! Feel free to add some or enjoy your day off.`}</p>
       )}
       {children}
     </section>
