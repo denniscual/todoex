@@ -24,8 +24,9 @@ const model = new OpenAIApi(configuration);
 /**
  * TODO:
  *
+ * - syncing is not working in Project route page after edit task mutation. This could be related to below issue.
  * - fix the Update problem in EditTask when this Component gets render in project intercepted route.
- *   The edit/mutation is working but it throws an error after mutation.
+ *   The edit/mutation is working but it unmounts and mounts again the EditTaskDialog after mutation.
  * - create edit-task folder and then move all related Components including the EditTaskDialog and UserTaskDetails.
  * - change the spinning icon into ReloadIcon from radix in the instant loading state files.
  * - update the page content layout. We need to add max width for the content to avoid huge space in large viewport. Huge space is not good for the page content. Maybe

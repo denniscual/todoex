@@ -5,6 +5,7 @@ import UserTasks from '@/app/(user-dashboard)/_components/user-tasks';
 import { deleteTaskByIdAction, updateTaskByIdAction, insertTaskAction } from '@/lib/actions';
 import { revalidatePath } from 'next/cache';
 import RootAddTaskDialog from '@/app/(user-dashboard)/_components/add-task/add-task-dialog';
+import { PopstateListener } from '@/components/popstate-listener';
 
 export default async function Project({
   params: { projectId },
@@ -53,6 +54,12 @@ export default async function Project({
       ) : (
         <p>{`Your schedule is clear today - no tasks! Feel free to add some or enjoy your day off.`}</p>
       )}
+      <PopstateListener
+        callback={async () => {
+          'use server';
+          revalidatePath(pathname);
+        }}
+      />
       <AddTaskDialog userId={userId} pathname={pathname} />
     </section>
   );
