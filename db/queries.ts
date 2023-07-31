@@ -183,7 +183,7 @@ export async function insertProject(
     // Insert row into project
     await tx.insert(project).values(validProject);
     const updatedProjects = await tx.select().from(project);
-    const newlyInsertedProject = updatedProjects[0];
+    const newlyInsertedProject = updatedProjects[updatedProjects.length - 1];
     // Insert row into ProjectUser
     const validProjectUser = insertProjectUserSchema.parse({
       projectId: newlyInsertedProject.id,

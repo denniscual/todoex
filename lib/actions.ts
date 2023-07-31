@@ -9,6 +9,7 @@ import {
   insertProject,
   Project,
 } from '@/db';
+import { revalidatePath } from 'next/cache';
 import { ZodError, z } from 'zod';
 
 export type InsertTaskAction = (task: z.infer<typeof insertTaskSchema>) => Promise<{
@@ -85,6 +86,7 @@ export type InsertProjectAction = (...args: Parameters<typeof insertProject>) =>
 
 export const insertProjectAction: InsertProjectAction = actionWrapper(async function (project) {
   const newProject = await insertProject(project);
+  revalidatePath('/');
   return {
     result: {
       message: 'Project is added successfully.',

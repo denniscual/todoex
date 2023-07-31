@@ -4,9 +4,11 @@ import { Dialog, DialogContent, DialogTrigger } from '@/components/ui/dialog';
 import { PlusIcon } from '@radix-ui/react-icons';
 import AddProjectDialogForm from './add-project-dialog-form';
 import { useState } from 'react';
+import { useRouter } from 'next/navigation';
 
 export default function AddProjectDialog() {
   const [open, setOpen] = useState(false);
+  const router = useRouter();
 
   return (
     <Dialog onOpenChange={setOpen} open={open}>
@@ -16,7 +18,13 @@ export default function AddProjectDialog() {
         </Button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-[425px]">
-        <AddProjectDialogForm onCancel={() => setOpen(false)} onSuccess={() => setOpen(false)} />
+        <AddProjectDialogForm
+          onCancel={() => setOpen(false)}
+          onSuccess={(project) => {
+            setOpen(false);
+            router.push(`/projects/${project.id}`);
+          }}
+        />
       </DialogContent>
     </Dialog>
   );
