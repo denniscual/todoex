@@ -6,6 +6,8 @@ import {
   insertTaskSchema,
   Task,
   deleteTaskById,
+  insertProject,
+  Project,
 } from '@/db';
 import { ZodError, z } from 'zod';
 
@@ -66,13 +68,27 @@ export type DeleteTaskByIdAction = (id: Task['id']) => Promise<{
   };
 }>;
 
-export const deleteTaskByIdAction: DeleteTaskByIdAction = actionWrapper(async function (
-  id: Task['id']
-) {
+export const deleteTaskByIdAction: DeleteTaskByIdAction = actionWrapper(async function (id) {
   await deleteTaskById(id);
   return {
     result: {
       message: 'Task status is delete successfully.',
+    },
+  };
+});
+
+export type InsertProjectAction = (...args: Parameters<typeof insertProject>) => Promise<{
+  result: {
+    message: string;
+  } & Project;
+}>;
+
+export const insertProjectAction: InsertProjectAction = actionWrapper(async function (project) {
+  const newProject = await insertProject(project);
+  return {
+    result: {
+      message: 'Project is added successfully.',
+      ...newProject,
     },
   };
 });
