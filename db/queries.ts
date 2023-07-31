@@ -15,8 +15,21 @@ export async function upsertUser(upsertedUser: z.infer<typeof insertUserSchema>)
 
 export const getUserProjectTasks = cache((userId: User['id'], projectId: Project['id']) => {
   const tasks = db
-    .select()
+    .select({
+      projectId: task.projectId,
+      id: task.id,
+      title: task.title,
+      description: task.description,
+      content: task.content,
+      dueDate: task.dueDate,
+      userId: task.userId,
+      createdAt: task.createdAt,
+      status: task.status,
+      projectTitle: project.title,
+      projectDescription: project.description,
+    })
     .from(task)
+    .innerJoin(project, eq(project.id, task.projectId))
     .where(and(eq(task.userId, userId), eq(task.projectId, projectId)));
   return tasks;
 });
@@ -94,9 +107,10 @@ export const getTaskById = cache(async (id: Task['id']) => {
   return tasks[0];
 });
 
-export const getProject = cache(async (id: Project['id']) => {
+export const getProjectById = cache(async (id: Project['id']) => {
   const projects = await db
     .select({
+      id: project.id,
       title: project.title,
       description: project.description,
     })

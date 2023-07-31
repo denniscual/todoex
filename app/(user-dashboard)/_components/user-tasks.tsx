@@ -1,4 +1,3 @@
-'use client';
 import { TaskWithProject } from '@/db';
 import UserTask from '@/app/(user-dashboard)/_components/user-task';
 import { UpdateTaskByIdAction, DeleteTaskByIdAction } from '@/lib/actions';

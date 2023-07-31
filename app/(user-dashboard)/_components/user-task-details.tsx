@@ -16,7 +16,7 @@ export default async function UserTaskDetails({ id }: { id: Task['id'] }) {
   const user = await currentUser();
 
   if (!user) {
-    return redirect('/sign-in');
+    return redirect('/sign-in', 'replace' as any);
   }
 
   preloadUserProjects(user.id);

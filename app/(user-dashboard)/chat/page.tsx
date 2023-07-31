@@ -1,5 +1,5 @@
 import ChatForm from './_chat-form';
-import { getUserProjectTasks, getUserProjects, getProject, Project, User } from '@/db';
+import { getUserProjectTasks, getUserProjects, getProjectById, Project, User } from '@/db';
 import { currentUser } from '@clerk/nextjs';
 import { revalidatePath } from 'next/cache';
 import { cookies } from 'next/headers';
@@ -64,7 +64,7 @@ async function UserProject({
   projectId: Project['id'];
   userId: User['id'];
 }) {
-  const userProject = await getProject(projectId);
+  const userProject = await getProjectById(projectId);
 
   if (!userProject) {
     return <div>Current project is not found.</div>;
@@ -114,5 +114,5 @@ function preloadUserProjectTasks(userId: User['id'], projectId: Project['id']) {
 }
 
 function preloadProject(projectId: Project['id']) {
-  void getProject(projectId);
+  void getProjectById(projectId);
 }

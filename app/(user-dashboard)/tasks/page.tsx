@@ -1,5 +1,5 @@
 import { redirect } from 'next/navigation';
 
 export default function Tasks() {
-  return redirect('/today');
+  return redirect('/today', 'replace' as any);
 }

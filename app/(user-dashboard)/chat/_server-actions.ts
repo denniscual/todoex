@@ -3,7 +3,7 @@ import { Configuration, OpenAIApi, ChatCompletionRequestMessage } from 'openai';
 import {
   db,
   deleteTaskById,
-  getProject,
+  getProjectById,
   getUserProjects,
   getUserProjectTasks,
   task,
@@ -53,7 +53,7 @@ async function generate({
   messages: ChatCompletionRequestMessage[];
 }) {
   const date = new Date().toISOString();
-  const userProject = await getProject(projectId);
+  const userProject = await getProjectById(projectId);
 
   if (!userProject) {
     throw new Error(`Project with an id ${projectId} is not found.`);
