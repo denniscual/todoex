@@ -9,9 +9,10 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
+  DropdownMenuShortcut,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { DotsHorizontalIcon } from '@radix-ui/react-icons';
+import { DotsHorizontalIcon, Pencil1Icon, TrashIcon } from '@radix-ui/react-icons';
 import { Button } from '@/components/ui/button';
 import { useRouter } from 'next/navigation';
 import { cn } from '@/lib/utils';
@@ -104,9 +105,12 @@ function UserTaskAction({
         <DropdownMenuItem asChild>
           <Link className="cursor-pointer" href={`/tasks/${task.id}`}>
             Edit
+            <DropdownMenuShortcut>
+              <Pencil1Icon className="w-4 h-4" />
+            </DropdownMenuShortcut>
           </Link>
         </DropdownMenuItem>
-        <DropdownMenuItem>
+        <DropdownMenuItem asChild>
           <form
             action={async () => {
               try {
@@ -126,9 +130,13 @@ function UserTaskAction({
                 console.error('Server Error: ', err);
               }
             }}
-            className="w-full"
           >
-            <button className="w-full text-left text-red-500">Delete</button>
+            <button className="flex items-center w-full text-left text-red-500">
+              Delete
+              <DropdownMenuShortcut>
+                <TrashIcon className="w-4 h-4" />
+              </DropdownMenuShortcut>
+            </button>
           </form>
         </DropdownMenuItem>
       </DropdownMenuContent>
