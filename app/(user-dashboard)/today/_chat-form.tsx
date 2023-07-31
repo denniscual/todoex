@@ -11,12 +11,19 @@ import {
 } from './_server-actions';
 import { FunctionHandlers } from './_utils.shared';
 import { ChatCompletionRequestMessage, ChatCompletionRequestMessageRoleEnum } from 'openai';
+import { Project } from '@/db';
 
 type ChatCompletionRequestMessageWithAssistantResult = ChatCompletionRequestMessage & {
   assistantResult?: ReactNode;
 };
 
-export default function ChatForm({ userId, projectId }: { userId: string; projectId: number }) {
+export default function ChatForm({
+  userId,
+  projectId,
+}: {
+  userId: string;
+  projectId: Project['id'];
+}) {
   const [messages, setMessages] = useState<ChatCompletionRequestMessageWithAssistantResult[]>([]);
   const [isPending, startTransition] = useTransition();
   const [chatBox, setChatBox] = useState('');

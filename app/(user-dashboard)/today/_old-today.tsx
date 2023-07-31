@@ -14,9 +14,8 @@ export default async function OldToday() {
   // preload current project and tasks.
   const projectId = cookieStore.get('projectId')?.value as string | undefined;
   if (!!projectId) {
-    const parsedProjectId = parseInt(projectId);
-    preloadProject(parsedProjectId);
-    preloadUserProjectTasks(userId, parsedProjectId);
+    preloadProject(projectId);
+    preloadUserProjectTasks(userId, projectId);
   }
 
   const projects = await getUserProjects(userId);
@@ -51,7 +50,7 @@ export default async function OldToday() {
       </form>
       {!!projectId && (
         <Suspense fallback={<div>Loading project...</div>}>
-          <UserProject projectId={parseInt(projectId)} userId={userId} />
+          <UserProject projectId={projectId} userId={userId} />
         </Suspense>
       )}
     </div>

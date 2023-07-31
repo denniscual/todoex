@@ -176,14 +176,18 @@ export async function updateTaskById({
 }
 
 export async function insertProject(
-  newProject: z.infer<typeof insertProjectSchema> & { userId: User['id'] }
+  newProject: Omit<z.infer<typeof insertProjectSchema> & { userId: User['id'] }, 'id'>
 ) {
-  const validProject = insertProjectSchema.parse(newProject);
+  const projectId = generateId();
+  const validProject = {
+    ...insertProjectSchema.parse(newProject),
+    projectId,
+  };
   return await db.transaction(async (tx) => {
     // Insert row into project
     await tx.insert(project).values(validProject);
-    const updatedProjects = await tx.select().from(project);
-    const newlyInsertedProject = updatedProjects[updatedProjects.length - 1];
+    const projects = await tx.select().from(project).where(eq(project.id, projectId));
+    const newlyInsertedProject = projects[0];
     // Insert row into ProjectUser
     const validProjectUser = insertProjectUserSchema.parse({
       projectId: newlyInsertedProject.id,
@@ -209,11 +213,6 @@ export const insertProjectUserSchema = createInsertSchema(projectUser);
 
 // Schema validation for inserting a task.
 export const insertTaskSchema = createInsertSchema(task, {
-  projectId(schema) {
-    return schema.projectId.positive({
-      message: 'The project id must be positive number.',
-    });
-  },
   dueDate(schema) {
     return schema.dueDate
       .regex(
@@ -240,3 +239,16 @@ export const insertTaskSchema = createInsertSchema(task, {
 
 export type UserProject = Awaited<ReturnType<typeof getUserProjects>>[0];
 export type TaskWithProject = Awaited<ReturnType<typeof getUserTodayTasks>>[0];
+
+/**
+ * Generate a time-based sortable id.
+ */
+function generateId() {
+  // get current timestamp in milliseconds (total milliseconds since 1970/01/01)
+  const timestamp = Date.now();
+  // convert it to a base36 string (numbers + letters, case-insensitive)
+  const timestampPart = timestamp.toString(36);
+  // generate a random base36 string
+  const randomPart = Math.random().toString(36).substring(2, 10);
+  return timestampPart + randomPart;
+}

@@ -35,7 +35,7 @@ export default function AddTaskDialogForm({
           await insertTaskAction({
             userId,
             title: (values.title as string).trim(),
-            projectId: parseInt(values.project as string),
+            projectId: values.project as string,
             dueDate: formatDate(new Date(), DATE_FORMATS.ISO_DATE_FORMAT),
           });
           toast({

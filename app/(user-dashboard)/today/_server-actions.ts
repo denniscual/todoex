@@ -9,6 +9,7 @@ import {
   task,
   Task,
   insertTask,
+  Project,
 } from '@/db';
 import { sql } from 'drizzle-orm';
 import { FunctionHandlers } from './_utils.shared';
@@ -54,7 +55,7 @@ async function generate({
   projectId,
 }: {
   userId: string;
-  projectId: number;
+  projectId: Project['id'];
   messages: ChatCompletionRequestMessage[];
 }) {
   const date = new Date().toISOString();
@@ -445,7 +446,7 @@ async function creating({
   successMessage: string;
   userId: string;
   dueDate?: string;
-  projectId: number;
+  projectId: Project['id'];
 }) {
   await insertTask({
     title,

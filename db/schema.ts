@@ -9,15 +9,16 @@ import {
   timestamp,
   primaryKey,
   json,
+  char,
 } from 'drizzle-orm/mysql-core';
 import { InferModel } from 'drizzle-orm';
 
 export const user = mysqlTable('user', {
   id: varchar('id', { length: 50 }).primaryKey().notNull(),
-  firstName: varchar('first_name', { length: 255 }),
-  lastName: varchar('last_name', { length: 255 }),
+  firstName: varchar('first_name', { length: 50 }),
+  lastName: varchar('last_name', { length: 50 }),
   username: varchar('username', { length: 50 }),
-  emailAddress: varchar('email_address', { length: 255 }).notNull(),
+  emailAddress: varchar('email_address', { length: 100 }).notNull(),
   createdAt: timestamp('created_at', { mode: 'string' }).defaultNow(),
   updatedAt: timestamp('updated_at', { mode: 'string' }).defaultNow().onUpdateNow(),
 });
@@ -25,7 +26,7 @@ export const user = mysqlTable('user', {
 export const project = mysqlTable(
   'project',
   {
-    id: int('id').autoincrement().primaryKey().notNull(),
+    id: char('id', { length: 16 }).primaryKey().notNull(),
     title: varchar('title', { length: 255 }).notNull(),
     description: text('description'),
     createdAt: timestamp('created_at', { mode: 'string' }).defaultNow(),
@@ -42,7 +43,7 @@ export const projectUser = mysqlTable(
   'project_user',
   {
     userId: varchar('user_id', { length: 50 }).notNull(),
-    projectId: int('project_id').notNull(),
+    projectId: char('project_id', { length: 16 }).notNull(),
   },
   (table) => {
     return {
@@ -56,7 +57,7 @@ export const task = mysqlTable(
   {
     id: int('id').autoincrement().primaryKey().notNull(),
     userId: varchar('user_id', { length: 50 }).notNull(),
-    projectId: int('project_id').notNull(),
+    projectId: char('project_id', { length: 16 }).notNull(),
     title: varchar('title', { length: 255 }).notNull(),
     description: text('description'),
     content: json('content'),

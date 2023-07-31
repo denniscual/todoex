@@ -61,7 +61,7 @@ export default function ProjectSelect({
     <Select
       value={task.projectId.toString()}
       onValueChange={(val) => {
-        const project = projects.find((project) => project.id === parseInt(val));
+        const project = projects.find((project) => project.id === val);
         if (!project) {
           return toast({
             variant: 'destructive',
