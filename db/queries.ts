@@ -175,6 +175,16 @@ export async function updateTaskById({
     .where(eq(task.id, validValues.id as number));
 }
 
+export async function insertProject(newProject: z.infer<typeof insertProjectSchema>) {
+  const validProject = insertProjectSchema.parse(newProject);
+  await db.insert(project).values(validProject);
+}
+
+export async function insertProjectUser(newProjectUser: z.infer<typeof insertProjectUserSchema>) {
+  const validProjectUser = insertProjectUserSchema.parse(newProjectUser);
+  await db.insert(projectUser).values(validProjectUser);
+}
+
 // Schema validation for inserting a user.
 export const insertUserSchema = createInsertSchema(user, {
   emailAddress(schema) {
@@ -184,6 +194,9 @@ export const insertUserSchema = createInsertSchema(user, {
 
 // Schema validation for inserting a project.
 export const insertProjectSchema = createInsertSchema(project);
+
+// Schema validation for inserting a project.
+export const insertProjectUserSchema = createInsertSchema(projectUser);
 
 // Schema validation for inserting a task.
 export const insertTaskSchema = createInsertSchema(task, {
