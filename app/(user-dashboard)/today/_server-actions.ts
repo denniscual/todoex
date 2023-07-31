@@ -22,7 +22,6 @@ const model = new OpenAIApi(configuration);
 /**
  * TODO:
  *
- * - add delete action.
  * - integrate project mutation in the AddProjectDialog.
  * - create edit-task folder and then move all related Components including the EditTaskDialog and UserTaskDetails.
  * - we need a default project so that the user don't need to create project just to add task. This is the same in Todoist "inbox" project.

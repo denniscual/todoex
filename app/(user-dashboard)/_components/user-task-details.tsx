@@ -7,7 +7,6 @@ import { currentUser } from '@clerk/nextjs';
 import { redirect } from 'next/navigation';
 import { Suspense } from 'react';
 import { Skeleton } from '@/components/ui/skeleton';
-
 import EditTitle from './edit-title';
 import EditContent from './edit-content';
 import ProjectSelect from './project-select';
