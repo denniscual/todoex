@@ -179,10 +179,10 @@ export async function insertProject(
   newProject: Omit<z.infer<typeof insertProjectSchema> & { userId: User['id'] }, 'id'>
 ) {
   const projectId = generateId();
-  const validProject = {
-    ...insertProjectSchema.parse(newProject),
-    projectId,
-  };
+  const validProject = insertProjectSchema.parse({
+    ...newProject,
+    id: projectId,
+  });
   return await db.transaction(async (tx) => {
     // Insert row into project
     await tx.insert(project).values(validProject);
