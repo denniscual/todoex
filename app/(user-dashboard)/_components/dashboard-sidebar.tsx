@@ -1,7 +1,7 @@
 import { cn } from '@/lib/utils';
 import { ChatBubbleIcon } from '@radix-ui/react-icons';
 import NavLink from '@/app/(user-dashboard)/_components/nav-link';
-import AddProjectDialog from './add-project-dialog';
+import AddProjectDialog from '@/app/(user-dashboard)/_components/add-project/add-project-dialog';
 import { currentUser } from '@clerk/nextjs';
 import { getUserProjects } from '@/db';
 import { Suspense } from 'react';
