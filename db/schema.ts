@@ -19,8 +19,8 @@ export const user = mysqlTable('user', {
   lastName: varchar('last_name', { length: 50 }),
   username: varchar('username', { length: 50 }),
   emailAddress: varchar('email_address', { length: 100 }).notNull(),
-  createdAt: timestamp('created_at', { mode: 'string' }).defaultNow(),
-  updatedAt: timestamp('updated_at', { mode: 'string' }).defaultNow().onUpdateNow(),
+  createdAt: timestamp('created_at', { mode: 'string' }).defaultNow().notNull(),
+  updatedAt: timestamp('updated_at', { mode: 'string' }).defaultNow().onUpdateNow().notNull(),
 });
 
 export const project = mysqlTable(
@@ -29,8 +29,8 @@ export const project = mysqlTable(
     id: char('id', { length: 16 }).primaryKey().notNull(),
     title: varchar('title', { length: 255 }).notNull(),
     description: text('description'),
-    createdAt: timestamp('created_at', { mode: 'string' }).defaultNow(),
-    updatedAt: timestamp('updated_at', { mode: 'string' }).defaultNow().onUpdateNow(),
+    createdAt: timestamp('created_at', { mode: 'string' }).defaultNow().notNull(),
+    updatedAt: timestamp('updated_at', { mode: 'string' }).defaultNow().onUpdateNow().notNull(),
   },
   (table) => {
     return {
@@ -63,8 +63,8 @@ export const task = mysqlTable(
     content: json('content'),
     dueDate: date('due_date', { mode: 'string' }),
     status: mysqlEnum('status', ['pending', 'completed']).default('pending').notNull(),
-    createdAt: timestamp('created_at', { mode: 'string' }).defaultNow(),
-    updatedAt: timestamp('updated_at', { mode: 'string' }).defaultNow().onUpdateNow(),
+    createdAt: timestamp('created_at', { mode: 'string' }).defaultNow().notNull(),
+    updatedAt: timestamp('updated_at', { mode: 'string' }).defaultNow().onUpdateNow().notNull(),
   },
   (table) => {
     return {
