@@ -3,7 +3,7 @@ import { db, task, User, user, project, projectUser, Project, Task } from '@/db'
 import { eq, and } from 'drizzle-orm';
 import { createInsertSchema } from 'drizzle-zod';
 import { z } from 'zod';
-import { DATE_FORMATS, areDatesEqualOrGreater, formatDate } from '@/lib/utils';
+import { areDatesEqualOrGreater } from '@/lib/utils';
 import { RequiredKeys } from '@/lib/types';
 
 export async function upsertUser(upsertedUser: z.infer<typeof insertUserSchema>) {
@@ -24,6 +24,7 @@ export const getUserProjectTasks = cache((userId: User['id'], projectId: Project
       dueDate: task.dueDate,
       userId: task.userId,
       createdAt: task.createdAt,
+      updatedAt: task.updatedAt,
       status: task.status,
       projectTitle: project.title,
       projectDescription: project.description,
@@ -45,6 +46,7 @@ export const getUserTasks = cache((userId: User['id']) => {
       dueDate: task.dueDate,
       userId: task.userId,
       createdAt: task.createdAt,
+      updatedAt: task.updatedAt,
       status: task.status,
       projectTitle: project.title,
       projectDescription: project.description,
@@ -66,6 +68,7 @@ export const getTaskById = cache(async (id: Task['id']) => {
       dueDate: task.dueDate,
       userId: task.userId,
       createdAt: task.createdAt,
+      updatedAt: task.updatedAt,
       status: task.status,
       projectTitle: project.title,
       projectDescription: project.description,

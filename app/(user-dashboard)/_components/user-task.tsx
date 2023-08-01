@@ -17,7 +17,6 @@ import { Button } from '@/components/ui/button';
 import { useRouter, useParams } from 'next/navigation';
 import { cn } from '@/lib/utils';
 import { DeleteTaskByIdAction, UpdateTaskByIdAction } from '@/lib/actions';
-import { convertToUTC } from '@/lib/utils';
 
 export default function UserTask({
   task,

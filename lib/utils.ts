@@ -19,6 +19,7 @@ export const DATE_FORMATS = {
   LONG_DATE_FORMAT: 'eee, MMM dd',
   LONG_DATE_FORMAT_WITH_YEAR: 'eee, MMM dd, yyyy',
   ISO_DATE_FORMAT: 'yyyy-MM-dd',
+  DEFAULT_TIME_FORMAT: 'p',
 } as const;
 
 export function formatDate(date: Date, formatString: ValueOf<typeof DATE_FORMATS>) {
@@ -45,4 +46,12 @@ export function convertToUTC(dateString: string) {
   const date = parse(dateString, 'yyyy-MM-dd HH:mm:ss', new Date());
   // Convert the Date object to a UTC string
   return date.toISOString();
+}
+
+/**
+ * Convert this date string format "2023-07-31 16:42:48" into UTC format "2023-07-31T16:42:48Z".
+ */
+export function convertToUTCFormat(dateString: string) {
+  // Replace the space with a 'T' and append 'Z' at the end
+  return dateString.replace(' ', 'T') + 'Z';
 }

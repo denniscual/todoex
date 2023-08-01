@@ -11,6 +11,8 @@ import EditTitle from './edit-title';
 import EditContent from './edit-content';
 import ProjectSelect from './project-select';
 import StatusSelect from './status-select';
+import { DATE_FORMATS, convertToUTCFormat, formatDate } from '@/lib/utils';
+import { formatDistanceToNow } from 'date-fns';
 
 export default async function UserTaskDetails({ id }: { id: Task['id'] }) {
   const user = await currentUser();
@@ -32,6 +34,9 @@ export default async function UserTaskDetails({ id }: { id: Task['id'] }) {
     revalidatePath(`/tasks/${updatedTask.id}`);
     return res;
   }
+
+  const createdAtDate = new Date(convertToUTCFormat(userTask.createdAt));
+  const updatedAtDate = new Date(convertToUTCFormat(userTask.updatedAt));
 
   return (
     <div className="flex items-start flex-1">
@@ -82,6 +87,15 @@ export default async function UserTaskDetails({ id }: { id: Task['id'] }) {
               updateTaskByIdAction={action}
               task={userTask}
             />
+          </div>
+          <div className="pt-2 space-y-3">
+            <p className="text-xs text-foreground/60">
+              Created {formatDate(createdAtDate, DATE_FORMATS.LONG_DATE_FORMAT)} at{' '}
+              {formatDate(createdAtDate, DATE_FORMATS.DEFAULT_TIME_FORMAT)}
+            </p>
+            <p className="text-xs text-foreground/60">
+              Updated {formatDistanceToNow(updatedAtDate)}
+            </p>
           </div>
         </Suspense>
       </div>
