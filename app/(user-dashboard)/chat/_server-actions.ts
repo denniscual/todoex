@@ -24,23 +24,30 @@ const model = new OpenAIApi(configuration);
 /**
  * TODO:
  *
- * - create edit-task folder and then move all related Components including the EditTaskDialog and UserTaskDetails.
- * - change the spinning icon into ReloadIcon from radix in the instant loading state files.
+ * - remove passed toast duration.
+ * - rewrite AI Assistant chat page. For function definitions, we can remove `task.description` field. We don't need the AI to generate the description.
+ *   But take note the description in Suggesting function is also used for getting some details from the user. So be aware to remove the description field
+ *   in Suggesting. But in other functions, its safe to remove. But first, review the server actions.
+ * - update the due date. I think we can make it to timestamp and add timezone. we can use UTC format.
  * - update the page content layout. We need to add max width for the content to avoid huge space in large viewport. Huge space is not good for the page content. Maybe
  *   in the future, some routes will require huge space. But for now, add max width for the page content.
+ * - add Today or Project actions. This action is used for sorting and changing layout/view.
+ * - when changing the task's project inside the EditTaskDialog or etc and the current route has `projectId` segment, then we need to make sure the `projectId` segment will
+ *   be changed.
+ * - create EditProjectDialog.
+ * - prettify the Sign-in/Sign-up/UserProfile clerk Components. Use tailwindcss to customize the styles and integrate our theme.
+ *
  * - show a fallback Component while the UserButton or other Components are still loading. Right now, even using Suspense, it didn't suspend. Maybe we need to disable the SSR?
  *   Do a research regarding this. I think in the nectxjs docs there is a hint there.
- * - Review: make sure the pages like today will always get the latest data whenever the user navigates on it. This is related to nextjs client-caching.
- * - update the due date. I think we can make it to timestamp and add timezone. we can use UTC format.
+ * - improve typescript.
+ * - use Zod to validate the form.
  * - make the edit-task/status-select generic. All presentational ui can be generic
+ * - create edit-task folder and then move all related Components including the EditTaskDialog and UserTaskDetails.
  * - add function defintion for handling couting and aggregating result. Make sure to add good function description to this
  *   to distinguish this function to "seaching" function. I think we can use the same function `ask_database` and call the `createChatCompletion`
  *   to pass message with role: "function" and append the `functionResponse` as the content. We let openai to generate the result for us and parse it by RSC.
  * - fine tune again the prompts like increase or more fine tuning the model to avoid doing destructive actions like dropping a table or moving a todo to another user. And also
  *   enhancing the prompts for better creation, updating task, suggesting todo, etc.
- * - add optimistic updates or maybe use 3rd party lib like react-hook-form to handle forms.
- * - improve typescript.
- * - use Zod to validate the form.
  */
 async function generate({
   userId,
