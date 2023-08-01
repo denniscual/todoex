@@ -1,6 +1,6 @@
 import { type ClassValue, clsx } from 'clsx';
 import { twMerge } from 'tailwind-merge';
-import { endOfYear, format, isAfter, isBefore } from 'date-fns';
+import { endOfYear, format, isAfter, isBefore, parse } from 'date-fns';
 import { ValueOf } from './types';
 import { isWithinInterval, addDays } from 'date-fns';
 
@@ -38,4 +38,11 @@ export function isWithinSevenDays(date: Date) {
   const currentDate = new Date(); // Current date and time
   const sevenDaysLater = addDays(currentDate, 7); // Add 7 days to the current date
   return isWithinInterval(date, { start: currentDate, end: sevenDaysLater });
+}
+
+export function convertToUTC(dateString: string) {
+  // Parse the date string into a Date object
+  const date = parse(dateString, 'yyyy-MM-dd HH:mm:ss', new Date());
+  // Convert the Date object to a UTC string
+  return date.toISOString();
 }
