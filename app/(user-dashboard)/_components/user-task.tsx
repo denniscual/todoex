@@ -14,7 +14,7 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { DotsHorizontalIcon, Pencil1Icon, TrashIcon } from '@radix-ui/react-icons';
 import { Button } from '@/components/ui/button';
-import { useRouter } from 'next/navigation';
+import { useRouter, useParams } from 'next/navigation';
 import { cn } from '@/lib/utils';
 import { DeleteTaskByIdAction, UpdateTaskByIdAction } from '@/lib/actions';
 
@@ -31,6 +31,10 @@ export default function UserTask({
 }) {
   const { toast } = useToast();
   const router = useRouter();
+  const params = useParams();
+  const taskPathname = params.projectId
+    ? `/projects/${params.projectId}/tasks/${task.id}`
+    : `/tasks/${task.id}`;
 
   async function action() {
     try {
@@ -62,7 +66,7 @@ export default function UserTask({
         <Checkbox type="submit" checked={isTaskCompleted(task.status)} />
         <button
           type="button"
-          onClick={() => router.push(`/tasks/${task.id}`)}
+          onClick={() => router.push(taskPathname as any)}
           className="flex flex-col items-start flex-1 cursor-pointer"
         >
           <span
@@ -86,7 +90,11 @@ export default function UserTask({
         </button>
       </form>
       <div>
-        <UserTaskAction task={task} deleteTaskByIdAction={deleteTaskByIdAction} />
+        <UserTaskAction
+          taskPathname={taskPathname}
+          task={task}
+          deleteTaskByIdAction={deleteTaskByIdAction}
+        />
       </div>
     </div>
   );
@@ -95,9 +103,11 @@ export default function UserTask({
 function UserTaskAction({
   task,
   deleteTaskByIdAction,
+  taskPathname,
 }: {
   task: TaskWithProject;
   deleteTaskByIdAction: DeleteTaskByIdAction;
+  taskPathname: string;
 }) {
   const { toast } = useToast();
   return (
@@ -110,7 +120,7 @@ function UserTaskAction({
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" className="w-[160px]">
         <DropdownMenuItem asChild>
-          <Link className="cursor-pointer" href={`/tasks/${task.id}`}>
+          <Link className="cursor-pointer" href={taskPathname as any}>
             Edit
             <DropdownMenuShortcut>
               <Pencil1Icon className="w-4 h-4" />

@@ -10,7 +10,6 @@ export function usePopstateListener(callback: () => void) {
 
   useEffect(() => {
     function callback() {
-      console.log('callback');
       startTransition(() => {
         effectEvent();
       });
