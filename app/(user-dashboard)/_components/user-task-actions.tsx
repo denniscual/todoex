@@ -10,7 +10,7 @@ import {
   DropdownMenuShortcut,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { DotsHorizontalIcon, Pencil1Icon, TrashIcon } from '@radix-ui/react-icons';
+import { CopyIcon, DotsHorizontalIcon, Pencil1Icon, TrashIcon } from '@radix-ui/react-icons';
 import { Button } from '@/components/ui/button';
 import { DeleteTaskByIdAction } from '@/lib/actions';
 import { useParams, useRouter } from 'next/navigation';
@@ -51,14 +51,37 @@ export default function UserTaskActions({
           </DropdownMenuItem>
         )}
         <DropdownMenuItem asChild>
+          <button
+            className="flex items-center w-full cursor-pointer"
+            onClick={async () => {
+              const rootTaskLink = `${window.location.origin}/tasks/${task.id}`;
+              try {
+                await navigator.clipboard.writeText(rootTaskLink);
+                toast({
+                  title: 'Task link copied.',
+                });
+              } catch (err) {
+                toast({
+                  variant: 'destructive',
+                  title: 'Something went wrong.',
+                  description: 'Failed to copy content',
+                  action: <ToastAction altText="Try again">Try again</ToastAction>,
+                });
+                console.error('Client Error:', err);
+              }
+            }}
+          >
+            Copy link to task
+            <DropdownMenuShortcut>
+              <CopyIcon className="w-4 h-4" />
+            </DropdownMenuShortcut>
+          </button>
+        </DropdownMenuItem>
+        <DropdownMenuItem asChild>
           <form
             action={async () => {
               try {
                 await deleteTaskByIdAction(task.id);
-                toast({
-                  title: 'A task is deleted.',
-                  duration: 5000,
-                });
                 // If true, the user will be redirected back to the previous route.
                 // This logic will be used when this UserTaskActions is rendered inside Dialog with Parallel route.
                 if (redirectBackAfterDeletion) {
@@ -80,13 +103,12 @@ export default function UserTaskActions({
                   title: 'Something went wrong.',
                   description: 'There was a problem with your request.',
                   action: <ToastAction altText="Try again">Try again</ToastAction>,
-                  duration: 5000,
                 });
                 console.error('Server Error: ', err);
               }
             }}
           >
-            <button className="flex items-center w-full text-left text-red-500">
+            <button className="flex items-center w-full text-red-500">
               Delete
               <DropdownMenuShortcut>
                 <TrashIcon className="w-4 h-4" />
