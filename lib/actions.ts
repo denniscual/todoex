@@ -19,22 +19,12 @@ export type InsertTaskAction = (task: z.infer<typeof insertTaskSchema>) => Promi
 }>;
 
 export const insertTaskAction: InsertTaskAction = actionWrapper(async function (task) {
-  try {
-    await insertTask(task);
-    return {
-      result: {
-        message: 'Task status is added successfully.',
-      },
-    };
-  } catch (err) {
-    if (err instanceof ZodError) {
-      console.log('Zod error: ', err.issues);
-      throw new Error(JSON.stringify(err.issues));
-    } else {
-      console.log('Error when generating response: ', (err as Error).toString());
-      throw new Error('Server error');
-    }
-  }
+  await insertTask(task);
+  return {
+    result: {
+      message: 'New task is added successfully.',
+    },
+  };
 });
 
 export type UpdateTaskByIdAction = (task: TaskWithProject) => Promise<{
