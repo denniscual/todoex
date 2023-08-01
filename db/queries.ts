@@ -34,32 +34,6 @@ export const getUserProjectTasks = cache((userId: User['id'], projectId: Project
   return tasks;
 });
 
-export const getUserTodayTasks = cache((userId: User['id']) => {
-  const tasks = db
-    .select({
-      projectId: task.projectId,
-      id: task.id,
-      title: task.title,
-      description: task.description,
-      content: task.content,
-      dueDate: task.dueDate,
-      userId: task.userId,
-      createdAt: task.createdAt,
-      status: task.status,
-      projectTitle: project.title,
-      projectDescription: project.description,
-    })
-    .from(task)
-    .innerJoin(project, eq(project.id, task.projectId))
-    .where(
-      and(
-        eq(task.userId, userId),
-        eq(task.dueDate, formatDate(new Date(), DATE_FORMATS.ISO_DATE_FORMAT))
-      )
-    );
-  return tasks;
-});
-
 export const getUserTasks = cache((userId: User['id']) => {
   const tasks = db
     .select({
@@ -252,7 +226,7 @@ export const insertTaskSchema = createInsertSchema(task, {
 });
 
 export type UserProject = Awaited<ReturnType<typeof getUserProjects>>[0];
-export type TaskWithProject = Awaited<ReturnType<typeof getUserTodayTasks>>[0];
+export type TaskWithProject = Awaited<ReturnType<typeof getUserProjectTasks>>[0];
 
 /**
  * Generate a time-based sortable id.
