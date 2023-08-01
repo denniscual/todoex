@@ -39,7 +39,7 @@ export default function UserTaskActions({
           <span className="sr-only">Open menu</span>
         </Button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent align="end" className="w-[160px]">
+      <DropdownMenuContent align="end" className="w-[200px]">
         {Boolean(taskPathname) && (
           <DropdownMenuItem asChild>
             <Link className="cursor-pointer" href={taskPathname as any}>
