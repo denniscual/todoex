@@ -5,18 +5,11 @@ import { useToast } from '@/components/ui/use-toast';
 import { ToastAction } from '@/components/ui/toast';
 import { TASK_STATUS_TEXTS, isTaskCompleted, toggleStatus } from '@/lib/db';
 import Link from 'next/link';
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuShortcut,
-  DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
-import { DotsHorizontalIcon, Pencil1Icon, TrashIcon } from '@radix-ui/react-icons';
 import { Button } from '@/components/ui/button';
 import { useRouter, useParams } from 'next/navigation';
 import { cn } from '@/lib/utils';
 import { DeleteTaskByIdAction, UpdateTaskByIdAction } from '@/lib/actions';
+import UserTaskActions from './user-task-actions';
 
 export default function UserTask({
   task,
@@ -90,73 +83,12 @@ export default function UserTask({
         </button>
       </form>
       <div>
-        <UserTaskAction
+        <UserTaskActions
           taskPathname={taskPathname}
           task={task}
           deleteTaskByIdAction={deleteTaskByIdAction}
         />
       </div>
     </div>
-  );
-}
-
-function UserTaskAction({
-  task,
-  deleteTaskByIdAction,
-  taskPathname,
-}: {
-  task: TaskWithProject;
-  deleteTaskByIdAction: DeleteTaskByIdAction;
-  taskPathname: string;
-}) {
-  const { toast } = useToast();
-  return (
-    <DropdownMenu>
-      <DropdownMenuTrigger asChild>
-        <Button variant="ghost" className="flex h-8 w-8 p-0 data-[state=open]:bg-muted">
-          <DotsHorizontalIcon className="w-4 h-4" />
-          <span className="sr-only">Open menu</span>
-        </Button>
-      </DropdownMenuTrigger>
-      <DropdownMenuContent align="end" className="w-[160px]">
-        <DropdownMenuItem asChild>
-          <Link className="cursor-pointer" href={taskPathname as any}>
-            Edit
-            <DropdownMenuShortcut>
-              <Pencil1Icon className="w-4 h-4" />
-            </DropdownMenuShortcut>
-          </Link>
-        </DropdownMenuItem>
-        <DropdownMenuItem asChild>
-          <form
-            action={async () => {
-              try {
-                await deleteTaskByIdAction(task.id);
-                toast({
-                  title: 'A task is deleted.',
-                  duration: 5000,
-                });
-              } catch (err) {
-                toast({
-                  variant: 'destructive',
-                  title: 'Something went wrong.',
-                  description: 'There was a problem with your request.',
-                  action: <ToastAction altText="Try again">Try again</ToastAction>,
-                  duration: 5000,
-                });
-                console.error('Server Error: ', err);
-              }
-            }}
-          >
-            <button className="flex items-center w-full text-left text-red-500">
-              Delete
-              <DropdownMenuShortcut>
-                <TrashIcon className="w-4 h-4" />
-              </DropdownMenuShortcut>
-            </button>
-          </form>
-        </DropdownMenuItem>
-      </DropdownMenuContent>
-    </DropdownMenu>
   );
 }
