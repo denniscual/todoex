@@ -19,10 +19,12 @@ export default function UserTaskActions({
   task,
   deleteTaskByIdAction,
   taskPathname,
+  redirectBackAfterDeletion = false,
 }: {
   task: TaskWithProject;
   deleteTaskByIdAction: DeleteTaskByIdAction;
   taskPathname?: string;
+  redirectBackAfterDeletion?: boolean;
 }) {
   const { toast } = useToast();
   const router = useRouter();
@@ -57,14 +59,20 @@ export default function UserTaskActions({
                   title: 'A task is deleted.',
                   duration: 5000,
                 });
-                // After successful deleation, redirect to project page
-                // if the Component is rendered inside a project page.
-                // Else, redirect to today route.
-                // Use `.replace` to remove the current route from the history stack.
-                if (isProjectRoute) {
-                  router.replace(`/projects/${task.projectId}`);
+                // If true, the user will be redirected back to the previous route.
+                // This logic will be used when this UserTaskActions is rendered inside Dialog with Parallel route.
+                if (redirectBackAfterDeletion) {
+                  router.back();
                 } else {
-                  router.replace('/today');
+                  // After successful deleation, redirect to project page
+                  // if the Component is rendered inside a project page.
+                  // Else, redirect to today route.
+                  // Use `.replace` to remove the current route from the history stack.
+                  if (isProjectRoute) {
+                    router.replace(`/projects/${task.projectId}`);
+                  } else {
+                    router.replace('/today');
+                  }
                 }
               } catch (err) {
                 toast({
