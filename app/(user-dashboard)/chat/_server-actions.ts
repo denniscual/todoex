@@ -29,8 +29,6 @@ const model = new OpenAIApi(configuration);
  *   in Suggesting. But in other functions, its safe to remove. But first, review the server actions.
  * - update the due date. I think we can make it to timestamp and add timezone. we can use UTC format.
  * - remove passed toast duration.
- * - update the page content layout. We need to add max width for the content to avoid huge space in large viewport. Huge space is not good for the page content. Maybe
- *   in the future, some routes will require huge space. But for now, add max width for the page content.
  * - add Today or Project actions. This action is used for sorting and changing layout/view.
  * - when changing the task's project inside the EditTaskDialog or etc and the current route has `projectId` segment, then we need to make sure the `projectId` segment will
  *   be changed.

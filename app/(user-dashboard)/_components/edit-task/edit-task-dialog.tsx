@@ -22,13 +22,13 @@ export default async function EditTaskDialog({ id }: { id: Task['id'] }) {
             <Button variant="link" className="p-0 text-foreground/60" asChild>
               <Link href={`/projects/${userTask.projectId}`}>{userTask.projectTitle}</Link>
             </Button>
-            <div className="mr-6">
+            <span className="mr-6">
               <UserTaskActions
                 redirectBackAfterDeletion
                 task={userTask}
                 deleteTaskByIdAction={deleteTaskByIdAction}
               />
-            </div>
+            </span>
           </DialogDescription>
         </DialogHeader>
         <UserTaskDetails id={id} />
