@@ -136,6 +136,9 @@ dependencies:
   react-error-boundary:
     specifier: ^4.0.4
     version: 4.0.4(react@18.3.0-canary-587ae49d7-20230720)
+  react-intersection-observer:
+    specifier: ^9.5.2
+    version: 9.5.2(react@18.3.0-canary-587ae49d7-20230720)
   react-textarea-autosize:
     specifier: ^8.5.2
     version: 8.5.2(@types/react@18.2.14)(react@18.3.0-canary-587ae49d7-20230720)
@@ -4526,6 +4529,14 @@ packages:
       react: '>=16.13.1'
     dependencies:
       '@babel/runtime': 7.21.5
+      react: 18.3.0-canary-587ae49d7-20230720
+    dev: false
+
+  /react-intersection-observer@9.5.2(react@18.3.0-canary-587ae49d7-20230720):
+    resolution: {integrity: sha512-EmoV66/yvksJcGa1rdW0nDNc4I1RifDWkT50gXSFnPLYQ4xUptuDD4V7k+Rj1OgVAlww628KLGcxPXFlOkkU/Q==}
+    peerDependencies:
+      react: ^15.0.0 || ^16.0.0 || ^17.0.0 || ^18.0.0
+    dependencies:
       react: 18.3.0-canary-587ae49d7-20230720
     dev: false
 
