@@ -6,6 +6,7 @@ import {
   useRef,
   type RefObject,
   ElementRef,
+  useState,
 } from 'react';
 
 /**
@@ -42,4 +43,28 @@ export function useEnterSubmit(): {
   };
 
   return { formRef, onKeyDown: handleKeyDown };
+}
+
+export function useAtBottom(offset = 0) {
+  const [isAtBottom, setIsAtBottom] = useState(true);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      const scrollTop = window.scrollY || document.documentElement.scrollTop;
+      const scrollHeight = document.documentElement.scrollHeight;
+      const clientHeight = document.documentElement.clientHeight;
+      const atBottom = scrollTop + clientHeight + offset >= scrollHeight;
+
+      setIsAtBottom(atBottom);
+    };
+
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    handleScroll();
+
+    return () => {
+      window.removeEventListener('scroll', handleScroll);
+    };
+  }, [offset]);
+
+  return isAtBottom;
 }

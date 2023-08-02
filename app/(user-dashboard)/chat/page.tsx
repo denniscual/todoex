@@ -10,17 +10,23 @@ import PromptForm from '@/app/(user-dashboard)/_components/chat/prompt-form';
 import { ExternalLink } from '@/components/external-link';
 import { Button } from '@/components/ui/button';
 import { UpdateIcon } from '@radix-ui/react-icons';
+import { ButtonScrollToBottom } from '@/components/button-scroll-to-bottom';
 
 export default function Chat() {
   return (
     <section className="relative flex flex-col h-full">
       <div className="flex-1 px-2 space-y-6">
-        <p>
-          flsajd lkf jasdlkfjlaskd jflkasdj fklasjdkl fjasldk flkasdj flkajsdfl jasdlkf jasdlkf
-          lksadfj sadfsdfas fkasj dfasdfasdf asdfaads;fa
-        </p>
+        {Array(12)
+          .fill(
+            `flsajd lkf jasdlkfjlaskd jflkasdj fklasjdkl fjasldk flkasdj flkajsdfl jasdlkf jasdlkf
+          lksadfj sadfsdfas fkasj dfasdfasdf asdfaads;fa`
+          )
+          .map((val, idx) => (
+            <p key={idx}>{val}</p>
+          ))}
       </div>
       <div className="sticky bottom-0 z-40 px-4 py-2 space-y-4 border-t shadow-lg supports-backdrop-blur:bg-background/60 bg-background/95 backdrop-blur sm:rounded-t-xl sm:border md:py-4">
+        <ButtonScrollToBottom />
         <Card className="flex flex-col flex-grow">
           <CardContent className="p-0">
             <PromptForm />
