@@ -6,7 +6,7 @@ import { cookies } from 'next/headers';
 import { Suspense } from 'react';
 import Link from 'next/link';
 import { Card, CardContent } from '@/components/ui/card';
-import PromptForm from '@/app/(user-dashboard)/_components/chat/prompt-form';
+import PromptForm from './_prompt-form';
 import { ExternalLink } from '@/components/external-link';
 import { Button } from '@/components/ui/button';
 import { PersonIcon, UpdateIcon } from '@radix-ui/react-icons';
@@ -14,13 +14,15 @@ import { ButtonScrollToBottom } from '@/components/button-scroll-to-bottom';
 import { Separator } from '@/components/ui/separator';
 import { OpenAIIcon } from '@/components/ui/icons';
 import { ChatScrollAnchor } from '@/components/chat-scroll-anchor';
+import EmptyScreen from './_empty-screen';
 
 export default function Chat() {
   return (
     <section className="relative flex flex-col h-full">
       <div className="flex-1 px-2">
-        <ul>
-          {Array(12)
+        <EmptyScreen />
+        {/* <ul>
+          {Array(7)
             .fill(
               `flsajd lkf jasdlkfjlaskd jflkasdj fklasjdkl fjasldk flkasdj flkajsdfl jasdlkf jasdlkf
           lksadfj sadfsdfas fkasj dfasdfasdf asdfaads;fa`
@@ -36,7 +38,7 @@ export default function Chat() {
                 <Separator className="my-4 md:my-8" />
               </li>
             ))}
-        </ul>
+        </ul> */}
         <ChatScrollAnchor trackVisibility={false} />
       </div>
       <div className="sticky bottom-0 z-40 pt-14">
