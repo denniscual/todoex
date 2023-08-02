@@ -6,7 +6,6 @@ import { useAtBottom } from '@/lib/hooks';
 
 export function ButtonScrollToBottom({ className, ...props }: ButtonProps) {
   const isAtBottom = useAtBottom();
-  console.log({ isAtBottom });
 
   return (
     <Button
