@@ -6,99 +6,36 @@ import { cookies } from 'next/headers';
 import { Suspense } from 'react';
 import Link from 'next/link';
 import { Card, CardContent } from '@/components/ui/card';
-import PromptForm from './_prompt-form';
+import PromptForm from '@/app/(user-dashboard)/_components/chat/prompt-form';
+import { ExternalLink } from '@/components/external-link';
+import { Button } from '@/components/ui/button';
+import { UpdateIcon } from '@radix-ui/react-icons';
 
 export default function Chat() {
   return (
-    <section className="relative h-full">
-      <div className="px-2 space-y-6">
-        <p>
-          flsajd lkf jasdlkfjlaskd jflkasdj fklasjdkl fjasldk flkasdj flkajsdfl jasdlkf jasdlkf
-          lksadfj sadfsdfas fkasj dfasdfasdf asdfaads;fa
-        </p>
-        <p>
-          flsajd lkf jasdlkfjlaskd jflkasdj fklasjdkl fjasldk flkasdj flkajsdfl jasdlkf jasdlkf
-          lksadfj sadfsdfas fkasj dfasdfasdf asdfaads;fa
-        </p>
-        <p>
-          flsajd lkf jasdlkfjlaskd jflkasdj fklasjdkl fjasldk flkasdj flkajsdfl jasdlkf jasdlkf
-          lksadfj sadfsdfas fkasj dfasdfasdf asdfaads;fa
-        </p>
-        <p>
-          flsajd lkf jasdlkfjlaskd jflkasdj fklasjdkl fjasldk flkasdj flkajsdfl jasdlkf jasdlkf
-          lksadfj sadfsdfas fkasj dfasdfasdf asdfaads;fa
-        </p>
-        <p>
-          flsajd lkf jasdlkfjlaskd jflkasdj fklasjdkl fjasldk flkasdj flkajsdfl jasdlkf jasdlkf
-          lksadfj sadfsdfas fkasj dfasdfasdf asdfaads;fa
-        </p>
-        <p>
-          flsajd lkf jasdlkfjlaskd jflkasdj fklasjdkl fjasldk flkasdj flkajsdfl jasdlkf jasdlkf
-          lksadfj sadfsdfas fkasj dfasdfasdf asdfaads;fa
-        </p>
-        <p>
-          flsajd lkf jasdlkfjlaskd jflkasdj fklasjdkl fjasldk flkasdj flkajsdfl jasdlkf jasdlkf
-          lksadfj sadfsdfas fkasj dfasdfasdf asdfaads;fa
-        </p>
-        <p>
-          flsajd lkf jasdlkfjlaskd jflkasdj fklasjdkl fjasldk flkasdj flkajsdfl jasdlkf jasdlkf
-          lksadfj sadfsdfas fkasj dfasdfasdf asdfaads;fa
-        </p>
-        <p>
-          flsajd lkf jasdlkfjlaskd jflkasdj fklasjdkl fjasldk flkasdj flkajsdfl jasdlkf jasdlkf
-          lksadfj sadfsdfas fkasj dfasdfasdf asdfaads;fa
-        </p>
-        <p>
-          flsajd lkf jasdlkfjlaskd jflkasdj fklasjdkl fjasldk flkasdj flkajsdfl jasdlkf jasdlkf
-          lksadfj sadfsdfas fkasj dfasdfasdf asdfaads;fa
-        </p>
-        <p>
-          flsajd lkf jasdlkfjlaskd jflkasdj fklasjdkl fjasldk flkasdj flkajsdfl jasdlkf jasdlkf
-          lksadfj sadfsdfas fkasj dfasdfasdf asdfaads;fa
-        </p>
-        <p>
-          flsajd lkf jasdlkfjlaskd jflkasdj fklasjdkl fjasldk flkasdj flkajsdfl jasdlkf jasdlkf
-          lksadfj sadfsdfas fkasj dfasdfasdf asdfaads;fa
-        </p>
-        <p>
-          flsajd lkf jasdlkfjlaskd jflkasdj fklasjdkl fjasldk flkasdj flkajsdfl jasdlkf jasdlkf
-          lksadfj sadfsdfas fkasj dfasdfasdf asdfaads;fa
-        </p>
-        <p>
-          flsajd lkf jasdlkfjlaskd jflkasdj fklasjdkl fjasldk flkasdj flkajsdfl jasdlkf jasdlkf
-          lksadfj sadfsdfas fkasj dfasdfasdf asdfaads;fa
-        </p>
-        <p>
-          flsajd lkf jasdlkfjlaskd jflkasdj fklasjdkl fjasldk flkasdj flkajsdfl jasdlkf jasdlkf
-          lksadfj sadfsdfas fkasj dfasdfasdf asdfaads;fa
-        </p>
-        <p>
-          flsajd lkf jasdlkfjlaskd jflkasdj fklasjdkl fjasldk flkasdj flkajsdfl jasdlkf jasdlkf
-          lksadfj sadfsdfas fkasj dfasdfasdf asdfaads;fa
-        </p>
-        <p>
-          flsajd lkf jasdlkfjlaskd jflkasdj fklasjdkl fjasldk flkasdj flkajsdfl jasdlkf jasdlkf
-          lksadfj sadfsdfas fkasj dfasdfasdf asdfaads;fa
-        </p>
-        <p>
-          flsajd lkf jasdlkfjlaskd jflkasdj fklasjdkl fjasldk flkasdj flkajsdfl jasdlkf jasdlkf
-          lksadfj sadfsdfas fkasj dfasdfasdf asdfaads;fa
-        </p>
-        <p>
-          flsajd lkf jasdlkfjlaskd jflkasdj fklasjdkl fjasldk flkasdj flkajsdfl jasdlkf jasdlkf
-          lksadfj sadfsdfas fkasj dfasdfasdf asdfaads;fa
-        </p>
+    <section className="relative flex flex-col h-full">
+      <div className="flex-1 px-2 space-y-6">
         <p>
           flsajd lkf jasdlkfjlaskd jflkasdj fklasjdkl fjasldk flkasdj flkajsdfl jasdlkf jasdlkf
           lksadfj sadfsdfas fkasj dfasdfasdf asdfaads;fa
         </p>
       </div>
-      <div className="sticky bottom-0 z-40 py-6 supports-backdrop-blur:bg-background/60 bg-background/95 backdrop-blur">
-        <Card className="flex flex-col flex-grow rounded-xl">
+      <div className="sticky bottom-0 z-40 px-4 py-2 space-y-4 border-t shadow-lg supports-backdrop-blur:bg-background/60 bg-background/95 backdrop-blur sm:rounded-t-xl sm:border md:py-4">
+        <Card className="flex flex-col flex-grow">
           <CardContent className="p-0">
             <PromptForm />
           </CardContent>
         </Card>
+        <div className="flex items-center justify-between">
+          <p className="hidden px-2 text-xs leading-normal text-center text-muted-foreground sm:block">
+            AI Chatbot built with{' '}
+            <ExternalLink href="https://openai.com/chatgpt">ChatGPT</ExternalLink>
+          </p>
+          <Button size="sm" variant="secondary">
+            <UpdateIcon className="w-4 h-4 mr-2" />
+            Regenerate Response
+          </Button>
+        </div>
       </div>
     </section>
   );
