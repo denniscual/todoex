@@ -49,7 +49,7 @@ export default function DashboardSidebar({ className, ...props }: SidebarProps) 
             Tasks
           </NavLink> */}
           <NavLink href="/chat" icon={<ChatBubbleIcon className="w-4 h-5 mr-2 text-orange-500" />}>
-            AI Assistant
+            Chatbot
           </NavLink>
           {/* <NavLink
             href="/upcoming"

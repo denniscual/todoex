@@ -5,42 +5,51 @@ import { revalidatePath } from 'next/cache';
 import { cookies } from 'next/headers';
 import { Suspense } from 'react';
 import Link from 'next/link';
-import { PersonIcon } from '@radix-ui/react-icons';
-import { Separator } from '@/components/ui/separator';
-import { OpenAIIcon } from '@/components/ui/icons';
-import { ChatScrollAnchor } from '@/components/chat-scroll-anchor';
 import EmptyScreen from './_empty-screen';
-import ChatPanel from './_chat-panel';
+import ExampleMessages from './_example-messages';
+import Chat from './_chat';
 
-export default function Chat() {
+export default function RootChat({
+  searchParams,
+}: {
+  searchParams: {
+    pid?: string;
+    initialMessage?: string;
+  };
+}) {
+  const { pid, initialMessage: initialMessageIdx } = searchParams;
+  const initialMessage = !!initialMessageIdx ? exampleMessages[parseInt(initialMessageIdx)] : null;
+  const hasInitialMessage = !!initialMessage;
+  const hasProjectId = !!pid;
+  const enableChat = hasInitialMessage && hasProjectId;
+
   return (
     <section className="relative flex flex-col h-full">
-      <div className="flex-1 px-2">
-        <EmptyScreen />
-        {/* <ul>
-          {Array(7)
-            .fill(
-              `flsajd lkf jasdlkfjlaskd jflkasdj fklasjdkl fjasldk flkasdj flkajsdfl jasdlkf jasdlkf
-          lksadfj sadfsdfas fkasj dfasdfasdf asdfaads;fa`
-            )
-            .map((val, idx) => (
-              <li key={idx}>
-                <div className="relative flex items-start mb-4">
-                  <span className="flex items-center justify-center w-8 h-8 bg-green-400 border rounded-md shadow select-none dark:bg-green-600 shrink-0">
-                    <OpenAIIcon className="w-4 h-4 text-white" />
-                  </span>
-                  <div className="flex-1 px-1 ml-4 space-y-2 overflow-hidden">{val}</div>
-                </div>
-                <Separator className="my-4 md:my-8" />
-              </li>
-            ))}
-        </ul> */}
-        <ChatScrollAnchor trackVisibility={false} />
-      </div>
-      <ChatPanel />
+      <Chat enableChat={enableChat} initialMessage={initialMessage?.message}>
+        {!enableChat && (
+          <EmptyScreen>
+            {hasProjectId && <ExampleMessages messages={exampleMessages} />}
+          </EmptyScreen>
+        )}
+      </Chat>
     </section>
   );
 }
+
+const exampleMessages = [
+  {
+    heading: 'Suggest a task for today',
+    message: 'Suggest a task for today',
+  },
+  {
+    heading: 'Show all of the tasks for this week.',
+    message: 'Show all of the tasks for this week.',
+  },
+  {
+    heading: 'Add "Clean my bedroom"',
+    message: 'Add "Clean my bedroom"',
+  },
+];
 
 async function OldChat() {
   const cookieStore = cookies();
