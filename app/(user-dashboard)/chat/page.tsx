@@ -5,8 +5,106 @@ import { revalidatePath } from 'next/cache';
 import { cookies } from 'next/headers';
 import { Suspense } from 'react';
 import Link from 'next/link';
+import { Card, CardContent } from '@/components/ui/card';
+import PromptForm from './_prompt-form';
 
-export default async function Chat() {
+export default function Chat() {
+  return (
+    <section className="relative h-full">
+      <div className="px-2 space-y-6">
+        <p>
+          flsajd lkf jasdlkfjlaskd jflkasdj fklasjdkl fjasldk flkasdj flkajsdfl jasdlkf jasdlkf
+          lksadfj sadfsdfas fkasj dfasdfasdf asdfaads;fa
+        </p>
+        <p>
+          flsajd lkf jasdlkfjlaskd jflkasdj fklasjdkl fjasldk flkasdj flkajsdfl jasdlkf jasdlkf
+          lksadfj sadfsdfas fkasj dfasdfasdf asdfaads;fa
+        </p>
+        <p>
+          flsajd lkf jasdlkfjlaskd jflkasdj fklasjdkl fjasldk flkasdj flkajsdfl jasdlkf jasdlkf
+          lksadfj sadfsdfas fkasj dfasdfasdf asdfaads;fa
+        </p>
+        <p>
+          flsajd lkf jasdlkfjlaskd jflkasdj fklasjdkl fjasldk flkasdj flkajsdfl jasdlkf jasdlkf
+          lksadfj sadfsdfas fkasj dfasdfasdf asdfaads;fa
+        </p>
+        <p>
+          flsajd lkf jasdlkfjlaskd jflkasdj fklasjdkl fjasldk flkasdj flkajsdfl jasdlkf jasdlkf
+          lksadfj sadfsdfas fkasj dfasdfasdf asdfaads;fa
+        </p>
+        <p>
+          flsajd lkf jasdlkfjlaskd jflkasdj fklasjdkl fjasldk flkasdj flkajsdfl jasdlkf jasdlkf
+          lksadfj sadfsdfas fkasj dfasdfasdf asdfaads;fa
+        </p>
+        <p>
+          flsajd lkf jasdlkfjlaskd jflkasdj fklasjdkl fjasldk flkasdj flkajsdfl jasdlkf jasdlkf
+          lksadfj sadfsdfas fkasj dfasdfasdf asdfaads;fa
+        </p>
+        <p>
+          flsajd lkf jasdlkfjlaskd jflkasdj fklasjdkl fjasldk flkasdj flkajsdfl jasdlkf jasdlkf
+          lksadfj sadfsdfas fkasj dfasdfasdf asdfaads;fa
+        </p>
+        <p>
+          flsajd lkf jasdlkfjlaskd jflkasdj fklasjdkl fjasldk flkasdj flkajsdfl jasdlkf jasdlkf
+          lksadfj sadfsdfas fkasj dfasdfasdf asdfaads;fa
+        </p>
+        <p>
+          flsajd lkf jasdlkfjlaskd jflkasdj fklasjdkl fjasldk flkasdj flkajsdfl jasdlkf jasdlkf
+          lksadfj sadfsdfas fkasj dfasdfasdf asdfaads;fa
+        </p>
+        <p>
+          flsajd lkf jasdlkfjlaskd jflkasdj fklasjdkl fjasldk flkasdj flkajsdfl jasdlkf jasdlkf
+          lksadfj sadfsdfas fkasj dfasdfasdf asdfaads;fa
+        </p>
+        <p>
+          flsajd lkf jasdlkfjlaskd jflkasdj fklasjdkl fjasldk flkasdj flkajsdfl jasdlkf jasdlkf
+          lksadfj sadfsdfas fkasj dfasdfasdf asdfaads;fa
+        </p>
+        <p>
+          flsajd lkf jasdlkfjlaskd jflkasdj fklasjdkl fjasldk flkasdj flkajsdfl jasdlkf jasdlkf
+          lksadfj sadfsdfas fkasj dfasdfasdf asdfaads;fa
+        </p>
+        <p>
+          flsajd lkf jasdlkfjlaskd jflkasdj fklasjdkl fjasldk flkasdj flkajsdfl jasdlkf jasdlkf
+          lksadfj sadfsdfas fkasj dfasdfasdf asdfaads;fa
+        </p>
+        <p>
+          flsajd lkf jasdlkfjlaskd jflkasdj fklasjdkl fjasldk flkasdj flkajsdfl jasdlkf jasdlkf
+          lksadfj sadfsdfas fkasj dfasdfasdf asdfaads;fa
+        </p>
+        <p>
+          flsajd lkf jasdlkfjlaskd jflkasdj fklasjdkl fjasldk flkasdj flkajsdfl jasdlkf jasdlkf
+          lksadfj sadfsdfas fkasj dfasdfasdf asdfaads;fa
+        </p>
+        <p>
+          flsajd lkf jasdlkfjlaskd jflkasdj fklasjdkl fjasldk flkasdj flkajsdfl jasdlkf jasdlkf
+          lksadfj sadfsdfas fkasj dfasdfasdf asdfaads;fa
+        </p>
+        <p>
+          flsajd lkf jasdlkfjlaskd jflkasdj fklasjdkl fjasldk flkasdj flkajsdfl jasdlkf jasdlkf
+          lksadfj sadfsdfas fkasj dfasdfasdf asdfaads;fa
+        </p>
+        <p>
+          flsajd lkf jasdlkfjlaskd jflkasdj fklasjdkl fjasldk flkasdj flkajsdfl jasdlkf jasdlkf
+          lksadfj sadfsdfas fkasj dfasdfasdf asdfaads;fa
+        </p>
+        <p>
+          flsajd lkf jasdlkfjlaskd jflkasdj fklasjdkl fjasldk flkasdj flkajsdfl jasdlkf jasdlkf
+          lksadfj sadfsdfas fkasj dfasdfasdf asdfaads;fa
+        </p>
+      </div>
+      <div className="sticky bottom-0 z-40 py-6 supports-backdrop-blur:bg-background/60 bg-background/95 backdrop-blur">
+        <Card className="flex flex-col flex-grow rounded-xl">
+          <CardContent className="p-0">
+            <PromptForm />
+          </CardContent>
+        </Card>
+      </div>
+    </section>
+  );
+}
+
+async function OldChat() {
   const cookieStore = cookies();
   const user = await currentUser();
   const userId = user?.id ?? '';
@@ -21,7 +119,7 @@ export default async function Chat() {
   const projects = await getUserProjects(userId);
 
   return (
-    <div className="space-y-8">
+    <section className="space-y-10">
       <Link href="/projects/1">Project 1</Link>
       <form
         action={async (formData) => {
@@ -53,7 +151,7 @@ export default async function Chat() {
           <UserProject projectId={projectId} userId={userId} />
         </Suspense>
       )}
-    </div>
+    </section>
   );
 }
 

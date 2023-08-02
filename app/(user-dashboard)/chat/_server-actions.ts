@@ -24,11 +24,11 @@ const model = new OpenAIApi(configuration);
 /**
  * TODO:
  *
- * - remove passed toast duration.
  * - rewrite AI Assistant chat page. For function definitions, we can remove `task.description` field. We don't need the AI to generate the description.
  *   But take note the description in Suggesting function is also used for getting some details from the user. So be aware to remove the description field
  *   in Suggesting. But in other functions, its safe to remove. But first, review the server actions.
  * - update the due date. I think we can make it to timestamp and add timezone. we can use UTC format.
+ * - remove passed toast duration.
  * - update the page content layout. We need to add max width for the content to avoid huge space in large viewport. Huge space is not good for the page content. Maybe
  *   in the future, some routes will require huge space. But for now, add max width for the page content.
  * - add Today or Project actions. This action is used for sorting and changing layout/view.
