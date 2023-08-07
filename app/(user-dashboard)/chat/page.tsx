@@ -8,8 +8,9 @@ import Link from 'next/link';
 import EmptyScreen from './_empty-screen';
 import ExampleMessages from './_example-messages';
 import Chat from './_chat';
+import { redirect } from 'next/navigation';
 
-export default function RootChat({
+export default async function RootChat({
   searchParams,
 }: {
   searchParams: {
@@ -17,13 +18,19 @@ export default function RootChat({
     initialMessage?: string;
   };
 }) {
+  const user = await currentUser();
+
+  if (!user) {
+    return redirect('/sign-in', 'replace' as any);
+  }
+
   const { pid, initialMessage: initialMessageIdx } = searchParams;
   const initialMessage = !!initialMessageIdx ? exampleMessages[parseInt(initialMessageIdx)] : null;
   const hasProjectId = !!pid;
 
   return (
     <section className="relative flex flex-col h-full">
-      <Chat initialMessage={initialMessage?.message}>
+      <Chat initialMessage={initialMessage?.message} userId={user.id} key={initialMessageIdx}>
         <EmptyScreen>{hasProjectId && <ExampleMessages messages={exampleMessages} />}</EmptyScreen>
       </Chat>
     </section>

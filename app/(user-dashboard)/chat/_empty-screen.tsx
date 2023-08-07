@@ -1,5 +1,5 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { User, getUserProjects } from '@/db';
+import { Project, User, getUserProjects } from '@/db';
 import { currentUser } from '@clerk/nextjs';
 import { redirect } from 'next/navigation';
 import RootEmptyScreenProjectSelect from './_empty-screen-project-select';

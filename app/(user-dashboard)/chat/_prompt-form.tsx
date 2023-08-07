@@ -6,13 +6,15 @@ import { useEnterSubmit } from '@/lib/hooks';
 import { ElementRef, useRef, useEffect, FormEventHandler, ChangeEventHandler } from 'react';
 
 export default function PromptForm({
-  onSubmit,
+  formAction,
   onInputChange,
   input,
+  disabled = false,
 }: {
-  onSubmit?: FormEventHandler;
-  onInputChange?: ChangeEventHandler;
+  formAction?: () => void;
+  onInputChange?: ChangeEventHandler<HTMLTextAreaElement>;
   input?: string;
+  disabled?: boolean;
 }) {
   const textareaRef = useRef<ElementRef<'textarea'>>(null);
   const { formRef, onKeyDown } = useEnterSubmit();
@@ -25,12 +27,12 @@ export default function PromptForm({
 
   return (
     <form
-      action={() => {
-        console.log('invoke');
+      onSubmit={(event) => {
+        event.preventDefault();
+        formAction?.();
       }}
       ref={formRef}
       className="flex items-center p-4"
-      onSubmit={onSubmit}
     >
       <Textarea
         ref={textareaRef}
@@ -43,7 +45,7 @@ export default function PromptForm({
         spellCheck={false}
         className="min-h-[30px] w-full resize-none bg-transparent focus-within:outline-none sm:text-sm"
       />
-      <Button variant="outline" size="icon">
+      <Button variant="outline" size="icon" disabled={disabled}>
         <PaperPlaneIcon className="w-4 h-4" />
       </Button>
     </form>

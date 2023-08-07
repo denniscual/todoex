@@ -24,11 +24,15 @@ const model = new OpenAIApi(configuration);
 /**
  * TODO:
  *
- * - we can enable the Chat without initialMessage chosen by the user. It means, only `pid` or projectId is needed to enable chat.
+ * - Review the new Chat page
+ * - show loader layout in the Chat list when the user is requesting. Check mdn for reference.
+ * - implement regenerate response.
+ * - add ratelimitting for user requests.
  * - rewrite AI Assistant chat page. For function definitions, we can remove `task.description` field. We don't need the AI to generate the description.
  *   But take note the description in Suggesting function is also used for getting some details from the user. So be aware to remove the description field
  *   in Suggesting. But in other functions, its safe to remove. But first, review the server actions.
  * - update the due date. I think we can make it to timestamp and add timezone. we can use UTC format.
+ * - fix the layout issue in small viewport. The ButtonScrollToBottom causes the page to overflow. Overall, check and fix the mobile layout. Make sure it is responsive.
  * - remove passed toast duration.
  * - add Today or Project actions. This action is used for sorting and changing layout/view.
  * - when changing the task's project inside the EditTaskDialog or etc and the current route has `projectId` segment, then we need to make sure the `projectId` segment will

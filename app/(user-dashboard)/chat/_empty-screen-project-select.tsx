@@ -2,11 +2,22 @@
 import { ProjectSelect } from '@/components/project-select';
 import { Button } from '@/components/ui/button';
 import { UserProject } from '@/db';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { useState } from 'react';
 
 export default function EmptyScreenProjectSelect({ projects }: { projects: UserProject[] }) {
-  const [project, setProject] = useState(projects.length > 0 ? projects[0].id : undefined);
+  const searchParams = useSearchParams();
+  const [project, setProject] = useState(() => {
+    const defaultProject = projects[0];
+    const pid = searchParams.get('pid');
+    if (!!pid) {
+      const foundProject = projects.find((project) => project.id === pid);
+      if (foundProject) {
+        return foundProject.id;
+      }
+    }
+    return defaultProject.id;
+  });
   const router = useRouter();
 
   return (
