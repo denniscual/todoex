@@ -3,7 +3,6 @@ import { db, task, User, user, project, projectUser, Project, Task } from '@/db'
 import { eq, and } from 'drizzle-orm';
 import { createInsertSchema } from 'drizzle-zod';
 import { z } from 'zod';
-import { areDatesEqualOrGreater } from '@/lib/utils';
 import { RequiredKeys } from '@/lib/types';
 
 export async function upsertUser(upsertedUser: z.infer<typeof insertUserSchema>) {
@@ -205,26 +204,25 @@ export const insertProjectUserSchema = createInsertSchema(projectUser);
 // Schema validation for inserting a task.
 export const insertTaskSchema = createInsertSchema(task, {
   dueDate(schema) {
-    return schema.dueDate
-      .regex(
-        // Valid date format is "YYYY-MM-DD".
-        /^\d{4}-\d{2}-\d{2}$/,
-        {
-          message: 'Invalid date format.',
-        }
-      )
-      .refine(
-        (val) => {
-          // TODO:
-          // use date-fns to do the dates equality checking.
-          const dueDate = new Date(val);
-          const currentDate = new Date();
-          return areDatesEqualOrGreater(dueDate, currentDate);
-        },
-        {
-          message: 'The due date must be on or after the current date.',
-        }
-      );
+    return schema.dueDate.regex(
+      // Valid date format is "YYYY-MM-DD".
+      /^\d{4}-\d{2}-\d{2}$/,
+      {
+        message: 'Invalid date format.',
+      }
+    );
+    // .refine(
+    //   (val) => {
+    //     // TODO:
+    //     // use date-fns to do the dates equality checking.
+    //     const dueDate = new Date(val);
+    //     const currentDate = new Date();
+    //     return areDatesEqualOrGreater(dueDate, currentDate);
+    //   },
+    //   {
+    //     message: 'The due date must be on or after the current date.',
+    //   }
+    // );
   },
 });
 

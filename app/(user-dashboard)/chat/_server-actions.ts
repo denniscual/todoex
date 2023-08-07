@@ -24,6 +24,7 @@ const model = new OpenAIApi(configuration);
 /**
  * TODO:
  *
+ * - we can enable the Chat without initialMessage chosen by the user. It means, only `pid` or projectId is needed to enable chat.
  * - rewrite AI Assistant chat page. For function definitions, we can remove `task.description` field. We don't need the AI to generate the description.
  *   But take note the description in Suggesting function is also used for getting some details from the user. So be aware to remove the description field
  *   in Suggesting. But in other functions, its safe to remove. But first, review the server actions.
