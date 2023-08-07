@@ -118,3 +118,13 @@ export function useAtBottom(offset = 0) {
 
   return isAtBottom;
 }
+
+export function useIsClient() {
+  const [isClient, setIsClient] = useState(false);
+
+  useEffect(() => {
+    setIsClient(true);
+  }, []);
+
+  return isClient;
+}
