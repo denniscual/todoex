@@ -20,7 +20,7 @@ export default function Chat({
   return (
     <>
       <div className="flex-1 px-2">
-        <div className="mb-6">{messages.filter(Boolean).length === 0 && children}</div>
+        <div className="mb-12">{messages.filter(Boolean).length === 0 && children}</div>
         {enableChat && (
           <>
             <ul>
