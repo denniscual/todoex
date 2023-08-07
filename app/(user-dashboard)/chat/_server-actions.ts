@@ -28,6 +28,7 @@ const model = new OpenAIApi(configuration);
  * - show loader layout in the Chat list when the user is requesting. Check mdn for reference.
  * - implement regenerate response.
  * - add ratelimitting for user requests.
+ * - handle "No projects" in the Chat page. Add "Create new project" in the chat page if no projects.
  * - rewrite AI Assistant chat page. For function definitions, we can remove `task.description` field. We don't need the AI to generate the description.
  *   But take note the description in Suggesting function is also used for getting some details from the user. So be aware to remove the description field
  *   in Suggesting. But in other functions, its safe to remove. But first, review the server actions.
@@ -40,6 +41,7 @@ const model = new OpenAIApi(configuration);
  * - create EditProjectDialog.
  * - prettify the Sign-in/Sign-up/UserProfile clerk Components. Use tailwindcss to customize the styles and integrate our theme.
  *
+ * - make topbar and sidebar fix layout.
  * - show a fallback Component while the UserButton or other Components are still loading. Right now, even using Suspense, it didn't suspend. Maybe we need to disable the SSR?
  *   Do a research regarding this. I think in the nectxjs docs there is a hint there.
  * - improve typescript.
