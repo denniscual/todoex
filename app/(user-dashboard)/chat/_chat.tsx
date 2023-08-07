@@ -4,19 +4,23 @@ import { OpenAIIcon } from '@/components/ui/icons';
 import { ChatScrollAnchor } from '@/components/chat-scroll-anchor';
 import ChatPanel from './_chat-panel';
 import { PropsWithChildren } from 'react';
+import { useSearchParams } from 'next/navigation';
 
 export default function Chat({
-  enableChat = false,
   initialMessage,
   children,
 }: PropsWithChildren<{
-  enableChat?: boolean;
   initialMessage?: string; // NOTE: If `enableChat` is true, then `initialMessage` has value.
 }>) {
+  const messages = [initialMessage];
+  const params = useSearchParams();
+  const projectId = params.get('pid');
+  const enableChat = !!projectId;
+
   return (
     <>
       <div className="flex-1 px-2">
-        {children}
+        <div className="mb-6">{messages.filter(Boolean).length === 0 && children}</div>
         {enableChat && (
           <>
             <ul>

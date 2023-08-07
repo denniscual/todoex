@@ -19,18 +19,12 @@ export default function RootChat({
 }) {
   const { pid, initialMessage: initialMessageIdx } = searchParams;
   const initialMessage = !!initialMessageIdx ? exampleMessages[parseInt(initialMessageIdx)] : null;
-  const hasInitialMessage = !!initialMessage;
   const hasProjectId = !!pid;
-  const enableChat = hasInitialMessage && hasProjectId;
 
   return (
     <section className="relative flex flex-col h-full">
-      <Chat enableChat={enableChat} initialMessage={initialMessage?.message}>
-        {!enableChat && (
-          <EmptyScreen>
-            {hasProjectId && <ExampleMessages messages={exampleMessages} />}
-          </EmptyScreen>
-        )}
+      <Chat initialMessage={initialMessage?.message}>
+        <EmptyScreen>{hasProjectId && <ExampleMessages messages={exampleMessages} />}</EmptyScreen>
       </Chat>
     </section>
   );
