@@ -21,6 +21,7 @@ import {
 } from './_server-actions';
 import PromptForm from './_prompt-form';
 import { Button } from '@/components/ui/button';
+import UserTaskActions from '@/app/(user-dashboard)/_components/user-task-actions';
 
 type ChatCompletionRequestMessageWithAssistantResult = ChatCompletionRequestMessage & {
   assistantResult?: ReactNode;
@@ -189,10 +190,17 @@ function TodoList({ rows }: SearchingReturnType) {
     return <div>I am sorry, but I could not find any todo list.</div>;
   }
   return (
-    <ul>
-      {rows.map((row, idx) => (
-        <li key={row.id}>
-          <span className="font-medium">{idx + 1}.</span> Title: {row.title}
+    <ul className="grid gap-6 list-none">
+      {rows.map((row) => (
+        <li key={row.id} className="flex justify-between pb-4 border-b">
+          {row.title}
+          <UserTaskActions
+            taskPathname={`/tasks/${row.id}`}
+            task={{
+              id: row.id,
+              projectId: row.projectId,
+            }}
+          />
         </li>
       ))}
     </ul>

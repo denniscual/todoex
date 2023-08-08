@@ -1,5 +1,5 @@
 'use client';
-import { TaskWithProject } from '@/db';
+import { Task, TaskWithProject } from '@/db';
 import { useToast } from '@/components/ui/use-toast';
 import { ToastAction } from '@/components/ui/toast';
 import Link from 'next/link';
@@ -21,8 +21,11 @@ export default function UserTaskActions({
   taskPathname,
   redirectBackAfterDeletion = false,
 }: {
-  task: TaskWithProject;
-  deleteTaskByIdAction: DeleteTaskByIdAction;
+  task: {
+    id: Task['id'];
+    projectId: Task['projectId'];
+  };
+  deleteTaskByIdAction?: DeleteTaskByIdAction;
   taskPathname?: string;
   redirectBackAfterDeletion?: boolean;
 }) {
@@ -77,45 +80,47 @@ export default function UserTaskActions({
             </DropdownMenuShortcut>
           </button>
         </DropdownMenuItem>
-        <DropdownMenuItem asChild>
-          <form
-            action={async () => {
-              try {
-                await deleteTaskByIdAction(task.id);
-                // If true, the user will be redirected back to the previous route.
-                // This logic will be used when this UserTaskActions is rendered inside Dialog with Parallel route.
-                if (redirectBackAfterDeletion) {
-                  router.back();
-                } else {
-                  // After successful deleation, redirect to project page
-                  // if the Component is rendered inside a project page.
-                  // Else, redirect to today route.
-                  // Use `.replace` to remove the current route from the history stack.
-                  if (isProjectRoute) {
-                    router.replace(`/projects/${task.projectId}`);
+        {deleteTaskByIdAction && (
+          <DropdownMenuItem asChild>
+            <form
+              action={async () => {
+                try {
+                  await deleteTaskByIdAction(task.id);
+                  // If true, the user will be redirected back to the previous route.
+                  // This logic will be used when this UserTaskActions is rendered inside Dialog with Parallel route.
+                  if (redirectBackAfterDeletion) {
+                    router.back();
                   } else {
-                    router.replace('/today');
+                    // After successful deleation, redirect to project page
+                    // if the Component is rendered inside a project page.
+                    // Else, redirect to today route.
+                    // Use `.replace` to remove the current route from the history stack.
+                    if (isProjectRoute) {
+                      router.replace(`/projects/${task.projectId}`);
+                    } else {
+                      router.replace('/today');
+                    }
                   }
+                } catch (err) {
+                  toast({
+                    variant: 'destructive',
+                    title: 'Something went wrong.',
+                    description: 'There was a problem with your request.',
+                    action: <ToastAction altText="Try again">Try again</ToastAction>,
+                  });
+                  console.error('Server Error: ', err);
                 }
-              } catch (err) {
-                toast({
-                  variant: 'destructive',
-                  title: 'Something went wrong.',
-                  description: 'There was a problem with your request.',
-                  action: <ToastAction altText="Try again">Try again</ToastAction>,
-                });
-                console.error('Server Error: ', err);
-              }
-            }}
-          >
-            <button className="flex items-center w-full text-red-500">
-              Delete
-              <DropdownMenuShortcut>
-                <TrashIcon className="w-4 h-4" />
-              </DropdownMenuShortcut>
-            </button>
-          </form>
-        </DropdownMenuItem>
+              }}
+            >
+              <button className="flex items-center w-full text-red-500">
+                Delete
+                <DropdownMenuShortcut>
+                  <TrashIcon className="w-4 h-4" />
+                </DropdownMenuShortcut>
+              </button>
+            </form>
+          </DropdownMenuItem>
+        )}
       </DropdownMenuContent>
     </DropdownMenu>
   );

@@ -5,7 +5,6 @@ import { Button } from '@/components/ui/button';
 import Link from 'next/link';
 import UserTaskActions from '@/app/(user-dashboard)/_components/user-task-actions';
 import { deleteTaskByIdAction } from '@/lib/actions';
-import { redirect } from 'next/navigation';
 
 export default async function Task({
   params,
