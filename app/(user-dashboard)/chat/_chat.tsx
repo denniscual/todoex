@@ -5,7 +5,7 @@ import ChatPanel from './_chat-panel';
 import { HTMLAttributes, PropsWithChildren, ReactNode, useState } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { Card, CardContent } from '@/components/ui/card';
-import { PersonIcon } from '@radix-ui/react-icons';
+import { PersonIcon, UpdateIcon } from '@radix-ui/react-icons';
 import { cn } from '@/lib/utils';
 import { ChatCompletionRequestMessage, ChatCompletionRequestMessageRoleEnum } from 'openai';
 import { FunctionHandlers } from './_utils.shared';
@@ -20,6 +20,7 @@ import {
   generateResponseAction,
 } from './_server-actions';
 import PromptForm from './_prompt-form';
+import { Button } from '@/components/ui/button';
 
 type ChatCompletionRequestMessageWithAssistantResult = ChatCompletionRequestMessage & {
   assistantResult?: ReactNode;
@@ -46,6 +47,7 @@ export default function Chat({
   async function generateResponse(chatMessages: ChatCompletionRequestMessageWithAssistantResult[]) {
     try {
       setIsPending(true);
+      setError(null);
       const res = await generateResponseAction({
         // Remove the jsx elements (assistantResult).
         messages: chatMessages.map((message) => ({
@@ -93,7 +95,6 @@ export default function Chat({
         assistantResult,
       });
       setMessages(messagesWithAssistant);
-      setError(null);
     } catch (err) {
       setError(err as Error);
     } finally {
@@ -104,7 +105,7 @@ export default function Chat({
   return (
     <>
       <div className="flex-1 px-2">
-        <div className="mb-12">{messages.filter(Boolean).length === 0 && children}</div>
+        {messages.filter(Boolean).length === 0 && <div className="mb-12">{children}</div>}
         {enableChat && (
           <>
             <ul className="space-y-6 md:space-y-10">
@@ -143,31 +144,40 @@ export default function Chat({
       </div>
       {enableChat && (
         <ChatPanel>
-          <PromptForm
-            disabled={isPending || !!error}
-            input={input}
-            onInputChange={(event) => setInput(event.currentTarget.value)}
-            onSubmit={(event) => {
-              event.preventDefault();
-              const trimmedInput = input.trim();
+          {!error ? (
+            <PromptForm
+              disabled={isPending || !!error}
+              input={input}
+              onInputChange={(event) => setInput(event.currentTarget.value)}
+              onSubmit={(event) => {
+                event.preventDefault();
+                const trimmedInput = input.trim();
 
-              if (trimmedInput === '') {
-                return;
-              }
+                if (trimmedInput === '') {
+                  return;
+                }
 
-              const messagesWithNewChatMessage: ChatCompletionRequestMessageWithAssistantResult[] =
-                [
-                  ...messages,
-                  {
-                    role: ChatCompletionRequestMessageRoleEnum.User,
-                    content: input.trim(),
-                  },
-                ];
-              setMessages(messagesWithNewChatMessage);
-              setInput('');
-              generateResponse(messagesWithNewChatMessage);
-            }}
-          />
+                const messagesWithNewChatMessage: ChatCompletionRequestMessageWithAssistantResult[] =
+                  [
+                    ...messages,
+                    {
+                      role: ChatCompletionRequestMessageRoleEnum.User,
+                      content: input.trim(),
+                    },
+                  ];
+                setMessages(messagesWithNewChatMessage);
+                setInput('');
+                generateResponse(messagesWithNewChatMessage);
+              }}
+            />
+          ) : (
+            <div className="flex justify-center p-4">
+              <Button size="sm" variant="secondary" onClick={() => generateResponse(messages)}>
+                <UpdateIcon className="w-4 h-4 mr-2" />
+                Regenerate Response
+              </Button>
+            </div>
+          )}
         </ChatPanel>
       )}
     </>
