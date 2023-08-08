@@ -25,7 +25,6 @@ const model = new OpenAIApi(configuration);
  * TODO:
  *
  * - Review the new Chat page
- * - show loader layout in the Chat list when the user is requesting. Check mdn for reference.
  * - implement regenerate response.
  * - add ratelimitting for user requests.
  * - handle "No projects" in the Chat page. Add "Create new project" in the chat page if no projects.
@@ -171,10 +170,10 @@ async function generate({
           };
         }
         case FunctionHandlers.suggesting: {
-          const { title, description, areThereDetailsNeededFromTheUser, message, dueDate } =
+          const { title, areThereDetailsNeededFromTheUser, message, dueDate } =
             functionResponse as InferHandlerReturnType<typeof functionName>;
 
-          if (!title && !description) {
+          if (!title) {
             return {
               result: {
                 message: `Apologies, but I am unable to understand your request. If you have a specific question or need assistance with your todo list, please let me know and I will be happy to help.`,
@@ -184,14 +183,11 @@ async function generate({
 
           const _message = areThereDetailsNeededFromTheUser
             ? message
-            : `Suggested todo: Title = ${title}; Description = ${description}. ${
-                !!dueDate ? `Due date = ${dueDate}` : ''
-              }.`;
+            : `Suggested todo: Title = ${title}; ${!!dueDate ? `Due date = ${dueDate}` : ''}.`;
           return {
             handler: functionName,
             result: {
               title,
-              description,
               suggestMessage: message,
               message: _message,
               areThereDetailsNeededFromTheUser,
@@ -287,10 +283,6 @@ function createFunctionsDefinitions({ date }: { date: string }) {
           title: {
             type: 'string',
             description: 'The title of the todo.',
-          },
-          description: {
-            type: 'string',
-            description: 'The description of the todo.',
           },
           dueDate: {
             type: 'string',
@@ -440,14 +432,12 @@ export type SearchingReturnType = Awaited<ReturnType<typeof searching>>;
 
 async function creating({
   title,
-  description,
   successMessage,
   userId,
   dueDate,
   projectId,
 }: {
   title: string;
-  description: string;
   successMessage: string;
   userId: string;
   dueDate?: string;
@@ -455,7 +445,6 @@ async function creating({
 }) {
   await insertTask({
     title,
-    description,
     userId,
     dueDate,
     projectId,
@@ -491,13 +480,11 @@ export type DroppingReturnType = Awaited<ReturnType<typeof dropping>>;
 
 async function suggesting({
   title,
-  description,
   successMessage,
   areThereDetailsNeededFromTheUser,
   dueDate,
 }: {
   title: string;
-  description: string;
   successMessage: string;
   areThereDetailsNeededFromTheUser: boolean;
   dueDate?: string;
@@ -505,7 +492,6 @@ async function suggesting({
   return {
     message: successMessage,
     title,
-    description,
     areThereDetailsNeededFromTheUser,
     dueDate,
   };

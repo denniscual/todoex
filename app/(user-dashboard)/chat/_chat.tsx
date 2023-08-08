@@ -217,7 +217,6 @@ function Dropping({ message }: DroppingReturnType) {
 
 function TodoSuggestion({
   title,
-  description,
   areThereDetailsNeededFromTheUser,
   dueDate,
   suggestMessage,
@@ -225,14 +224,13 @@ function TodoSuggestion({
   suggestMessage: string;
 }) {
   if (areThereDetailsNeededFromTheUser) {
-    return <div>{description}</div>;
+    return <div>{suggestMessage}</div>;
   }
 
   return (
     <div>
       <p>{suggestMessage}</p>
       <p>Title: {title}</p>
-      <p>Description: {description}</p>
       {!!dueDate && <p>Due date: {dueDate}</p>}
     </div>
   );
