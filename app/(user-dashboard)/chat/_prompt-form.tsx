@@ -4,14 +4,15 @@ import { Button } from '@/components/ui/button';
 import { PaperPlaneIcon } from '@radix-ui/react-icons';
 import { useEnterSubmit } from '@/lib/hooks';
 import { ElementRef, useRef, useEffect, FormEventHandler, ChangeEventHandler } from 'react';
+import { cn } from '@/lib/utils';
 
 export default function PromptForm({
-  formAction,
+  onSubmit,
   onInputChange,
   input,
   disabled = false,
 }: {
-  formAction?: () => void;
+  onSubmit?: FormEventHandler;
   onInputChange?: ChangeEventHandler<HTMLTextAreaElement>;
   input?: string;
   disabled?: boolean;
@@ -26,15 +27,9 @@ export default function PromptForm({
   }, []);
 
   return (
-    <form
-      onSubmit={(event) => {
-        event.preventDefault();
-        formAction?.();
-      }}
-      ref={formRef}
-      className="flex items-center p-4"
-    >
+    <form onSubmit={onSubmit} ref={formRef} className="flex items-center p-4">
       <Textarea
+        disabled={disabled}
         ref={textareaRef}
         tabIndex={0}
         value={input}
@@ -43,7 +38,10 @@ export default function PromptForm({
         rows={1}
         placeholder="Ask your questions (2 questions remaining today)"
         spellCheck={false}
-        className="min-h-[30px] w-full resize-none bg-transparent focus-within:outline-none sm:text-sm"
+        className={cn(
+          'min-h-[30px] w-full resize-none bg-transparent focus-within:outline-none sm:text-sm',
+          disabled ? 'text-muted-foreground' : ''
+        )}
       />
       <Button variant="outline" size="icon" disabled={disabled}>
         <PaperPlaneIcon className="w-4 h-4" />

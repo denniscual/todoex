@@ -2,14 +2,7 @@
 import { OpenAIIcon } from '@/components/ui/icons';
 import { ChatScrollAnchor } from '@/components/chat-scroll-anchor';
 import ChatPanel from './_chat-panel';
-import {
-  FormEventHandler,
-  HTMLAttributes,
-  PropsWithChildren,
-  ReactNode,
-  useState,
-  useTransition,
-} from 'react';
+import { HTMLAttributes, PropsWithChildren, ReactNode, useState } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { Card, CardContent } from '@/components/ui/card';
 import { PersonIcon } from '@radix-ui/react-icons';
@@ -48,12 +41,11 @@ export default function Chat({
   // handle AI request.
   const [input, setInput] = useState(!!initialMessage ? initialMessage : '');
   const [error, setError] = useState<Error | null>(null);
-  const [isPending, startTransition] = useTransition();
-
-  console.log({ error });
+  const [isPending, setIsPending] = useState(false);
 
   async function generateResponse(chatMessages: ChatCompletionRequestMessageWithAssistantResult[]) {
     try {
+      setIsPending(true);
       const res = await generateResponseAction({
         // Remove the jsx elements (assistantResult).
         messages: chatMessages.map((message) => ({
@@ -104,6 +96,8 @@ export default function Chat({
       setError(null);
     } catch (err) {
       setError(err as Error);
+    } finally {
+      setIsPending(false);
     }
   }
 
@@ -118,36 +112,30 @@ export default function Chat({
                 if (message.role === ChatCompletionRequestMessageRoleEnum.User) {
                   return (
                     <li key={idx}>
-                      <ChatMessage
-                        icon={
-                          <ChatIcon className="bg-primary">
-                            <PersonIcon className="w-4 h-4 text-primary-foreground" />
-                          </ChatIcon>
-                        }
-                      >
-                        {message.content}
-                      </ChatMessage>
+                      <UserChatMessage>{message.content}</UserChatMessage>
                     </li>
                   );
                 }
                 return (
                   <li key={idx}>
-                    <Card>
-                      <CardContent className="px-0 pt-6">
-                        <ChatMessage
-                          icon={
-                            <ChatIcon className="bg-green-400 dark:bg-green-600">
-                              <OpenAIIcon className="w-4 h-4 text-white" />
-                            </ChatIcon>
-                          }
-                        >
-                          {message.assistantResult}
-                        </ChatMessage>
-                      </CardContent>
-                    </Card>
+                    <AssistantChatMessage>{message.assistantResult}</AssistantChatMessage>
                   </li>
                 );
               })}
+              {isPending && (
+                <li>
+                  <AssistantChatMessage className="items-center">
+                    <div className="w-3 h-4 animate-pulse bg-primary/50" />
+                  </AssistantChatMessage>
+                </li>
+              )}
+              {error && (
+                <li>
+                  <AssistantChatMessage hasError className="items-center">
+                    An error occured.
+                  </AssistantChatMessage>
+                </li>
+              )}
             </ul>
             <ChatScrollAnchor trackVisibility={false} />
           </>
@@ -156,10 +144,17 @@ export default function Chat({
       {enableChat && (
         <ChatPanel>
           <PromptForm
-            disabled={isPending}
+            disabled={isPending || !!error}
             input={input}
             onInputChange={(event) => setInput(event.currentTarget.value)}
-            formAction={() => {
+            onSubmit={(event) => {
+              event.preventDefault();
+              const trimmedInput = input.trim();
+
+              if (trimmedInput === '') {
+                return;
+              }
+
               const messagesWithNewChatMessage: ChatCompletionRequestMessageWithAssistantResult[] =
                 [
                   ...messages,
@@ -168,10 +163,9 @@ export default function Chat({
                     content: input.trim(),
                   },
                 ];
-              console.log({ messagesWithNewChatMessage });
               setMessages(messagesWithNewChatMessage);
               setInput('');
-              startTransition(() => generateResponse(messagesWithNewChatMessage));
+              generateResponse(messagesWithNewChatMessage);
             }}
           />
         </ChatPanel>
@@ -234,9 +228,50 @@ function TodoSuggestion({
   );
 }
 
-function ChatMessage({ icon, children }: PropsWithChildren<{ icon?: ReactNode }>) {
+function UserChatMessage({ children }: PropsWithChildren) {
   return (
-    <div className="flex items-start px-6">
+    <ChatMessage
+      icon={
+        <ChatIcon className="bg-primary">
+          <PersonIcon className="w-4 h-4 text-primary-foreground" />
+        </ChatIcon>
+      }
+    >
+      {children}
+    </ChatMessage>
+  );
+}
+
+function AssistantChatMessage({
+  children,
+  className,
+  hasError = false,
+}: PropsWithChildren<{ className?: string; hasError?: boolean }>) {
+  return (
+    <Card className={cn(hasError ? 'border border-destructive bg-destructive/10' : undefined)}>
+      <CardContent className="px-0 pt-6">
+        <ChatMessage
+          className={className}
+          icon={
+            <ChatIcon className="bg-green-400 dark:bg-green-600">
+              <OpenAIIcon className="w-4 h-4 text-white" />
+            </ChatIcon>
+          }
+        >
+          {children}
+        </ChatMessage>
+      </CardContent>
+    </Card>
+  );
+}
+
+function ChatMessage({
+  icon,
+  children,
+  className,
+}: PropsWithChildren<{ icon?: ReactNode; className?: string }>) {
+  return (
+    <div className={cn('flex items-start px-6', className)}>
       {icon}
       <div className="flex-1 px-1 ml-4">{children}</div>
     </div>
