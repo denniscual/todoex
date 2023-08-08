@@ -187,7 +187,7 @@ export default function Chat({
 
 function TodoList({ rows }: SearchingReturnType) {
   if (rows.length === 0) {
-    return <div>I am sorry, but I could not find any todo list.</div>;
+    return <div>No tasks.</div>;
   }
   return (
     <ul className="grid gap-6 list-none">
